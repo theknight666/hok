@@ -1,131 +1,152 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
-import { ArrowRight } from "lucide-react";
-import { MaskLines, EASE } from "@/components/site/Reveal";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { ArrowUpRight } from "lucide-react";
+import { Bottle } from "@/components/site/Bottle";
+import { EASE } from "@/components/site/Reveal";
+import { worldOf } from "@/lib/visual";
+import { useCart } from "@/context/CartContext";
 import { inr } from "@/lib/api";
 
 const FALLBACK = [
-  { slug: "blonde-amber", name: "Blonde Amber", color: "#D4A24C", price: 18500, image: "/images/blonde-amber.jpg" },
-  { slug: "layton", name: "Layton", color: "#2E4C86", price: 16500, image: "/images/layton.jpg" },
-  { slug: "angels-share-on-the-rocks", name: "Angels Share On The Rocks", color: "#B4622A", price: 17500, image: "/images/angels-share.jpg" },
-  { slug: "side-effect", name: "Side Effect", color: "#8A2436", price: 16000, image: "/images/side-effect.jpg" },
+  { slug: "blonde-amber", name: "Blonde Amber", price: 18500, image: "/images/blonde-amber.jpg", tagline: "Liquid gold, warm resins and a whisper of smoke." },
+  { slug: "layton", name: "Layton", price: 16500, image: "/images/layton.jpg", tagline: "Crisp bergamot, lavender and warm woods." },
+  { slug: "angels-share-on-the-rocks", name: "Angels Share On The Rocks", price: 17500, image: "/images/angels-share.jpg", tagline: "Cognac, cinnamon and oak — served over ice." },
+  { slug: "side-effect", name: "Side Effect", price: 16000, image: "/images/side-effect.jpg", tagline: "Tobacco, rum and dark leather after midnight." },
 ];
+
+const TILTS = [-7, 4, -3, 6];
+const DEPTH = [1.2, 0.7, 1, 0.55];
+
+function FloatingBottle({ p, i, active, onPick, mx, my }) {
+  const x = useTransform(mx, (v) => v * 40 * DEPTH[i]);
+  const y = useTransform(my, (v) => v * 26 * DEPTH[i]);
+  return (
+    <motion.button
+      type="button"
+      onClick={() => onPick(i)}
+      data-testid={`hero-bottle-${p.slug}`}
+      aria-label={`Select ${p.name}`}
+      aria-pressed={active}
+      style={{ zIndex: active ? 5 : 1 }}
+      initial={{ opacity: 0, y: 160, rotate: TILTS[i] * 2 }}
+      animate={{ opacity: 1, y: active ? -28 : 0, rotate: 0, scale: active ? 1.12 : 0.9 }}
+      transition={{ duration: 1.1, ease: EASE, delay: 0.25 + i * 0.1 }}
+      className="group relative origin-bottom px-1 focus:outline-none sm:px-2"
+    >
+      <motion.div style={{ x, y }}>
+        <div className="animate-floaty" style={{ "--tilt": `${TILTS[i]}deg`, animationDelay: `${i * -1.4}s` }}>
+          <Bottle p={p} className={`bottle-shadow h-[26svh] w-auto transition-[filter] duration-500 sm:h-[34svh] lg:h-[42svh] ${active ? "" : "brightness-[0.82] group-hover:brightness-100"}`} />
+        </div>
+      </motion.div>
+    </motion.button>
+  );
+}
 
 export function Hero({ products }) {
   const list = products.length ? products : FALLBACK;
   const [active, setActive] = useState(0);
   const cur = list[active] || list[0];
-  const ref = useRef(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "42%"]);
-  const stageY = useTransform(scrollYProgress, [0, 1], ["0%", "14%"]);
-  const stageScale = useTransform(scrollYProgress, [0, 1], [1, 1.08]);
+  const world = worldOf(cur);
+  const { add } = useCart();
+
+  const rawX = useMotionValue(0);
+  const rawY = useMotionValue(0);
+  const mx = useSpring(rawX, { stiffness: 60, damping: 20 });
+  const my = useSpring(rawY, { stiffness: 60, damping: 20 });
+  const onMove = (e) => {
+    const r = e.currentTarget.getBoundingClientRect();
+    rawX.set((e.clientX - r.left) / r.width - 0.5);
+    rawY.set((e.clientY - r.top) / r.height - 0.5);
+  };
 
   return (
-    <section ref={ref} className="relative min-h-[100svh] overflow-hidden pt-[72px]" data-testid="hero-section">
-      <div className="spotlight pointer-events-none absolute inset-0" />
-      <motion.p
-        style={{ y: bgY }}
+    <motion.section
+      onMouseMove={onMove}
+      onMouseLeave={() => { rawX.set(0); rawY.set(0); }}
+      animate={{ backgroundColor: world.bg, color: world.ink }}
+      transition={{ duration: 0.9, ease: EASE }}
+      style={{ "--w-bg": world.bg, "--w-ink": world.ink, "--w-soft": world.soft }}
+      className="grain relative flex min-h-[100svh] flex-col overflow-hidden pt-24"
+      data-testid="hero-section"
+    >
+      <motion.div
+        key={cur.slug}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 2, delay: 0.4 }}
-        className="pointer-events-none absolute inset-x-0 top-[20%] select-none whitespace-nowrap text-center font-display text-[26vw] leading-none tracking-tight text-outline lg:top-[14%] lg:text-[19vw]"
-        aria-hidden="true"
-      >
-        Knight
-      </motion.p>
+        transition={{ duration: 1.2 }}
+        className="world-glow pointer-events-none absolute left-1/2 top-[55%] h-[70vw] w-[70vw] -translate-x-1/2 -translate-y-1/2"
+      />
 
-      <div className="relative mx-auto grid max-w-[1500px] grid-cols-1 px-5 sm:px-10 lg:min-h-[calc(100svh-72px)] lg:grid-cols-12">
-        <div className="z-10 order-2 flex flex-col justify-end pb-10 lg:order-1 lg:col-span-4 lg:pb-24">
-          <motion.p className="eyebrow" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6, duration: 1 }}>
-            House of the Knight · Haute Parfumerie
-          </motion.p>
-          <MaskLines
-            lines={["Armour", "for the", <em key="s" className="gold-gradient not-italic">senses.</em>]}
-            delay={0.5}
-            className="mt-6 font-display text-6xl font-light leading-[0.92] tracking-tight sm:text-7xl lg:text-[6.4rem]"
-          />
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.2, duration: 1, ease: EASE }}
-            className="mt-8 max-w-sm text-base leading-relaxed text-muted-foreground"
-          >
-            Four signatures composed for those who carry themselves with quiet command. Choose your crest and wear the House.
-          </motion.p>
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.4, duration: 1 }} className="mt-10 flex flex-wrap gap-4">
-            <Link to="/#collection" className="btn-royal" data-testid="hero-shop-btn">
-              <span>Discover the collection</span>
-            </Link>
-          </motion.div>
-        </div>
-
-        <motion.div style={{ y: stageY }} className="relative order-1 flex h-[64svh] items-center justify-center lg:order-2 lg:col-span-5 lg:h-auto">
-          {/* accent halo bloom */}
-          <motion.div
-            key={`halo-${cur.slug}`}
-            className="halo pointer-events-none absolute left-1/2 top-1/2 h-[clamp(340px,40vw,560px)] w-[clamp(340px,40vw,560px)] -translate-x-1/2 -translate-y-1/2 opacity-50"
-            style={{ "--halo": cur.color }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.5 }}
-            transition={{ duration: 1.4, ease: EASE }}
-          />
-          <motion.div style={{ scale: stageScale }} className="animate-floaty relative z-[1]">
-            <motion.div
-              initial={{ opacity: 0, y: 60 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1.3, ease: EASE, delay: 0.3 }}
-              className="lux-frame grain relative aspect-[3/4] w-[min(72vw,380px)] overflow-hidden bg-card"
-              data-testid="hero-bottle-stage"
-            >
-              <AnimatePresence mode="wait">
-                <motion.img
-                  key={cur.slug}
-                  src={cur.image}
-                  alt={cur.name}
-                  initial={{ opacity: 0, scale: 1.06 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 1.02 }}
-                  transition={{ duration: 0.9, ease: EASE }}
-                  className="absolute inset-0 h-full w-full object-cover"
-                />
-              </AnimatePresence>
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-white/10" />
-              <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between">
-                <span className="bg-background/85 px-3 py-1.5 text-[0.6rem] uppercase tracking-[0.28em] backdrop-blur">
-                  Extrait · 100ml
-                </span>
-                <span className="font-display text-2xl text-white drop-shadow" data-testid="hero-active-price">{inr(cur.price)}</span>
-              </div>
-            </motion.div>
-          </motion.div>
+      <div className="relative z-10 mx-auto w-full max-w-[1600px] px-5 sm:px-10">
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.8 }} className="flex flex-wrap items-center gap-3">
+          <span className="pill border-2 border-current">Extrait de Parfum</span>
+          <span className="pill border-2 border-current">Four signatures</span>
+          <span className="hidden text-xs font-semibold uppercase tracking-[0.2em] opacity-70 sm:inline">Est. for people who enter rooms</span>
         </motion.div>
 
-        <div className="z-10 order-3 flex flex-col justify-end pb-16 lg:col-span-3 lg:pb-24">
-          <motion.div initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 1.5, duration: 1.1, ease: EASE }}>
-            <p className="eyebrow">Choose your signature</p>
-            <ul className="mt-5 divide-y border-y">
-              {list.map((p, i) => (
-                <li key={p.slug}>
-                  <button
-                    onClick={() => setActive(i)}
-                    data-testid={`hero-swatch-${p.slug}`}
-                    className={`group flex w-full items-center gap-4 py-4 text-left transition-colors duration-300 ${i === active ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}
-                  >
-                    <span className="h-3 w-3 shrink-0 rounded-full ring-1 ring-offset-2 ring-offset-background transition-transform duration-500 group-hover:scale-125" style={{ background: p.color, "--tw-ring-color": i === active ? p.color : "transparent" }} />
-                    <span className="flex-1 font-display text-xl leading-tight">{p.name}</span>
-                    {p.price ? <span className="text-xs tabular-nums">{inr(p.price)}</span> : null}
-                  </button>
-                </li>
-              ))}
-            </ul>
-            <Link to={`/fragrance/${cur.slug}`} data-testid="hero-discover-active" className="mt-6 inline-flex items-center gap-3 text-xs uppercase tracking-[0.3em] text-gold">
-              <span className="link-line">Discover {cur.name}</span> <ArrowRight className="h-4 w-4" strokeWidth={1.3} />
-            </Link>
-          </motion.div>
-        </div>
+        <h1 className="hero-title mt-6 font-display" data-testid="hero-headline">
+          {["Smell like", "you own", "the castle."].map((l, i) => (
+            <span key={l} className="block overflow-hidden pb-[0.1em] -mb-[0.1em]">
+              <motion.span
+                className="block"
+                initial={{ y: "110%" }}
+                animate={{ y: 0 }}
+                transition={{ duration: 1.1, ease: EASE, delay: 0.35 + i * 0.1 }}
+              >
+                {l}
+              </motion.span>
+            </span>
+          ))}
+        </h1>
+
       </div>
-    </section>
+
+      <div className="relative z-20 mt-8 flex items-end justify-center lg:absolute lg:bottom-[13svh] lg:left-[40%] lg:right-[22%] lg:mt-0" data-testid="hero-bottle-stage">
+        {list.map((p, i) => (
+          <FloatingBottle key={p.slug} p={p} i={i} active={i === active} onPick={setActive} mx={mx} my={my} />
+        ))}
+      </div>
+
+      <div className="relative z-10 mx-auto mt-auto flex w-full max-w-[1600px] flex-col gap-8 px-5 pb-8 pt-10 sm:px-10 lg:flex-row lg:items-end lg:justify-between lg:pb-10">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9, duration: 0.9, ease: EASE }}>
+          <p className="text-xs font-bold uppercase tracking-[0.22em] opacity-70">Product n°0{active + 1} / 0{list.length}</p>
+          <ul className="mt-3 flex flex-wrap gap-2">
+            {list.map((p, i) => (
+              <li key={p.slug}>
+                <button
+                  onClick={() => setActive(i)}
+                  data-testid={`hero-swatch-${p.slug}`}
+                  aria-pressed={i === active}
+                  className={`rounded-full border-2 border-current px-5 py-2.5 font-display text-base leading-none transition-all duration-300 sm:text-lg ${i === active ? "bg-[var(--w-ink)] text-[var(--w-bg)]" : "opacity-60 hover:opacity-100"}`}
+                >
+                  {p.name}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1, duration: 0.9, ease: EASE }}
+          className="flex flex-wrap items-end gap-x-8 gap-y-4 lg:justify-end lg:text-right"
+        >
+          <div className="lg:max-w-[240px]">
+            <p className="text-sm font-medium leading-snug opacity-80">{cur.tagline}</p>
+            <p className="mt-1 font-display text-4xl" data-testid="hero-active-price">{inr(cur.price)}</p>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <button onClick={() => add(cur)} className="btn-world" data-testid="hero-shop-btn">
+              Add to bag
+            </button>
+            <Link to={`/fragrance/${cur.slug}`} className="btn-world-ghost" data-testid="hero-discover-active">
+              Discover <ArrowUpRight className="h-4 w-4" strokeWidth={2.4} />
+            </Link>
+          </div>
+        </motion.div>
+      </div>
+    </motion.section>
   );
 }

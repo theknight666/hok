@@ -37,15 +37,15 @@ export default function Login() {
 
   return (
     <main className="grid min-h-screen lg:grid-cols-2" data-testid="login-page">
-      <div className="relative hidden overflow-hidden bg-[#0E0C0A] lg:block">
-        <img src="/images/side-effect.jpg" alt="" className="absolute inset-0 h-full w-full object-cover opacity-70" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0E0C0A] via-transparent" />
-        <p className="absolute bottom-16 left-16 max-w-md font-display text-5xl font-light leading-tight text-[#EFE6D2]">Enter the House.</p>
+      <div className="relative hidden overflow-hidden bg-[#4B0F2C] text-[#FFE4EE] lg:block">
+        <p aria-hidden="true" className="pointer-events-none absolute left-6 top-28 select-none font-display text-[11vw] leading-[0.85] opacity-[0.14]">Side<br />Effect</p>
+        <img src="/images/cut-side-effect.png" alt="" className="bottle-shadow animate-floaty absolute left-1/2 top-1/2 h-[62svh] w-auto -translate-x-1/2 -translate-y-1/2" style={{ "--tilt": "-5deg" }} />
+        <p className="absolute bottom-16 left-16 max-w-md font-display text-6xl leading-[0.9]">Enter the House.</p>
       </div>
       <div className="flex items-center justify-center px-6 pb-16 pt-28">
         <div className="w-full max-w-md">
           <KnightMark className="h-12 w-12 text-gold" />
-          <h1 className="mt-8 font-display text-5xl font-light">{mode === "login" ? "Welcome back." : "Join the House."}</h1>
+          <h1 className="mt-8 font-display text-5xl">{mode === "login" ? "Welcome back." : "Join the House."}</h1>
           <div className="mt-8 flex gap-8 border-b">
             {["login", "register"].map((m) => (
               <button key={m} onClick={() => setMode(m)} data-testid={`auth-tab-${m}`} className={`-mb-px border-b pb-3 text-xs uppercase tracking-[0.3em] transition-colors ${mode === m ? "border-gold text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>

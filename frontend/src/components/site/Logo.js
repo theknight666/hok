@@ -1,7 +1,6 @@
 export const KnightMark = ({ className = "h-8 w-8" }) => (
   <svg viewBox="0 0 64 64" className={className} fill="none" aria-hidden="true">
-    <path d="M32 3 L55 11 V30 C55 45 45 55 32 61 C19 55 9 45 9 30 V11 Z" stroke="currentColor" strokeWidth="1.6" />
-    <path d="M32 7.5 L51 14 V30 C51 42.5 43 51 32 56.4 C21 51 13 42.5 13 30 V14 Z" stroke="currentColor" strokeWidth="0.6" opacity="0.6" />
+    <path d="M32 3 L55 11 V30 C55 45 45 55 32 61 C19 55 9 45 9 30 V11 Z" stroke="currentColor" strokeWidth="2.4" strokeLinejoin="round" />
     <path
       fillRule="evenodd"
       fill="currentColor"
@@ -12,8 +11,7 @@ export const KnightMark = ({ className = "h-8 w-8" }) => (
 );
 
 export const Wordmark = ({ className = "" }) => (
-  <span className={`flex flex-col leading-none ${className}`}>
-    <span className="mb-1 text-[0.55rem] tracking-[0.5em] uppercase opacity-80">House of the</span>
-    <span className="font-display text-[1.15rem] tracking-[0.34em] uppercase">Knight</span>
+  <span className={`font-display text-lg leading-none tracking-tight ${className}`}>
+    House of the Knight
   </span>
 );

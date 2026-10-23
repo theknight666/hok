@@ -3,6 +3,11 @@ import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { KnightMark } from "./Logo";
 
+const COLS = [
+  { t: "Shop", links: [["/#collection", "Collection"], ["/#armoury", "Build an armoury"], ["/checkout", "Checkout"]] },
+  { t: "House", links: [["/#house", "Why the House"], ["/account", "My account", "footer-account"], ["/login", "Sign in"]] },
+];
+
 export function Footer() {
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
@@ -15,57 +20,51 @@ export function Footer() {
   };
 
   return (
-    <footer className="relative overflow-hidden bg-[#0B0A09] text-[#E9E2D2]" data-testid="site-footer">
-      <div className="mx-auto max-w-[1500px] px-5 pb-10 pt-24 sm:px-10">
-        <div className="grid gap-16 md:grid-cols-12">
-          <div className="md:col-span-5">
-            <KnightMark className="h-12 w-12 text-[#D9B56A]" />
-            <p className="mt-6 max-w-sm font-display text-3xl leading-snug">Armour for the senses. Four signatures, one House.</p>
-            <form onSubmit={subscribe} className="mt-10 max-w-sm" data-testid="newsletter-form">
-              <p className="text-[0.68rem] uppercase tracking-[0.3em] text-[#D9B56A]">Join the House</p>
+    <footer className="relative overflow-hidden bg-foreground text-background" data-testid="site-footer">
+      <div className="mx-auto max-w-[1600px] px-5 pb-8 pt-24 sm:px-10">
+        <div className="grid gap-14 lg:grid-cols-12">
+          <div className="lg:col-span-6">
+            <KnightMark className="h-12 w-12 text-gold" />
+            <p className="mt-6 max-w-md font-display text-4xl leading-[0.95] sm:text-5xl">Join the court. First dibs on drops, zero spam, occasional swagger.</p>
+            <form onSubmit={subscribe} className="mt-10 max-w-md" data-testid="newsletter-form">
               {sent ? (
-                <p className="mt-4 text-sm text-[#C9BFAE]" data-testid="newsletter-success">Welcome. Watch your inbox for private releases.</p>
+                <p className="rounded-full border border-background/30 px-6 py-4 text-sm font-semibold" data-testid="newsletter-success">Welcome to the court. Watch your inbox.</p>
               ) : (
-                <div className="mt-4 flex items-center border-b border-white/25 focus-within:border-[#D9B56A]">
+                <div className="flex items-center rounded-full border-2 border-background/30 p-1.5 pl-6 focus-within:border-gold">
                   <input
                     type="email"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Your email address"
+                    placeholder="your@email.com"
                     data-testid="newsletter-input"
-                    className="w-full bg-transparent py-3 text-sm text-[#E9E2D2] placeholder:text-[#6E6860] focus:outline-none"
+                    className="w-full bg-transparent py-2 text-sm font-medium placeholder:opacity-50 focus:outline-none"
                   />
-                  <button type="submit" data-testid="newsletter-submit" aria-label="Subscribe" className="grid h-10 w-10 shrink-0 place-items-center text-[#D9B56A] transition-transform duration-300 hover:translate-x-1">
-                    <ArrowRight className="h-5 w-5" strokeWidth={1.3} />
+                  <button type="submit" data-testid="newsletter-submit" aria-label="Subscribe" className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-gold text-[#110e13] transition-transform duration-300 hover:scale-110">
+                    <ArrowRight className="h-5 w-5" strokeWidth={2.6} />
                   </button>
                 </div>
               )}
             </form>
           </div>
-          <div className="md:col-span-3 md:col-start-7">
-            <p className="text-[0.68rem] uppercase tracking-[0.3em] text-[#D9B56A]">The House</p>
-            <ul className="mt-5 space-y-3 text-sm text-[#C9BFAE]">
-              <li><Link to="/#collection" className="link-line transition-colors hover:text-white">Collection</Link></li>
-              <li><Link to="/#atelier" className="link-line transition-colors hover:text-white">Atelier</Link></li>
-              <li><Link to="/#notes" className="link-line transition-colors hover:text-white">Scent notes</Link></li>
-            </ul>
-          </div>
-          <div className="md:col-span-3">
-            <p className="text-[0.68rem] uppercase tracking-[0.3em] text-[#D9B56A]">Client Services</p>
-            <ul className="mt-5 space-y-3 text-sm text-[#C9BFAE]">
-              <li><Link to="/account" className="link-line transition-colors hover:text-white" data-testid="footer-account">My account</Link></li>
-              <li><Link to="/checkout" className="link-line transition-colors hover:text-white">Checkout</Link></li>
-              <li><span className="text-[#6E6860]">concierge@houseoftheknight.com</span></li>
-            </ul>
-          </div>
+          {COLS.map((c) => (
+            <div key={c.t} className="lg:col-span-3">
+              <p className="text-xs font-bold uppercase tracking-[0.22em] text-gold">{c.t}</p>
+              <ul className="mt-5 space-y-3 text-base font-semibold">
+                {c.links.map(([to, label, tid]) => (
+                  <li key={to + label}><Link to={to} data-testid={tid} className="link-line opacity-80 transition-opacity hover:opacity-100">{label}</Link></li>
+                ))}
+              </ul>
+              {c.t === "House" && <p className="mt-6 text-sm opacity-50">concierge@houseoftheknight.com</p>}
+            </div>
+          ))}
         </div>
-        <p className="pointer-events-none mt-20 select-none whitespace-nowrap font-display text-[17vw] leading-[0.8] tracking-tight md:text-[13vw]" style={{ color: "transparent", WebkitTextStroke: "1px rgba(217,181,106,0.35)" }}>
-          The Knight
+        <p className="pointer-events-none mt-24 select-none whitespace-nowrap text-center font-display text-[13.5vw] leading-[0.8] tracking-tight" aria-hidden="true">
+          House of the Knight
         </p>
-        <div className="mt-8 flex flex-col justify-between gap-3 border-t border-white/10 pt-8 text-xs text-[#6E6860] sm:flex-row">
+        <div className="mt-10 flex flex-col justify-between gap-3 border-t border-background/15 pt-6 text-xs font-semibold opacity-60 sm:flex-row">
           <span>© {new Date().getFullYear()} House Of The Knight. All rights reserved.</span>
-          <span className="uppercase tracking-[0.3em]">Haute Parfumerie · London · Paris</span>
+          <span className="uppercase tracking-[0.2em]">Extrait de Parfum · Made with obsession</span>
         </div>
       </div>
     </footer>

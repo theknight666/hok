@@ -1,33 +1,24 @@
-import { useRef } from "react";
 import { Link } from "react-router-dom";
-import { motion, useScroll, useTransform } from "framer-motion";
-import { MaskLines } from "@/components/site/Reveal";
+import { ScrollWords, FadeUp } from "@/components/site/Reveal";
 
 export function Manifesto() {
-  const ref = useRef(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
-  const x1 = useTransform(scrollYProgress, [0, 1], ["8%", "-12%"]);
-  const x2 = useTransform(scrollYProgress, [0, 1], ["-14%", "6%"]);
-
   return (
-    <section ref={ref} className="relative overflow-hidden border-t py-28 lg:py-40" data-testid="manifesto-section">
-      <motion.p style={{ x: x1 }} className="whitespace-nowrap font-display text-[16vw] font-light leading-[0.9] tracking-tight" aria-hidden="true">
-        Honour · Valour
-      </motion.p>
-      <motion.p style={{ x: x2 }} className="whitespace-nowrap font-display text-[16vw] font-light italic leading-[0.9] tracking-tight text-gold" aria-hidden="true">
-        Presence · Legacy
-      </motion.p>
-      <div className="mx-auto mt-20 max-w-[1500px] px-5 sm:px-10">
-        <div className="grid gap-10 lg:grid-cols-12">
-          <MaskLines as="h2" inView lines={["Every knight", "carries a signature."]} className="font-display text-4xl font-light leading-tight sm:text-5xl lg:col-span-6" />
-          <div className="flex flex-col items-start gap-8 lg:col-span-4 lg:col-start-9">
-            <p className="text-base leading-relaxed text-muted-foreground">
-              Not a scent to blend in — a crest to be recognised by. Find yours among the four.
-            </p>
-            <Link to="/#collection" className="btn-ghost-royal" data-testid="manifesto-cta">Find your signature</Link>
-          </div>
-        </div>
-      </div>
+    <section className="relative mx-auto max-w-[1600px] px-5 py-32 sm:px-10 lg:py-48" data-testid="manifesto-section">
+      <p className="eyebrow">The House</p>
+      <ScrollWords
+        text="Our perfumes use real, serious ingredients like it's the 1400s. Resins, woods, spirits and spice — things with weight, not a chemistry set with a French name."
+        className="display-md mt-6 max-w-[22ch] font-display"
+      />
+      <ScrollWords
+        text="Spray it on before you walk in and act surprised when the room turns around."
+        className="display-md mt-16 max-w-[20ch] font-display text-gold lg:ml-[20%]"
+      />
+      <FadeUp className="mt-16 flex flex-wrap gap-4 lg:ml-[20%]">
+        <Link to="/#collection" className="btn-royal" data-testid="manifesto-cta">Find your signature</Link>
+        <Link to="/#armoury" className="btn-ghost-royal" data-testid="manifesto-armoury-cta">
+          <span>Build an armoury</span>
+        </Link>
+      </FadeUp>
     </section>
   );
 }

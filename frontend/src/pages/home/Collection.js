@@ -1,90 +1,102 @@
+import { useRef } from "react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
-import { Plus } from "lucide-react";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { ArrowUpRight, Plus } from "lucide-react";
 import { useCart } from "@/context/CartContext";
-import { MaskLines, EASE } from "@/components/site/Reveal";
+import { Bottle } from "@/components/site/Bottle";
+import { SplitChars, EASE } from "@/components/site/Reveal";
+import { worldOf, worldVars, flatNotes } from "@/lib/visual";
 import { inr } from "@/lib/api";
 
-const LAYOUT = [
-  "lg:col-span-7 lg:row-span-2",
-  "lg:col-span-5",
-  "lg:col-span-5",
-  "lg:col-span-12 lg:flex-row",
-];
-
-function Card({ p, idx }) {
+function Chapter({ p, idx, total }) {
   const { add } = useCart();
-  const wide = idx === 3;
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
+  const rotate = useTransform(scrollYProgress, [0, 0.5, 1], [-14, 0, 10]);
+  const by = useTransform(scrollYProgress, [0, 0.5, 1], ["22%", "0%", "-12%"]);
+  const ghostX = useTransform(scrollYProgress, [0, 1], ["6%", "-10%"]);
+  const world = worldOf(p);
   const sold = p.stock <= 0;
+  const notes = flatNotes(p.notes, 5);
+
   return (
-    <motion.article
-      initial="hidden"
-      whileInView="show"
-      viewport={{ once: true, amount: 0.1 }}
-      variants={{ hidden: { opacity: 0, y: 40 }, show: { opacity: 1, y: 0 } }}
-      transition={{ duration: 1.1, ease: EASE, delay: (idx % 2) * 0.12 }}
-      className={`lux-card group relative flex min-h-[560px] flex-col border bg-card hover:border-gold lg:min-h-0 ${LAYOUT[idx] || "lg:col-span-6"}`}
-      data-testid={`product-card-${p.slug}`}
-    >
-      <Link to={`/fragrance/${p.slug}`} className={`grain relative block flex-1 overflow-hidden ${wide ? "lg:w-1/2 lg:flex-none" : ""}`}>
-        <img
-          src={p.image}
-          alt={p.name}
-          loading="lazy"
-          className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1.6s] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.07]"
-          style={{ objectPosition: "50% 42%" }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
-        <div className="absolute inset-0 opacity-0 transition-opacity duration-700 group-hover:opacity-100" style={{ background: `radial-gradient(60% 50% at 50% 85%, ${p.color}55, transparent 70%)` }} />
-        <span className="absolute left-5 top-5 bg-background/85 px-3 py-1.5 text-[0.62rem] uppercase tracking-[0.3em] backdrop-blur">
-          {p.badge || "Signature"}
-        </span>
-        <span className="absolute right-5 top-5 font-display text-5xl text-white/90">0{idx + 1}</span>
-      </Link>
-      <div className={`flex flex-col gap-4 p-6 sm:p-8 ${wide ? "lg:w-1/2 lg:justify-center lg:p-16" : ""}`}>
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h3 className={`font-display font-normal leading-none ${wide ? "text-4xl lg:text-6xl" : "text-3xl"}`}>{p.name}</h3>
-            <p className="mt-3 text-sm text-muted-foreground">{p.tagline}</p>
+    <div ref={ref} className="h-[115svh]" data-testid={`product-card-${p.slug}`}>
+      <article
+        style={{ ...worldVars(world), zIndex: idx + 1 }}
+        className="grain sticky top-0 flex h-[100svh] flex-col overflow-hidden rounded-t-[2.5rem] shadow-[0_-30px_80px_-30px_rgba(0,0,0,0.45)]"
+      >
+        <motion.p
+          style={{ x: ghostX }}
+          aria-hidden="true"
+          className="pointer-events-none absolute left-0 top-[18%] select-none whitespace-nowrap font-display text-[24vw] leading-none opacity-[0.12]"
+        >
+          {p.name}
+        </motion.p>
+
+        <div className="relative mx-auto grid h-full w-full max-w-[1600px] grid-cols-1 gap-6 px-5 pb-8 pt-24 sm:px-10 lg:grid-cols-12 lg:pb-12">
+          <div className="z-10 flex flex-col justify-end lg:col-span-4">
+            <div className="flex items-center gap-3">
+              <span className="pill border-2 border-current">{p.badge || "Signature"}</span>
+              <span className="text-xs font-bold uppercase tracking-[0.22em] opacity-70">0{idx + 1} / 0{total}</span>
+            </div>
+            <h3 className="display-lg mt-6 font-display">{p.name}</h3>
+            <p className="mt-5 max-w-sm text-base font-medium leading-snug opacity-85 sm:text-lg">{p.tagline}</p>
+            <ul className="mt-6 flex flex-wrap gap-2" data-testid={`chapter-notes-${p.slug}`}>
+              {notes.map((n) => (
+                <li key={n} className="rounded-full border border-current/40 px-3 py-1 text-xs font-semibold">{n}</li>
+              ))}
+            </ul>
           </div>
-          <span className="whitespace-nowrap font-display text-2xl" data-testid={`product-price-${p.slug}`}>{inr(p.price)}</span>
+
+          <div className="relative z-10 flex items-center justify-center lg:col-span-4">
+            <div className="world-glow pointer-events-none absolute left-1/2 top-1/2 h-[80%] w-[90%] -translate-x-1/2 -translate-y-1/2" />
+            <motion.div style={{ rotate, y: by }} className="relative">
+              <Link to={`/fragrance/${p.slug}`} aria-label={`Open ${p.name}`}>
+                <Bottle p={p} className="bottle-shadow h-[38svh] w-auto transition-transform duration-700 hover:scale-105 sm:h-[48svh] lg:h-[66svh]" />
+              </Link>
+            </motion.div>
+          </div>
+
+          <div className="z-10 flex flex-col justify-end gap-6 lg:col-span-4 lg:items-end lg:text-right">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.22em] opacity-70">{p.concentration} · {p.volume}</p>
+              <p className="mt-2 font-display text-5xl sm:text-6xl" data-testid={`product-price-${p.slug}`}>{inr(p.price)}</p>
+            </div>
+            <div className="flex flex-wrap gap-3 lg:justify-end">
+              <button disabled={sold} onClick={() => add(p)} className="btn-world disabled:opacity-50" data-testid={`quick-add-${p.slug}`}>
+                {sold ? "Sold out" : (<><Plus className="h-4 w-4" strokeWidth={2.6} /> Add to bag</>)}
+              </button>
+              <Link to={`/fragrance/${p.slug}`} className="btn-world-ghost" data-testid={`view-product-${p.slug}`}>
+                View <ArrowUpRight className="h-4 w-4" strokeWidth={2.4} />
+              </Link>
+            </div>
+          </div>
         </div>
-        {wide && (
-          <p className="max-w-md text-base leading-relaxed text-muted-foreground">{p.story}</p>
-        )}
-        <div className="flex items-center justify-between gap-4 border-t pt-4">
-          <span className="text-[0.65rem] uppercase tracking-[0.3em] text-muted-foreground">
-            {p.concentration} · {p.volume}
-          </span>
-          <button
-            disabled={sold}
-            onClick={() => add(p)}
-            data-testid={`quick-add-${p.slug}`}
-            className="inline-flex items-center gap-2 text-[0.68rem] uppercase tracking-[0.3em] text-gold transition-opacity hover:opacity-70 disabled:text-muted-foreground"
-          >
-            {sold ? "Sold out" : (<><Plus className="h-3.5 w-3.5" /> Add to bag</>)}
-          </button>
-        </div>
-      </div>
-    </motion.article>
+      </article>
+    </div>
   );
 }
 
 export function Collection({ products }) {
   return (
-    <section id="collection" className="mx-auto max-w-[1500px] px-5 py-28 sm:px-10 lg:py-40" data-testid="collection-section">
-      <div className="mb-16 grid gap-8 lg:grid-cols-12">
-        <div className="lg:col-span-7">
-          <p className="eyebrow">The Collection · 04 Signatures</p>
-          <MaskLines as="h2" inView lines={["Four crests.", <em key="i" className="text-gold">One bloodline.</em>]} className="mt-5 font-display text-5xl font-light leading-[0.95] sm:text-6xl lg:text-7xl" />
-        </div>
-        <p className="self-end text-base leading-relaxed text-muted-foreground lg:col-span-4 lg:col-start-9">
-          Each fragrance is a different facet of the same character — warm, noble, spirited and dark. Wear one, or build your armoury.
-        </p>
+    <section id="collection" className="relative" data-testid="collection-section">
+      <div className="mx-auto max-w-[1600px] px-5 pb-16 pt-28 sm:px-10 lg:pb-24 lg:pt-40">
+        <p className="eyebrow">The Collection</p>
+        <SplitChars text="Choose your" className="display-xl mt-4 font-display" />
+        <SplitChars text="weapon." className="display-xl font-display text-gold" delay={0.3} />
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.9, ease: EASE, delay: 0.5 }}
+          className="mt-8 max-w-xl text-lg font-medium leading-snug text-muted-foreground"
+        >
+          Four extraits, four moods, zero subtlety. Each one is built to be noticed from across the hall — pick the one that sounds like you.
+        </motion.p>
       </div>
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-12 lg:grid-rows-[400px_400px_520px]">
+      <div className="relative">
         {products.map((p, i) => (
-          <Card key={p.slug} p={p} idx={i} />
+          <Chapter key={p.slug} p={p} idx={i} total={products.length} />
         ))}
       </div>
     </section>

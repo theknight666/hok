@@ -46,7 +46,7 @@ export function ProductDialog({ product, onClose, onSaved }) {
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto rounded-none bg-background" data-lenis-prevent data-testid="product-dialog">
-        <DialogHeader><DialogTitle className="font-display text-3xl font-normal">{isNew ? "New fragrance" : `Edit ${product.name}`}</DialogTitle></DialogHeader>
+        <DialogHeader><DialogTitle className="font-display text-3xl">{isNew ? "New fragrance" : `Edit ${product.name}`}</DialogTitle></DialogHeader>
         <form onSubmit={save} className="grid gap-x-6 gap-y-4 sm:grid-cols-2">
           {TEXT.map(([k, l]) => (
             <label key={k} className="text-xs uppercase tracking-[0.2em] text-muted-foreground">

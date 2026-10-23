@@ -27,7 +27,7 @@ export default function Admin() {
   return (
     <main className="mx-auto min-h-screen max-w-[1500px] px-5 pb-24 pt-[120px] sm:px-10" data-testid="admin-page">
       <p className="eyebrow">The Keep · Admin</p>
-      <h1 className="mt-3 font-display text-5xl font-light">House ledger</h1>
+      <h1 className="mt-3 font-display text-5xl">House ledger</h1>
       <Tabs defaultValue="overview" className="mt-10">
         <TabsList className="h-auto w-full justify-start gap-1 overflow-x-auto rounded-none border-b bg-transparent p-0">
           {TABS.map(([v, label]) => (

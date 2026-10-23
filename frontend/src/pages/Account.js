@@ -28,7 +28,7 @@ export default function Account() {
       <div className="flex flex-col justify-between gap-6 border-b pb-10 sm:flex-row sm:items-end">
         <div>
           <p className="eyebrow">Your account</p>
-          <h1 className="mt-4 font-display text-5xl font-light sm:text-6xl" data-testid="account-name">{user.name}</h1>
+          <h1 className="mt-4 font-display text-5xl sm:text-6xl" data-testid="account-name">{user.name}</h1>
           <p className="mt-2 text-muted-foreground">{user.email}</p>
         </div>
         <div className="flex gap-4">

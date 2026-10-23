@@ -6,6 +6,8 @@ import { CheckCircle2 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { api, formatErr, inr, FREE_SHIPPING, SHIPPING_FEE } from "@/lib/api";
+import { Bottle } from "@/components/site/Bottle";
+import { worldOf } from "@/lib/visual";
 
 const FIELDS = [
   ["full_name", "Full name", "sm:col-span-2"],
@@ -102,7 +104,7 @@ export default function Checkout() {
         <div>
           <CheckCircle2 className="mx-auto h-12 w-12 text-gold" strokeWidth={1} />
           <p className="eyebrow mt-8" data-testid="payment-status">{paid ? "Payment received" : "Order reserved · payment pending"}</p>
-          <h1 className="mt-4 font-display text-5xl font-light sm:text-6xl">Thank you, {order.address.full_name.split(" ")[0]}.</h1>
+          <h1 className="mt-4 font-display text-5xl sm:text-6xl">Thank you, {order.address.full_name.split(" ")[0]}.</h1>
           <p className="mt-6 text-muted-foreground">Order <span className="text-foreground" data-testid="order-id">{order.order_id}</span> · {inr(order.total)}</p>
           <p className="mx-auto mt-4 max-w-md text-sm text-muted-foreground">
             {paid
@@ -126,7 +128,7 @@ export default function Checkout() {
   return (
     <main className="mx-auto max-w-[1300px] px-5 pb-24 pt-[120px] sm:px-10" data-testid="checkout-page">
       <p className="eyebrow">Checkout</p>
-      <h1 className="mt-4 font-display text-5xl font-light sm:text-6xl">Seal your order.</h1>
+      <h1 className="mt-4 font-display text-5xl sm:text-6xl">Seal your order.</h1>
       {!items.length ? (
         <div className="mt-12">
           <p className="text-muted-foreground">Your bag is empty.</p>
@@ -148,11 +150,11 @@ export default function Checkout() {
             <textarea rows={3} placeholder="An optional message, hand-written on the card" value={gift} onChange={(e) => setGift(e.target.value)} className={`${inputCls} mt-4 resize-none`} data-testid="checkout-gift" />
           </div>
           <aside className="lg:col-span-5">
-            <div className="border bg-card p-8 lg:sticky lg:top-28">
+            <div className="rounded-[2rem] bg-card p-8 shadow-xl lg:sticky lg:top-28">
               <p className="eyebrow">Summary</p>
               {items.map((i) => (
                 <div key={i.slug} className="flex items-center gap-4 border-b py-5">
-                  <img src={i.image} alt={i.name} className="h-16 w-12 object-cover" />
+                  <div className="flex h-16 w-12 items-center justify-center rounded-xl" style={{ background: worldOf(i).bg }}><Bottle p={i} className="h-14 w-auto" /></div>
                   <span className="flex-1 font-display text-lg">{i.name} <span className="text-sm text-muted-foreground">× {i.qty}</span></span>
                   <span className="text-sm">{inr(i.price * i.qty)}</span>
                 </div>

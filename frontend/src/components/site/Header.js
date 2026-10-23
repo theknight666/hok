@@ -9,13 +9,13 @@ import { useAuth } from "@/context/AuthContext";
 
 const LINKS = [
   { to: "/#collection", label: "Collection" },
-  { to: "/#atelier", label: "Atelier" },
-  { to: "/#notes", label: "Notes" },
+  { to: "/#armoury", label: "Armoury" },
+  { to: "/#house", label: "The House" },
 ];
 
 function IconBtn({ children, ...p }) {
   return (
-    <button className="relative grid h-10 w-10 place-items-center transition-colors duration-300 hover:text-gold" {...p}>
+    <button className="relative grid h-10 w-10 place-items-center rounded-full transition-colors duration-300 hover:bg-foreground hover:text-background" {...p}>
       {children}
     </button>
   );
@@ -29,76 +29,81 @@ export function Header() {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    const on = () => setScrolled(window.scrollY > 40);
+    const on = () => setScrolled(window.scrollY > 24);
     on();
     window.addEventListener("scroll", on, { passive: true });
     return () => window.removeEventListener("scroll", on);
   }, []);
 
-  const solid = scrolled || pathname !== "/";
+  const compact = scrolled || pathname !== "/";
 
   return (
-    <header
-      data-testid="site-header"
-      className={`fixed inset-x-0 top-0 z-50 transition-[background-color,border-color,backdrop-filter] duration-500 ${
-        solid ? "border-b border-border/70 bg-background/75 backdrop-blur-xl" : "border-b border-transparent"
-      }`}
-    >
-      <div className="mx-auto flex h-[72px] max-w-[1500px] items-center justify-between px-5 sm:px-10">
-        <nav className="hidden flex-1 items-center gap-9 md:flex">
+    <header data-testid="site-header" className="fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-5 sm:pt-4">
+      <div
+        className={`mx-auto flex h-16 max-w-[1600px] items-center justify-between rounded-full border px-3 pl-5 text-foreground transition-[background-color,border-color,box-shadow,backdrop-filter] duration-500 ${
+          compact ? "border-border/60 bg-background/80 shadow-lg backdrop-blur-xl" : "border-background/40 bg-background/60 backdrop-blur-md"
+        }`}
+      >
+        <Link to="/" data-testid="brand-logo" className="flex items-center gap-3">
+          <KnightMark className="h-8 w-8" />
+          <Wordmark className="hidden sm:inline" />
+        </Link>
+
+        <nav className="hidden items-center gap-1 md:flex">
           {LINKS.map((l) => (
-            <Link key={l.to} to={l.to} data-testid={`nav-${l.label.toLowerCase()}`} className="link-line text-[0.7rem] uppercase tracking-[0.3em]">
+            <Link
+              key={l.to}
+              to={l.to}
+              data-testid={`nav-${l.label.toLowerCase().replace(/\s+/g, "-")}`}
+              className="rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.16em] transition-colors duration-300 hover:bg-foreground hover:text-background"
+            >
               {l.label}
             </Link>
           ))}
         </nav>
-        <Sheet>
-          <SheetTrigger asChild>
-            <button data-testid="mobile-menu-btn" className="grid h-10 w-10 place-items-center md:hidden" aria-label="Menu">
-              <Menu className="h-5 w-5" strokeWidth={1.3} />
-            </button>
-          </SheetTrigger>
-          <SheetContent side="left" className="w-[85%] max-w-sm bg-background">
-            <SheetTitle className="sr-only">Menu</SheetTitle>
-            <SheetDescription className="sr-only">Browse the House of the Knight collection and your account.</SheetDescription>
-            <div className="mt-16 flex flex-col gap-8">
-              {LINKS.map((l) => (
-                <Link key={l.to} to={l.to} data-testid={`mobile-nav-${l.label.toLowerCase()}`} className="font-display text-4xl">
-                  {l.label}
-                </Link>
-              ))}
-              <Link to={user ? "/account" : "/login"} data-testid="mobile-nav-account" className="font-display text-4xl">
-                Account
-              </Link>
-            </div>
-          </SheetContent>
-        </Sheet>
 
-        <Link to="/" data-testid="brand-logo" className="flex items-center gap-3">
-          <KnightMark className="h-9 w-9 text-gold" />
-          <Wordmark className="hidden sm:flex" />
-        </Link>
-
-        <div className="flex flex-1 items-center justify-end gap-1 sm:gap-2">
+        <div className="flex items-center gap-1">
           {user?.role === "admin" && (
-            <Link to="/admin" data-testid="nav-admin" className="hidden items-center gap-2 px-3 text-[0.7rem] uppercase tracking-[0.3em] text-gold sm:flex">
-              <Crown className="h-4 w-4" strokeWidth={1.3} /> Admin
+            <Link to="/admin" data-testid="nav-admin" className="hidden items-center gap-2 rounded-full bg-gold px-4 py-2 text-xs font-bold uppercase tracking-[0.16em] text-[#110e13] sm:flex">
+              <Crown className="h-4 w-4" strokeWidth={2.4} /> Admin
             </Link>
           )}
           <IconBtn onClick={toggle} data-testid="theme-toggle" aria-label="Toggle theme">
-            {theme === "dark" ? <Sun className="h-[18px] w-[18px]" strokeWidth={1.3} /> : <Moon className="h-[18px] w-[18px]" strokeWidth={1.3} />}
+            {theme === "dark" ? <Sun className="h-[18px] w-[18px]" strokeWidth={2.2} /> : <Moon className="h-[18px] w-[18px]" strokeWidth={2.2} />}
           </IconBtn>
-          <Link to={user ? "/account" : "/login"} data-testid="nav-account" className="hidden h-10 w-10 place-items-center hover:text-gold sm:grid">
-            <User className="h-[18px] w-[18px]" strokeWidth={1.3} />
+          <Link to={user ? "/account" : "/login"} data-testid="nav-account" className="hidden h-10 w-10 place-items-center rounded-full transition-colors duration-300 hover:bg-foreground hover:text-background sm:grid">
+            <User className="h-[18px] w-[18px]" strokeWidth={2.2} />
           </Link>
-          <IconBtn onClick={() => setOpen(true)} data-testid="cart-open-btn" aria-label="Open bag">
-            <ShoppingBag className="h-[18px] w-[18px]" strokeWidth={1.3} />
-            {count > 0 && (
-              <span data-testid="cart-count" className="absolute right-0.5 top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-gold px-1 text-[0.6rem] text-background">
-                {count}
-              </span>
-            )}
-          </IconBtn>
+          <button
+            onClick={() => setOpen(true)}
+            data-testid="cart-open-btn"
+            aria-label="Open bag"
+            className="ml-1 flex h-10 items-center gap-2 rounded-full bg-foreground px-4 text-background transition-transform duration-300 hover:scale-105"
+          >
+            <ShoppingBag className="h-[16px] w-[16px]" strokeWidth={2.4} />
+            <span className="text-xs font-bold tabular-nums" data-testid="cart-count">{count}</span>
+          </button>
+          <Sheet>
+            <SheetTrigger asChild>
+              <button data-testid="mobile-menu-btn" className="grid h-10 w-10 place-items-center rounded-full md:hidden" aria-label="Menu">
+                <Menu className="h-5 w-5" strokeWidth={2.2} />
+              </button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-[85%] max-w-sm bg-background">
+              <SheetTitle className="sr-only">Menu</SheetTitle>
+              <SheetDescription className="sr-only">Browse the House of the Knight collection and your account.</SheetDescription>
+              <div className="mt-16 flex flex-col gap-6">
+                {LINKS.map((l) => (
+                  <Link key={l.to} to={l.to} data-testid={`mobile-nav-${l.label.toLowerCase().replace(/\s+/g, "-")}`} className="font-display text-5xl">
+                    {l.label}
+                  </Link>
+                ))}
+                <Link to={user ? "/account" : "/login"} data-testid="mobile-nav-account" className="font-display text-5xl">
+                  Account
+                </Link>
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
     </header>
