@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState } from "react";
+import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Minus, Plus, ArrowLeft } from "lucide-react";
@@ -7,8 +7,6 @@ import { useCart } from "@/context/CartContext";
 import { MaskLines, EASE, FadeUp } from "@/components/site/Reveal";
 import { NotesPyramid } from "./home/NotesAtlas";
 import { inr } from "@/lib/api";
-
-const BottleScene = lazy(() => import("@/components/site/BottleScene"));
 
 function StockLine({ p }) {
   if (p.stock <= 0) return <p className="text-sm text-destructive" data-testid="stock-status">Currently sold out</p>;
@@ -39,13 +37,22 @@ export default function Product() {
   return (
     <main className="pt-[72px]" data-testid="product-page">
       <div className="mx-auto grid max-w-[1500px] lg:grid-cols-2">
-        <div className="relative h-[62svh] lg:sticky lg:top-[72px] lg:h-[calc(100svh-72px)]">
+        <div className="relative h-[70svh] overflow-hidden lg:sticky lg:top-[72px] lg:h-[calc(100svh-72px)]">
           <div className="spotlight absolute inset-0" />
-          <div className="absolute inset-0 opacity-[0.08]" style={{ background: `radial-gradient(circle at 50% 50%, ${p.color}, transparent 60%)` }} />
-          <Suspense fallback={null}>
-            <BottleScene color={p.color} className="absolute inset-0 cursor-grab active:cursor-grabbing" />
-          </Suspense>
-          <Link to="/#collection" className="absolute left-5 top-6 inline-flex items-center gap-2 text-[0.68rem] uppercase tracking-[0.3em] hover:text-gold sm:left-10" data-testid="back-to-collection">
+          <div
+            className="halo pointer-events-none absolute left-1/2 top-1/2 h-[55%] w-[70%] -translate-x-1/2 -translate-y-1/2 opacity-40"
+            style={{ "--halo": p.color }}
+          />
+          <motion.div
+            initial={{ opacity: 0, scale: 1.05 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1.2, ease: EASE }}
+            className="absolute inset-0 grain"
+          >
+            <img src={p.image} alt={p.name} className="h-full w-full object-cover" />
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent" />
+          </motion.div>
+          <Link to="/#collection" className="absolute left-5 top-6 z-10 inline-flex items-center gap-2 bg-background/70 px-3 py-1.5 text-[0.68rem] uppercase tracking-[0.3em] backdrop-blur hover:text-gold sm:left-10" data-testid="back-to-collection">
             <ArrowLeft className="h-4 w-4" strokeWidth={1.3} /> Collection
           </Link>
         </div>
@@ -83,8 +90,10 @@ export default function Product() {
             <NotesPyramid notes={p.notes} color={p.color} />
           </FadeUp>
           <FadeUp className="mt-16">
-            <div className="relative aspect-[4/5] overflow-hidden bg-card">
-              <img src={p.image} alt={p.name} className="absolute inset-0 h-full w-full object-cover" />
+            <div className="lux-frame grain relative aspect-[4/5] overflow-hidden bg-card">
+              <img src="/images/atelier.jpg" alt="The atelier of House of the Knight" loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+              <p className="absolute bottom-6 left-6 right-6 font-display text-2xl text-white">Hand-composed in the House atelier.</p>
             </div>
           </FadeUp>
         </div>

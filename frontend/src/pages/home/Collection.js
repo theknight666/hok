@@ -23,18 +23,19 @@ function Card({ p, idx }) {
       viewport={{ once: true, amount: 0.1 }}
       variants={{ hidden: { opacity: 0, y: 40 }, show: { opacity: 1, y: 0 } }}
       transition={{ duration: 1.1, ease: EASE, delay: (idx % 2) * 0.12 }}
-      className={`group relative flex min-h-[560px] flex-col border bg-card transition-colors duration-500 hover:border-gold lg:min-h-0 ${LAYOUT[idx] || "lg:col-span-6"}`}
+      className={`lux-card group relative flex min-h-[560px] flex-col border bg-card hover:border-gold lg:min-h-0 ${LAYOUT[idx] || "lg:col-span-6"}`}
       data-testid={`product-card-${p.slug}`}
     >
-      <Link to={`/fragrance/${p.slug}`} className={`relative block flex-1 overflow-hidden ${wide ? "lg:w-1/2 lg:flex-none" : ""}`}>
+      <Link to={`/fragrance/${p.slug}`} className={`grain relative block flex-1 overflow-hidden ${wide ? "lg:w-1/2 lg:flex-none" : ""}`}>
         <img
           src={p.image}
           alt={p.name}
           loading="lazy"
-          className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1.6s] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.06]"
-          style={{ objectPosition: "50% 40%" }}
+          className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1.6s] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.07]"
+          style={{ objectPosition: "50% 42%" }}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+        <div className="absolute inset-0 opacity-0 transition-opacity duration-700 group-hover:opacity-100" style={{ background: `radial-gradient(60% 50% at 50% 85%, ${p.color}55, transparent 70%)` }} />
         <span className="absolute left-5 top-5 bg-background/85 px-3 py-1.5 text-[0.62rem] uppercase tracking-[0.3em] backdrop-blur">
           {p.badge || "Signature"}
         </span>

@@ -1,17 +1,15 @@
-import { lazy, Suspense, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { MaskLines, EASE } from "@/components/site/Reveal";
 import { inr } from "@/lib/api";
 
-const BottleScene = lazy(() => import("@/components/site/BottleScene"));
-
 const FALLBACK = [
-  { slug: "blonde-amber", name: "Blonde Amber", color: "#D4A24C" },
-  { slug: "layton", name: "Layton", color: "#1E2F5C" },
-  { slug: "angels-share-on-the-rocks", name: "Angels Share On The Rocks", color: "#8A4B1F" },
-  { slug: "side-effect", name: "Side Effect", color: "#5A1420" },
+  { slug: "blonde-amber", name: "Blonde Amber", color: "#D4A24C", price: 18500, image: "/images/blonde-amber.jpg" },
+  { slug: "layton", name: "Layton", color: "#2E4C86", price: 16500, image: "/images/layton.jpg" },
+  { slug: "angels-share-on-the-rocks", name: "Angels Share On The Rocks", color: "#B4622A", price: 17500, image: "/images/angels-share.jpg" },
+  { slug: "side-effect", name: "Side Effect", color: "#8A2436", price: 16000, image: "/images/side-effect.jpg" },
 ];
 
 export function Hero({ products }) {
@@ -20,8 +18,9 @@ export function Hero({ products }) {
   const cur = list[active] || list[0];
   const ref = useRef(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "40%"]);
-  const canvasY = useTransform(scrollYProgress, [0, 1], ["0%", "18%"]);
+  const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "42%"]);
+  const stageY = useTransform(scrollYProgress, [0, 1], ["0%", "14%"]);
+  const stageScale = useTransform(scrollYProgress, [0, 1], [1, 1.08]);
 
   return (
     <section ref={ref} className="relative min-h-[100svh] overflow-hidden pt-[72px]" data-testid="hero-section">
@@ -31,7 +30,7 @@ export function Hero({ products }) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 2, delay: 0.4 }}
-        className="pointer-events-none absolute inset-x-0 top-[22%] select-none whitespace-nowrap text-center font-display text-[26vw] leading-none tracking-tight text-outline lg:top-[16%] lg:text-[19vw]"
+        className="pointer-events-none absolute inset-x-0 top-[20%] select-none whitespace-nowrap text-center font-display text-[26vw] leading-none tracking-tight text-outline lg:top-[14%] lg:text-[19vw]"
         aria-hidden="true"
       >
         Knight
@@ -43,7 +42,7 @@ export function Hero({ products }) {
             House of the Knight · Haute Parfumerie
           </motion.p>
           <MaskLines
-            lines={["Armour", "for the", <em key="s" className="text-gold">senses.</em>]}
+            lines={["Armour", "for the", <em key="s" className="gold-gradient not-italic">senses.</em>]}
             delay={0.5}
             className="mt-6 font-display text-6xl font-light leading-[0.92] tracking-tight sm:text-7xl lg:text-[6.4rem]"
           />
@@ -53,7 +52,7 @@ export function Hero({ products }) {
             transition={{ delay: 1.2, duration: 1, ease: EASE }}
             className="mt-8 max-w-sm text-base leading-relaxed text-muted-foreground"
           >
-            Four signatures composed for those who carry themselves with quiet command. Turn the bottle. Choose your crest.
+            Four signatures composed for those who carry themselves with quiet command. Choose your crest and wear the House.
           </motion.p>
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.4, duration: 1 }} className="mt-10 flex flex-wrap gap-4">
             <Link to="/#collection" className="btn-royal" data-testid="hero-shop-btn">
@@ -62,13 +61,45 @@ export function Hero({ products }) {
           </motion.div>
         </div>
 
-        <motion.div style={{ y: canvasY }} className="relative order-1 h-[58svh] lg:order-2 lg:col-span-5 lg:h-auto">
-          <Suspense fallback={<div className="h-full w-full" />}>
-            <BottleScene color={cur.color} className="absolute inset-0 cursor-grab active:cursor-grabbing" />
-          </Suspense>
-          <p className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 text-[0.65rem] uppercase tracking-[0.35em] text-muted-foreground">
-            Drag to turn
-          </p>
+        <motion.div style={{ y: stageY }} className="relative order-1 flex h-[64svh] items-center justify-center lg:order-2 lg:col-span-5 lg:h-auto">
+          {/* accent halo bloom */}
+          <motion.div
+            key={`halo-${cur.slug}`}
+            className="halo pointer-events-none absolute left-1/2 top-1/2 h-[clamp(340px,40vw,560px)] w-[clamp(340px,40vw,560px)] -translate-x-1/2 -translate-y-1/2 opacity-50"
+            style={{ "--halo": cur.color }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.5 }}
+            transition={{ duration: 1.4, ease: EASE }}
+          />
+          <motion.div style={{ scale: stageScale }} className="animate-floaty relative z-[1]">
+            <motion.div
+              initial={{ opacity: 0, y: 60 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1.3, ease: EASE, delay: 0.3 }}
+              className="lux-frame grain relative aspect-[3/4] w-[min(72vw,380px)] overflow-hidden bg-card"
+              data-testid="hero-bottle-stage"
+            >
+              <AnimatePresence mode="wait">
+                <motion.img
+                  key={cur.slug}
+                  src={cur.image}
+                  alt={cur.name}
+                  initial={{ opacity: 0, scale: 1.06 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 1.02 }}
+                  transition={{ duration: 0.9, ease: EASE }}
+                  className="absolute inset-0 h-full w-full object-cover"
+                />
+              </AnimatePresence>
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-white/10" />
+              <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between">
+                <span className="bg-background/85 px-3 py-1.5 text-[0.6rem] uppercase tracking-[0.28em] backdrop-blur">
+                  Extrait · 100ml
+                </span>
+                <span className="font-display text-2xl text-white drop-shadow" data-testid="hero-active-price">{inr(cur.price)}</span>
+              </div>
+            </motion.div>
+          </motion.div>
         </motion.div>
 
         <div className="z-10 order-3 flex flex-col justify-end pb-16 lg:col-span-3 lg:pb-24">

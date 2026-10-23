@@ -1,179 +1,157 @@
 {
-  "project_title": "House Of The Knight - Haute Parfumerie",
-  "archetype": "LUXURY & SWISS HIGH-CONTRAST (Multi-Million Dollar Royal Perfume House)",
-  "app_type": "e-commerce",
-  "theme_strategy": {
-    "default_mode": "light",
-    "toggle_supported": true,
+  "project_name": "House Of The Knight - Revamp Design Guidelines",
+  "version": "2.0.0",
+  "design_archetype": "Bright Editorial Luxury with Cinematic Depth (Bucks Sauce Inspired)",
+  "tech_stack": {
+    "framework": "React.js (JavaScript, .js / .jsx)",
+    "styling": "Tailwind CSS",
+    "animation": "Framer Motion + Lenis Smooth Scroll",
+    "icons": "lucide-react"
+  },
+  "overall_mood": "Bright Editorial Luxury — white/cream primary canvas with high-contrast obsidian editorial blocks, dramatic lighting overlays, subtle noise texture, bold kinetic serif typography, and gold/bronze metallic accents.",
+  "colors": {
     "light_mode": {
-      "background": "#FAFAFA",
+      "background": "#FAF8F5",
       "surface": "#FFFFFF",
-      "card": "#F4F3EF",
-      "foreground": "#0D0D0D",
-      "muted": "#71717A",
-      "border": "#E4E4E7",
-      "gold_accent": "#C5A059",
-      "gold_glow": "rgba(197, 160, 89, 0.15)"
+      "surface_elevated": "#F3EFE9",
+      "text_primary": "#0F0E0C",
+      "text_secondary": "#524E48",
+      "text_muted": "#8A847C",
+      "border": "#E6E1DA",
+      "border_focus": "#C5A059",
+      "accent_gold": "#C5A059",
+      "accent_gold_hover": "#A8833E",
+      "accent_amber": "#D48B38",
+      "badge_bg": "#141311",
+      "badge_text": "#F5E4C7"
     },
     "dark_mode": {
-      "background": "#09090B",
-      "surface": "#121215",
-      "card": "#18181C",
-      "foreground": "#F4F4F5",
-      "muted": "#A1A1AA",
-      "border": "#27272A",
-      "gold_accent": "#D4AF37",
-      "gold_glow": "rgba(212, 175, 55, 0.2)"
-    }
+      "background": "#0B0A09",
+      "surface": "#141311",
+      "surface_elevated": "#1E1C19",
+      "text_primary": "#F8F6F0",
+      "text_secondary": "#A8A29A",
+      "text_muted": "#6E6860",
+      "border": "#282521",
+      "border_focus": "#D4AF37",
+      "accent_gold": "#E0B862",
+      "accent_gold_hover": "#ECC774",
+      "accent_amber": "#E59B42",
+      "badge_bg": "#F5E4C7",
+      "badge_text": "#0B0A09"
+    },
+    "forbidden_colors": [
+      "#7351B7",
+      "#1B93A4",
+      "flat pure gray without warm tint",
+      "neon green or saturated blue"
+    ]
   },
   "typography": {
-    "font_family_heading": "'Playfair Display', 'Cormorant Garamond', serif",
-    "font_family_body": "'Plus Jakarta Sans', 'Inter', sans-serif",
-    "font_family_mono": "'JetBrains Mono', monospace",
-    "google_fonts_import": "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap",
-    "hierarchy": {
-      "h1_hero": "text-4xl sm:text-5xl lg:text-6xl font-serif font-normal tracking-tight leading-[1.1]",
-      "h2_section": "text-2xl sm:text-3xl lg:text-4xl font-serif font-medium tracking-tight",
-      "h3_card": "text-xl sm:text-2xl font-serif font-medium",
-      "subtitle": "text-base sm:text-lg text-muted-foreground font-sans tracking-wide font-light",
-      "overline": "text-xs uppercase tracking-[0.25em] text-[#C5A059] font-sans font-semibold",
-      "body": "text-base font-sans leading-relaxed",
-      "price": "text-xl font-mono font-medium tracking-tight"
+    "headings": {
+      "font_family": "Cinzel / Playfair Display, serif",
+      "weights": ["font_bold", "font_medium", "font_normal"],
+      "letter_spacing": "tracking-tight (-0.02em)",
+      "scale": {
+        "h1": "text-4xl sm:text-5xl lg:text-6xl uppercase tracking-wider leading-[1.05]",
+        "h2": "text-2xl sm:text-3xl lg:text-4xl font-serif tracking-tight",
+        "h3": "text-xl sm:text-2xl font-serif",
+        "h4": "text-lg sm:text-xl font-medium"
+      }
+    },
+    "body": {
+      "font_family": "Plus Jakarta Sans / Inter, sans-serif",
+      "weights": ["font_normal", "font_medium"],
+      "leading": "leading-relaxed",
+      "scale": {
+        "body_lg": "text-lg leading-relaxed",
+        "body": "text-base leading-normal",
+        "small": "text-sm text-muted-foreground",
+        "overline": "text-xs font-mono uppercase tracking-[0.25em] text-amber-700 dark:text-amber-400"
+      }
     }
   },
-  "colors": {
-    "primary": "#0D0D0D",
-    "gold_royal": "#C5A059",
-    "gold_champagne": "#E6CA65",
-    "gold_dark": "#9A7B38",
-    "royal_navy": "#0A1128",
-    "burgundy_velvet": "#2B0B14",
-    "emerald_shadow": "#091E13",
-    "white_alabaster": "#FAFAFA",
-    "charcoal": "#121215"
+  "hero_revamp_blueprint": {
+    "concept": "Replaces the cheap 3D bottle with a high-impact, cinematic multi-fragrance stage featuring real bottle photography, dynamic dramatic background lighting effects, parallax motion, and interactive scent switcher.",
+    "bottle_switcher_data": [
+      {
+        "id": "blonde-amber",
+        "name": "Blonde Amber",
+        "price": "₹18,500",
+        "tagline": "Liquid Gold & Smoking Wood",
+        "image": "/images/blonde-amber.jpg",
+        "gradient": "from-amber-500/20 via-orange-950/40 to-black/80",
+        "accent": "#C5A059"
+      },
+      {
+        "id": "layton",
+        "name": "Layton",
+        "price": "₹16,500",
+        "tagline": "Aristocratic Bergamot & Vanilla",
+        "image": "/images/layton.jpg",
+        "gradient": "from-blue-900/30 via-slate-950/50 to-black/80",
+        "accent": "#4B6B94"
+      },
+      {
+        "id": "angels-share",
+        "name": "Angels' Share",
+        "price": "₹17,500",
+        "tagline": "Cognac, Cinnamon & Oakwood",
+        "image": "/images/angels-share.jpg",
+        "gradient": "from-amber-800/30 via-stone-950/60 to-black/80",
+        "accent": "#D48B38"
+      },
+      {
+        "id": "side-effect",
+        "name": "Side Effect",
+        "price": "₹16,000",
+        "tagline": "Rum, Tobacco & Velvet Cinnamon",
+        "image": "/images/side-effect.jpg",
+        "gradient": "from-purple-900/30 via-neutral-950/60 to-black/80",
+        "accent": "#8C4A60"
+      }
+    ]
   },
-  "perfumes_catalog": [
-    {
-      "id": "blonde-amber",
-      "name": "Blonde Amber",
-      "subtitle": "An elixir of liquid gold, rare ambergris & smoky dried fruits",
-      "price": 28500,
-      "volume": "100ml / 3.4 fl. oz.",
-      "concentration": "Extrait de Parfum (30% concentration)",
-      "badge": "Iconic Signature",
-      "image": "https://images.unsplash.com/photo-1588405748880-12d1d2a59f75?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMjd8MHwxfHNlYXJjaHxfhn|0",
-      "color_hex": "#D4AF37",
-      "notes_pyramid": {
-        "top": ["Bitter Orange", "Cardamom", "Pink Pepper", "Rhum"],
-        "heart": ["Blonde Tobacco", "White Jasmine", "Tuberose", "Orris"],
-        "base": ["Golden Amber", "Tonka Bean", "Cedarwood", "Myrrh", "Vanilla"]
-      },
-      "story": "Created for royal galas in Mayfair. Blonde Amber encapsulates the warmth of amber light reflecting off crystal chandeliers."
-    },
-    {
-      "id": "layton",
-      "name": "Layton",
-      "subtitle": "Distinguished nobility with noble bergamot, lavender & warm vanilla",
-      "price": 24000,
-      "volume": "100ml / 3.4 fl. oz.",
-      "concentration": "Eau de Parfum",
-      "badge": "Best Seller",
-      "image": "https://images.pexels.com/photos/12456259/pexels-photo-12456259.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
-      "color_hex": "#1B2A4A",
-      "notes_pyramid": {
-        "top": ["Apple", "Bergamot", "Lavender", "Mandarin Orange"],
-        "heart": ["Jasmine", "Violet", "Geranium"],
-        "base": ["Vanilla", "Cardamom", "Sandalwood", "Guaiac Wood", "Pepper"]
-      },
-      "story": "A fragrance that captivates through its elegance and intensity. Inspired by the royal courtyards of Versailles."
-    },
-    {
-      "id": "angels-share",
-      "name": "Angels' Share On The Rocks",
-      "subtitle": "Oak cognac barrels, crystallised cinnamon & icy praline twist",
-      "price": 26500,
-      "volume": "100ml / 3.4 fl. oz.",
-      "concentration": "Extrait de Parfum",
-      "badge": "Collector's Reserve",
-      "image": "https://images.pexels.com/photos/7254755/pexels-photo-7254755.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
-      "color_hex": "#8C4A22",
-      "notes_pyramid": {
-        "top": ["Cognac Oil", "Frozen Bergamot", "Ice Accord"],
-        "heart": ["Cinnamon Bark", "Oak Absolute", "Tonka Bean"],
-        "base": ["Sandalwood", "Praline", "Vanilla Pod"]
-      },
-      "story": "Derived from the liquor evaporated during cognac aging in oak barrels, chilled over handcrafted crystal ice."
-    },
-    {
-      "id": "side-effect",
-      "name": "Side Effect",
-      "subtitle": "Hypnotic blend of tobacco, rum, cinnamon bark & dark leather",
-      "price": 25000,
-      "volume": "100ml / 3.4 fl. oz.",
-      "concentration": "Eau de Parfum",
-      "badge": "Limited Craft",
-      "image": "https://images.unsplash.com/photo-1700317134431-39ca9a802320?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMjd8MHwxfHNlYXJjaHxfhn|1",
-      "color_hex": "#4A121A",
-      "notes_pyramid": {
-        "top": ["Havana Tobacco", "Aged Rum"],
-        "heart": ["Cinnamon", "Saffron", "Leather"],
-        "base": ["Bourbon Vanilla", "Hedione", "Woody Amber"]
-      },
-      "story": "An enigmatic spell that awakens the senses with unabashed passion and mysterious dark accords."
-    }
-  ],
-  "layout_and_components": {
-    "header_nav": {
-      "style": "Glassmorphism header with 1px gold/subtle border, blur backdrop-blur-xl bg-white/80 dark:bg-black/80 z-50 fixed top-0 left-0 right-0",
-      "elements": [
-        "Brand Crest & Typography ('HOUSE OF THE KNIGHT')",
-        "Nav Links: Collection, Our Heritage, Scent Notes, Custom Engraving",
-        "Action Buttons: Search, Currency Switcher (₹ INR), Wishlist, Cart Drawer Trigger (with counter badge), Account Modal, Admin Access",
-        "Dark/Light Mode Toggle Button"
-      ]
-    },
-    "hero_3d_section": {
-      "concept": "3D Canvas rendered with React Three Fiber (@react-three/fiber & @react-three/drei). Procedural crystal glass perfume bottle with rotating metallic knight crest tag, reflective cap, liquid refractivity, lighting rig, and interactive camera drag/orbit.",
-      "fallback": "High resolution webgl canvas / procedural fallback if R3F context drops",
-      "reveal_effect": "Framer Motion line-by-line masked reveal animation for headlines and CTA"
-    },
-    "editorial_marquee": {
-      "style": "Low-contrast luxury ribbon with slow kinetic drift. Text: 'HAUTE PARFUMERIE • LONDON & PARIS • CRAFTED FOR ROYALTY • EXTRACTED FROM NATURE'S RAREST BOTANICALS • HOUSE OF THE KNIGHT'"
-    },
-    "product_grid": {
-      "style": "Asymmetric Bento Grid (MODE A Tetris Layout) with high-density card detailing, gold hover border glow, note badges, and Quick Add / Explore Fragrance actions"
-    },
-    "notes_pyramid_component": {
-      "style": "Interactive 3-tier pyramid component (Top Notes, Heart Notes, Base Notes) with visual ingredients pill badges and olfactory radar"
-    },
-    "cart_drawer": {
-      "style": "Slide-over drawer from right with order summary, complimentary royal sample selector, progress to free shipping tier, and instant checkout button (deferred payment gateway flow)"
-    },
-    "admin_panel": {
-      "style": "High-density dashboard with inventory manager, price modifier, order status updater (Pending, Processing, Dispatched, Delivered), low-stock warning thresholds, total revenue stats in INR (₹), and authentication tab (Email/Password & Simulated Google Sign-In)"
+  "visual_enhancers": {
+    "texture": "Subtle noise overlay using SVG pattern or CSS pseudo-element fixed over background with 0.03 opacity",
+    "borders": "1px solid border-amber-900/10 dark:border-amber-500/15 with inner shadow or subtle ambient drop shadow",
+    "glassmorphism": "backdrop-blur-xl bg-white/70 dark:bg-black/75 border border-white/20 dark:border-white/10",
+    "marquee": "Slow drifting oversized outline typography with low opacity in editorial separator sections"
+  },
+  "layout_strategies": {
+    "home_page": {
+      "header": "Sticky glassmorphism header with logo, nav links (Collection, Atelier, Notes), dark/light toggle, account button, cart count drawer button",
+      "hero": "Cinematic real photography hero stage with animated line reveals, scent switcher bar, price badge in ₹, and parallax float effect",
+      "manifesto": "High-contrast dark editorial block with kinetic marquee text and royal brand statement",
+      "collection": "Asymmetric Bento Grid showcasing all 4 perfumes with note pills, quick-add-to-cart buttons, and hover tilt effects",
+      "notes_atlas": "Interactive fragrance pyramid section (Top, Heart, Base) with tabbed note exploration",
+      "atelier": "Craftsmanship storytelling section with rich image grid and gilded accent callouts",
+      "footer": "Deep dark obsidian footer with luxury newsletter signup, brand mark, navigation, and copyright"
     }
   },
-  "motion_and_interactions": {
-    "smooth_scroll": "Lenis smooth scrolling library enabled for fluid luxury momentum",
-    "framer_motion_presets": {
-      "fade_up": "{ initial: { opacity: 0, y: 30 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }",
-      "mask_reveal": "{ initial: { y: '100%' }, animate: { y: '0%' }, transition: { duration: 1, ease: [0.25, 1, 0.5, 1] } }"
+  "image_urls": {
+    "products": {
+      "blonde_amber": "/images/blonde-amber.jpg",
+      "layton": "/images/layton.jpg",
+      "angels_share": "/images/angels-share.jpg",
+      "side_effect": "/images/side-effect.jpg"
+    },
+    "editorial": {
+      "atelier": "/images/atelier.jpg",
+      "cinematic_smoke_bottle": "https://images.pexels.com/photos/13767417/pexels-photo-13767417.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "dark_moody_perfume": "https://images.pexels.com/photos/14402561/pexels-photo-14402561.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940"
     }
   },
-  "general_ui_ux_guidelines": {
-    "data_testid_rule": "ALL interactive buttons, links, form inputs, dialog triggers, tabs, table rows, and key text metrics MUST include a unique kebab-case data-testid attribute.",
-    "hover_state_rule": "Every button or clickable element must explicitly define hover text and background color (e.g. hover:bg-neutral-900 hover:text-white dark:hover:bg-neutral-100 dark:hover:text-black transition-colors duration-300).",
-    "accessibility": "Contrast ratio minimum 4.5:1 for standard text, 3:1 for large display text. Clear focus outlines for keyboard navigation.",
-    "code_format": "Use JavaScript (.js / .jsx) components. Do NOT use TypeScript interfaces or .tsx files."
+  "instructions_to_main_agent": {
+    "rule_1": "Replace BottleScene low-poly canvas with cinematic photo hero BottleScene.js component that renders high-definition photo stage with animated glowing pedestal, atmospheric particle movement, and bottle switcher.",
+    "rule_2": "Ensure every interactive button, input, and link has `data-testid` attribute for robust automated testing.",
+    "rule_3": "Keep pricing strictly in Indian Rupee (₹) matching database records.",
+    "rule_4": "Do not break existing backend integration or cart context; enhance visual presentation while preserving all API calls and flow logic.",
+    "rule_5": "Avoid generic Vercel/Inter styling — enforce serif headers, elevated warm luxury palette, and micro-interactions on hover."
   },
-  "instructions_to_main_agent": [
-    "1. Read this guidelines file carefully.",
-    "2. Ensure all 4 perfumes (Blonde Amber, Layton, Angels Share On The Rocks, Side Effect) are accurately rendered with full details and ₹ INR pricing.",
-    "3. Build the 3D interactive bottle hero section in JS with R3F or Three.js fallback canvas.",
-    "4. Build full functionality: Cart drawer, product detail modal/view, customer account portal with order history, and full-fledged Admin Panel for inventory and order management.",
-    "5. Ensure data-testid attributes are added to all interactive elements."
-  ]
-},
-  "overwrite": true,
-  "path": "/app/design_guidelines.json"
+  "GENERAL_UI_UX_DESIGN_GUIDELINES": {
+    "testing_attributes": "All interactive elements (buttons, links, inputs, tabs, cards) MUST contain data-testid attributes in kebab-case.",
+    "contrast": "Ensure WCAG AA compliance for normal and large text on all backgrounds.",
+    "responsive": "Mobile-first grid system (grid-cols-1 md:grid-cols-2 lg:grid-cols-4) with generous spacing (p-6 to p-12)."
+  }
 }
