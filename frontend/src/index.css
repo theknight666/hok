@@ -76,7 +76,7 @@
 @layer components {
   .font-display { font-weight: 800; }
   .display-xl { font-size: clamp(3.4rem, 10.5vw, 13rem); line-height: 0.86; }
-  .hero-title { font-size: clamp(3.2rem, min(10vw, 19svh), 12rem); line-height: 0.86; }
+  .hero-title { font-size: clamp(3.2rem, min(8.6vw, 19svh), 11rem); line-height: 0.86; }
   .display-lg { font-size: clamp(2.8rem, 7.5vw, 8.5rem); line-height: 0.88; }
   .display-md { font-size: clamp(2.2rem, 5vw, 5.5rem); line-height: 0.92; }
 

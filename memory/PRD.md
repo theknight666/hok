@@ -34,10 +34,22 @@ User choices: payment gateway later; currency INR (₹); perfumes Blonde Amber, 
 - index.css: added global film-grain overlay, .halo bloom, .gold-gradient text, .lux-frame gilt hairline, .lux-card lift, floaty/halo-pulse keyframes.
 - Verified via testing_agent (frontend) — 100% pass, all flows intact (hero switcher, quick-add, cart drawer, checkout nav, product add-to-bag, theme toggle, newsletter). Fixed Radix Sheet a11y warnings (added SheetDescription to cart drawer + mobile menu).
 
-## Placeholders (owner to confirm)
+## Implemented (2026-10-23, iteration 4 — Bold "Bucks Sauce" rebuild)
+- User rejected iteration 3 ("completely unacceptable… not the vibe"). Direction confirmed: NOT bound to gold/black/white; giant cheeky type; floating transparent bottle cutouts; full-screen colour world per perfume (buckssauce.com energy).
+- Design system (index.css): Bricolage Grotesque 800 (condensed) display + Instrument Sans body; cream paper base / ink dark mode; pill buttons (.btn-royal, .btn-ghost-royal, .btn-world*, .pill); .display-xl/lg/md + .hero-title (vw/svh capped); .text-outline, .grain, .bottle-shadow, .world-glow; marquee/floaty keyframes. Old .lux-* / halo utilities removed.
+- lib/visual.js: WORLDS per slug (Blonde Amber #F2A900, Layton #2338DB, Angels Share #C9471B, Side Effect #4B0F2C), worldOf(), worldVars(), cutout() path mapper, flatNotes(). components/site/Bottle.js = cutout <img> with fallback to staged photo.
+- Transparent bottle PNGs generated (Gemini edit → rembg isnet) → /public/images/cut-{blonde-amber,layton,angels-share,side-effect}.png. Original staged JPGs kept as fallback.
+- Home: Intro (ink curtain, stacked words) → Hero (world bg animates with active product, 3-line headline, 4 floating cutouts with mouse parallax + float, pill selector, price + Add to bag/Discover) → Marquee (ink, outline alternation) → Manifesto (ScrollWords scroll-scrubbed kinetic copy) → Collection "Choose your weapon." (SplitChars) + 4 sticky stacking 100svh colour chapters (ghost name type, scroll-rotating bottle, notes chips, quick-add/view) → Armoury bundle builder (toggle pills, 4 slots, total, free-shipping msg, add-all) → Atelier "Why House of the Knight?" (ink, tilted polaroid, 3 numbered reasons) → Quotes marquee (amber, sample reviews) → Footer (ink, giant wordmark, newsletter pill).
+- Product page: colour-world stage with floating cutout + ghost type, cream detail card (pill qty, add-to-bag with live total, story, NotesPyramid pills), "The other three" world-tinted related cards.
+- Header: floating glass pill nav (Collection / Armoury / The House → #collection #armoury #house), ink cart pill with count. Login left panel = Side Effect world. Cart drawer + checkout thumbnails use world-tinted cutouts.
+- Reveal.js: MaskLines, FadeUp, SplitChars, ScrollWords, EASE. NotesAtlas.js now only exports NotesPyramid.
+- Tested via testing_agent (frontend, iteration_2.json): 95% → fixed hero bottle/headline overlap (headline capped at min(8.6vw,19svh), stage moved to left-48%). Intro curtain shows once per session (sessionStorage) — by design.
+
+
 - Prices (₹18,500 / 16,500 / 17,500 / 16,000), scent notes, taglines, stories, stock 50 each, free shipping over ₹15,000 else ₹500, footer contact email (now concierge@houseoftheknight.com placeholder)
 
 ## Backlog
 - P0: Payment gateway (Razorpay/Stripe); owner Gmail in ADMIN_GOOGLE_EMAILS
 - P1: Order confirmation emails, coupon codes, wishlist, image upload in admin, wire newsletter signup to backend/email provider
 - P2: Gift wrapping/engraving, reviews, SEO
+- P2 (new): a11y/perf pass on sticky chapters for mobile; wire Quotes to real reviews; swap sample quotes before launch

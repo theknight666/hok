@@ -1,157 +1,50 @@
 {
-  "project_name": "House Of The Knight - Revamp Design Guidelines",
-  "version": "2.0.0",
-  "design_archetype": "Bright Editorial Luxury with Cinematic Depth (Bucks Sauce Inspired)",
-  "tech_stack": {
-    "framework": "React.js (JavaScript, .js / .jsx)",
-    "styling": "Tailwind CSS",
-    "animation": "Framer Motion + Lenis Smooth Scroll",
-    "icons": "lucide-react"
-  },
-  "overall_mood": "Bright Editorial Luxury — white/cream primary canvas with high-contrast obsidian editorial blocks, dramatic lighting overlays, subtle noise texture, bold kinetic serif typography, and gold/bronze metallic accents.",
-  "colors": {
-    "light_mode": {
-      "background": "#FAF8F5",
-      "surface": "#FFFFFF",
-      "surface_elevated": "#F3EFE9",
-      "text_primary": "#0F0E0C",
-      "text_secondary": "#524E48",
-      "text_muted": "#8A847C",
-      "border": "#E6E1DA",
-      "border_focus": "#C5A059",
-      "accent_gold": "#C5A059",
-      "accent_gold_hover": "#A8833E",
-      "accent_amber": "#D48B38",
-      "badge_bg": "#141311",
-      "badge_text": "#F5E4C7"
-    },
-    "dark_mode": {
-      "background": "#0B0A09",
-      "surface": "#141311",
-      "surface_elevated": "#1E1C19",
-      "text_primary": "#F8F6F0",
-      "text_secondary": "#A8A29A",
-      "text_muted": "#6E6860",
-      "border": "#282521",
-      "border_focus": "#D4AF37",
-      "accent_gold": "#E0B862",
-      "accent_gold_hover": "#ECC774",
-      "accent_amber": "#E59B42",
-      "badge_bg": "#F5E4C7",
-      "badge_text": "#0B0A09"
-    },
-    "forbidden_colors": [
-      "#7351B7",
-      "#1B93A4",
-      "flat pure gray without warm tint",
-      "neon green or saturated blue"
-    ]
-  },
-  "typography": {
-    "headings": {
-      "font_family": "Cinzel / Playfair Display, serif",
-      "weights": ["font_bold", "font_medium", "font_normal"],
-      "letter_spacing": "tracking-tight (-0.02em)",
-      "scale": {
-        "h1": "text-4xl sm:text-5xl lg:text-6xl uppercase tracking-wider leading-[1.05]",
-        "h2": "text-2xl sm:text-3xl lg:text-4xl font-serif tracking-tight",
-        "h3": "text-xl sm:text-2xl font-serif",
-        "h4": "text-lg sm:text-xl font-medium"
-      }
-    },
-    "body": {
-      "font_family": "Plus Jakarta Sans / Inter, sans-serif",
-      "weights": ["font_normal", "font_medium"],
-      "leading": "leading-relaxed",
-      "scale": {
-        "body_lg": "text-lg leading-relaxed",
-        "body": "text-base leading-normal",
-        "small": "text-sm text-muted-foreground",
-        "overline": "text-xs font-mono uppercase tracking-[0.25em] text-amber-700 dark:text-amber-400"
-      }
-    }
-  },
-  "hero_revamp_blueprint": {
-    "concept": "Replaces the cheap 3D bottle with a high-impact, cinematic multi-fragrance stage featuring real bottle photography, dynamic dramatic background lighting effects, parallax motion, and interactive scent switcher.",
-    "bottle_switcher_data": [
-      {
-        "id": "blonde-amber",
-        "name": "Blonde Amber",
-        "price": "₹18,500",
-        "tagline": "Liquid Gold & Smoking Wood",
-        "image": "/images/blonde-amber.jpg",
-        "gradient": "from-amber-500/20 via-orange-950/40 to-black/80",
-        "accent": "#C5A059"
-      },
-      {
-        "id": "layton",
-        "name": "Layton",
-        "price": "₹16,500",
-        "tagline": "Aristocratic Bergamot & Vanilla",
-        "image": "/images/layton.jpg",
-        "gradient": "from-blue-900/30 via-slate-950/50 to-black/80",
-        "accent": "#4B6B94"
-      },
-      {
-        "id": "angels-share",
-        "name": "Angels' Share",
-        "price": "₹17,500",
-        "tagline": "Cognac, Cinnamon & Oakwood",
-        "image": "/images/angels-share.jpg",
-        "gradient": "from-amber-800/30 via-stone-950/60 to-black/80",
-        "accent": "#D48B38"
-      },
-      {
-        "id": "side-effect",
-        "name": "Side Effect",
-        "price": "₹16,000",
-        "tagline": "Rum, Tobacco & Velvet Cinnamon",
-        "image": "/images/side-effect.jpg",
-        "gradient": "from-purple-900/30 via-neutral-950/60 to-black/80",
-        "accent": "#8C4A60"
-      }
-    ]
-  },
-  "visual_enhancers": {
-    "texture": "Subtle noise overlay using SVG pattern or CSS pseudo-element fixed over background with 0.03 opacity",
-    "borders": "1px solid border-amber-900/10 dark:border-amber-500/15 with inner shadow or subtle ambient drop shadow",
-    "glassmorphism": "backdrop-blur-xl bg-white/70 dark:bg-black/75 border border-white/20 dark:border-white/10",
-    "marquee": "Slow drifting oversized outline typography with low opacity in editorial separator sections"
-  },
-  "layout_strategies": {
-    "home_page": {
-      "header": "Sticky glassmorphism header with logo, nav links (Collection, Atelier, Notes), dark/light toggle, account button, cart count drawer button",
-      "hero": "Cinematic real photography hero stage with animated line reveals, scent switcher bar, price badge in ₹, and parallax float effect",
-      "manifesto": "High-contrast dark editorial block with kinetic marquee text and royal brand statement",
-      "collection": "Asymmetric Bento Grid showcasing all 4 perfumes with note pills, quick-add-to-cart buttons, and hover tilt effects",
-      "notes_atlas": "Interactive fragrance pyramid section (Top, Heart, Base) with tabbed note exploration",
-      "atelier": "Craftsmanship storytelling section with rich image grid and gilded accent callouts",
-      "footer": "Deep dark obsidian footer with luxury newsletter signup, brand mark, navigation, and copyright"
-    }
-  },
-  "image_urls": {
-    "products": {
-      "blonde_amber": "/images/blonde-amber.jpg",
-      "layton": "/images/layton.jpg",
-      "angels_share": "/images/angels-share.jpg",
-      "side_effect": "/images/side-effect.jpg"
-    },
-    "editorial": {
-      "atelier": "/images/atelier.jpg",
-      "cinematic_smoke_bottle": "https://images.pexels.com/photos/13767417/pexels-photo-13767417.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
-      "dark_moody_perfume": "https://images.pexels.com/photos/14402561/pexels-photo-14402561.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940"
-    }
-  },
-  "instructions_to_main_agent": {
-    "rule_1": "Replace BottleScene low-poly canvas with cinematic photo hero BottleScene.js component that renders high-definition photo stage with animated glowing pedestal, atmospheric particle movement, and bottle switcher.",
-    "rule_2": "Ensure every interactive button, input, and link has `data-testid` attribute for robust automated testing.",
-    "rule_3": "Keep pricing strictly in Indian Rupee (₹) matching database records.",
-    "rule_4": "Do not break existing backend integration or cart context; enhance visual presentation while preserving all API calls and flow logic.",
-    "rule_5": "Avoid generic Vercel/Inter styling — enforce serif headers, elevated warm luxury palette, and micro-interactions on hover."
-  },
-  "GENERAL_UI_UX_DESIGN_GUIDELINES": {
-    "testing_attributes": "All interactive elements (buttons, links, inputs, tabs, cards) MUST contain data-testid attributes in kebab-case.",
-    "contrast": "Ensure WCAG AA compliance for normal and large text on all backgrounds.",
-    "responsive": "Mobile-first grid system (grid-cols-1 md:grid-cols-2 lg:grid-cols-4) with generous spacing (p-6 to p-12)."
+ "name": "House of the Knight \u2014 Bold Colour-World System (supersedes 'Bright editorial luxury')",
+ "reference": "buckssauce.com energy: giant type, floating product cutouts, full-screen colour per product, kinetic scroll text, pill UI",
+ "typography": {
+  "display": "Bricolage Grotesque 800, font-variation 'opsz' 96 'wdth' 88, letter-spacing -0.035em, line-height 0.86",
+  "body": "Instrument Sans 400-700",
+  "scale": {
+   ".display-xl": "clamp(3.4rem,10.5vw,13rem)",
+   ".display-lg": "clamp(2.8rem,7.5vw,8.5rem)",
+   ".display-md": "clamp(2.2rem,5vw,5.5rem)",
+   ".hero-title": "clamp(3.2rem,min(8.6vw,19svh),11rem)"
   }
+ },
+ "colour": {
+  "base_light": "#F6F0E6 paper / #110E13 ink",
+  "base_dark": "ink bg / paper text",
+  "accent": "hsl(24 96% 48%) hot orange (--gold var name kept)",
+  "worlds": {
+   "blonde-amber": {
+    "bg": "#F2A900",
+    "ink": "#1C1105"
+   },
+   "layton": {
+    "bg": "#2338DB",
+    "ink": "#F3F5FF"
+   },
+   "angels-share-on-the-rocks": {
+    "bg": "#C9471B",
+    "ink": "#FFF1E4"
+   },
+   "side-effect": {
+    "bg": "#4B0F2C",
+    "ink": "#FFE4EE"
+   }
+  },
+  "rule": "Each perfume owns a full-screen world; UI inside a world uses --w-bg/--w-ink via worldVars()"
+ },
+ "components": {
+  "buttons": "pill (rounded-full), uppercase 0.14em tracking, bold; .btn-royal ink\u2192orange hover; .btn-world inherits world ink",
+  "cards": "rounded-[2rem]+, solid colour or cream, large shadows",
+  "imagery": "transparent cutouts /images/cut-*.png via <Bottle/>, .bottle-shadow drop shadows, float + mouse parallax; staged JPGs only as fallback",
+  "motion": "framer-motion EASE [0.16,1,0.3,1]; MaskLines/SplitChars entrances; ScrollWords scroll-scrubbed; sticky stacking chapters; lenis smooth scroll"
+ },
+ "do_not": [
+  "reintroduce 3D",
+  "go back to cream editorial whitespace with small cards",
+  "use Inter/Roboto",
+  "use thin/light display weights"
+ ]
 }

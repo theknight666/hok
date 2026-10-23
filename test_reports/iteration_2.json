@@ -1,0 +1,30 @@
+{
+  "summary": "Frontend-only testing of the redesigned bold 'House of the Knight' storefront (buckssauce-inspired). Exercised home hero (bottle+swatch active-product swapping, price/colour swap, discover link, add-to-bag, cart drawer), marquee/manifesto/collection sticky chapters (quick-add + view-product), armoury bundle builder (pick, slots, total, free-shipping, add-all), atelier/quotes/footer, newsletter success, header nav + theme toggle, product pages for all 4 slugs with qty controls + related cards, checkout fallback order placement (Razorpay-less reserve mode), login (admin) + /admin dashboard, and 390px mobile responsive sanity. All 4 /images/cut-*.png return 200 and are used by the hero.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "Hero (desktop)", "issue": "Floating bottle cutouts overlap and partially hide the final word of the headline ('castle.' / 'the castl*') on the active-product state. The headline letters are visually cut by the Blonde Amber bottle at 1920x1080. Readability degraded.", "selector": "[data-testid='hero-headline']", "priority": "MEDIUM"},
+      {"component": "IntroCurtain", "issue": "data-testid 'intro-curtain' not found at any point on home load (checked immediately and after 2.5s). Spec in review request mentions it should appear then disappear.", "selector": "[data-testid='intro-curtain']", "priority": "LOW"}
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Home hero", "issues": ["Bottles overlap body headline on desktop reducing readability of the last line."]}
+    ]
+  },
+  "test_report_links": [],
+  "action_items": [
+    "Prevent hero bottle cluster from overlapping the headline on desktop (shift bottles further right, add z-index/clip, or constrain headline column width).",
+    "If the intro curtain is intended per spec, re-wire it so data-testid='intro-curtain' is rendered on first paint of /. If removed intentionally, update the spec/README."
+  ],
+  "critical_code_review_comments": [
+    "Many /api/auth/me and /api/auth/refresh 401s on every page load for guests – noisy in console. Consider silently skipping /me on no-cookie first paint.",
+    "Lenis warning: 'container needs non-static position' is logged on home – add position:relative to the wrapper used by Lenis to avoid scroll offset miscalculations."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a", "frontend": "95%"},
+  "test_credentials": "admin@houseoftheknight.com / KnightAdmin#2026 (login worked, nav-admin pill appears, /admin dashboard renders new design with pill tabs & orange ADMIN button)",
+  "seed_data_creation": "Placed one guest reserve order via /checkout (HOTK-EF8C7C, ₹18,500) – visible in admin dashboard revenue.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "All critical frontend flows pass. Known minor issues: (1) hero bottles overlap headline on desktop; (2) intro-curtain testid never rendered. Newsletter success requires ~2s wait after submit (framer motion mount). Lenis smooth scroll is active – use window.__lenis.scrollTo(target,{immediate:true}). Payment is intentionally in reserve-only fallback (Razorpay keys absent) – 'Order reserved · payment pending' screen is the expected success state."
+}

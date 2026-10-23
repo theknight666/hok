@@ -102,7 +102,7 @@ export function Hero({ products }) {
 
       </div>
 
-      <div className="relative z-20 mt-8 flex items-end justify-center lg:absolute lg:bottom-[13svh] lg:left-[40%] lg:right-[22%] lg:mt-0" data-testid="hero-bottle-stage">
+      <div className="relative z-20 mt-8 flex items-end justify-center lg:absolute lg:bottom-[15svh] lg:left-[48%] lg:right-[14%] lg:mt-0" data-testid="hero-bottle-stage">
         {list.map((p, i) => (
           <FloatingBottle key={p.slug} p={p} i={i} active={i === active} onPick={setActive} mx={mx} my={my} />
         ))}
