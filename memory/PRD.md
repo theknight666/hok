@@ -21,6 +21,9 @@ User choices: payment gateway later; currency INR (₹); perfumes Blonde Amber, 
 - Admin: stats, low-stock alerts, best sellers, inventory (+/- stock with log, live toggle, full edit/new fragrance), orders (filter, status, cancel restocks), customers
 - Light (white) default + dark mode toggle, SVG knight-crest logo + favicon
 
+## Implemented (2026-10-23, iteration 2)
+- Razorpay checkout (card/UPI/netbanking): server creates Razorpay order with each order, checkout.js modal, HMAC signature verify at /api/payments/verify → payment_status paid + status processing; "Pay now" retry on confirmation; admin + account show payment status. Auto-disabled (reserve-and-pay-later) until RAZORPAY_KEY_ID / RAZORPAY_KEY_SECRET are set.
+
 ## Placeholders (owner to confirm)
 - Prices (₹18,500 / 16,500 / 17,500 / 16,000), scent notes, taglines, stories, stock 50 each, free shipping over ₹15,000 else ₹500, footer contact email
 

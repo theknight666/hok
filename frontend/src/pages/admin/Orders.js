@@ -47,7 +47,7 @@ export function Orders() {
                   <td>{o.address?.full_name}<p className="text-xs text-muted-foreground">{o.email}</p></td>
                   <td className="text-muted-foreground">{new Date(o.created_at).toLocaleDateString("en-IN")}</td>
                   <td>{inr(o.total)}</td>
-                  <td className="text-xs text-muted-foreground">Awaiting</td>
+                  <td className="text-xs" data-testid={`order-payment-${o.order_id}`}><span className={o.payment_status === "paid" ? "text-emerald-700 dark:text-emerald-400" : o.payment_status === "failed" ? "text-destructive" : "text-muted-foreground"}>{o.payment_status === "paid" ? "Paid" : o.payment_status === "failed" ? "Failed" : "Awaiting"}</span></td>
                   <td onClick={(e) => e.stopPropagation()}>
                     <Select value={o.status} onValueChange={(v) => setStatus(o.order_id, v)}>
                       <SelectTrigger className="h-9 w-40 rounded-none" data-testid={`order-status-${o.order_id}`}><SelectValue /></SelectTrigger>

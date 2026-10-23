@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { CheckCircle2 } from "lucide-react";
@@ -18,6 +19,17 @@ const FIELDS = [
 
 const inputCls = "w-full border-b border-input bg-transparent py-3 text-base outline-none transition-colors focus:border-gold";
 
+function loadRazorpay() {
+  if (window.Razorpay) return Promise.resolve(true);
+  return new Promise((res) => {
+    const s = document.createElement("script");
+    s.src = "https://checkout.razorpay.com/v1/checkout.js";
+    s.onload = () => res(true);
+    s.onerror = () => res(false);
+    document.body.appendChild(s);
+  });
+}
+
 export default function Checkout() {
   const { items, subtotal, clear } = useCart();
   const { user } = useAuth();
@@ -28,6 +40,45 @@ export default function Checkout() {
   const [order, setOrder] = useState(null);
   const shipping = subtotal >= FREE_SHIPPING ? 0 : SHIPPING_FEE;
   const mail = email || (user && user.email) || "";
+  const { data: payCfg } = useQuery({ queryKey: ["pay-config"], queryFn: async () => (await api.get("/payments/config")).data });
+  const payOn = !!payCfg?.enabled;
+  const placedId = order?.order_id;
+
+  useEffect(() => {
+    if (!placedId) return;
+    if (window.__lenis) window.__lenis.scrollTo(0, { immediate: true });
+    else window.scrollTo(0, 0);
+  }, [placedId]);
+
+  const pay = async (o) => {
+    if (!o?.razorpay) return;
+    if (!(await loadRazorpay())) {
+      toast.error("Could not load the payment window. Check your connection and try again.");
+      return;
+    }
+    const rzp = new window.Razorpay({
+      key: o.razorpay.key_id,
+      amount: o.razorpay.amount,
+      currency: o.razorpay.currency,
+      order_id: o.razorpay.order_id,
+      name: "House Of The Knight",
+      description: `Order ${o.order_id}`,
+      prefill: { name: o.address.full_name, email: o.email, contact: o.address.phone },
+      theme: { color: "#8E6B26" },
+      handler: async (r) => {
+        try {
+          const { data } = await api.post("/payments/verify", { order_id: o.order_id, ...r });
+          setOrder(data);
+          toast.success("Payment received");
+        } catch (err) {
+          toast.error(formatErr(err));
+        }
+      },
+      modal: { ondismiss: () => toast("Payment not completed. You can try again below.") },
+    });
+    rzp.on("payment.failed", () => toast.error("Payment failed. Please try again."));
+    rzp.open();
+  };
 
   const submit = async (e) => {
     e.preventDefault();
@@ -36,6 +87,7 @@ export default function Checkout() {
       const { data } = await api.post("/orders", { email: mail, address: addr, gift_note: gift, items: items.map((i) => ({ slug: i.slug, qty: i.qty })) });
       setOrder(data);
       clear();
+      pay(data);
     } catch (err) {
       toast.error(formatErr(err));
     } finally {
@@ -43,22 +95,33 @@ export default function Checkout() {
     }
   };
 
-  if (order)
+  if (order) {
+    const paid = order.payment_status === "paid";
     return (
       <main className="mx-auto grid min-h-screen max-w-2xl place-items-center px-6 pt-[72px] text-center" data-testid="order-confirmation">
         <div>
           <CheckCircle2 className="mx-auto h-12 w-12 text-gold" strokeWidth={1} />
-          <p className="eyebrow mt-8">Order reserved</p>
+          <p className="eyebrow mt-8" data-testid="payment-status">{paid ? "Payment received" : "Order reserved · payment pending"}</p>
           <h1 className="mt-4 font-display text-5xl font-light sm:text-6xl">Thank you, {order.address.full_name.split(" ")[0]}.</h1>
           <p className="mt-6 text-muted-foreground">Order <span className="text-foreground" data-testid="order-id">{order.order_id}</span> · {inr(order.total)}</p>
-          <p className="mx-auto mt-4 max-w-md text-sm text-muted-foreground">Online payment is not connected yet — your order is reserved and the House will contact you at {order.email} to complete payment.</p>
-          <div className="mt-10 flex justify-center gap-4">
+          <p className="mx-auto mt-4 max-w-md text-sm text-muted-foreground">
+            {paid
+              ? `Your order is confirmed. A note will reach you at ${order.email} once it is dispatched.`
+              : order.razorpay
+                ? "Your order is reserved. Complete the payment to confirm it."
+                : `Online payment is not connected yet — your order is reserved and the House will contact you at ${order.email} to complete payment.`}
+          </p>
+          <div className="mt-10 flex flex-wrap justify-center gap-4">
+            {!paid && order.razorpay && (
+              <button onClick={() => pay(order)} className="btn-royal" data-testid="pay-now-btn"><span>Pay {inr(order.total)} now</span></button>
+            )}
             <Link to="/" className="btn-ghost-royal">Return home</Link>
-            {user && <Link to="/account" className="btn-royal" data-testid="view-orders-btn"><span>View my orders</span></Link>}
+            {user && <Link to="/account" className="btn-ghost-royal" data-testid="view-orders-btn">View my orders</Link>}
           </div>
         </div>
       </main>
     );
+  }
 
   return (
     <main className="mx-auto max-w-[1300px] px-5 pb-24 pt-[120px] sm:px-10" data-testid="checkout-page">
@@ -103,9 +166,9 @@ export default function Checkout() {
                 <span className="font-display text-3xl" data-testid="checkout-total">{inr(subtotal + shipping)}</span>
               </div>
               <button disabled={busy} className="btn-royal mt-8 w-full disabled:opacity-60" data-testid="place-order-btn">
-                <span>{busy ? "Reserving…" : "Place order"}</span>
+                <span>{busy ? "Reserving…" : payOn ? "Place order & pay" : "Place order"}</span>
               </button>
-              <p className="mt-4 text-xs leading-relaxed text-muted-foreground">Online payment is coming soon. Your order will be reserved and payment completed on confirmation.</p>
+              <p className="mt-4 text-xs leading-relaxed text-muted-foreground" data-testid="payment-note">{payOn ? "Pay securely by card, UPI or net banking via Razorpay." : "Online payment is coming soon. Your order will be reserved and payment completed on confirmation."}</p>
             </div>
           </aside>
         </form>

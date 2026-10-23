@@ -52,6 +52,7 @@ export default function Account() {
                 <p className="text-xs text-muted-foreground">{new Date(o.created_at).toLocaleDateString("en-IN", { dateStyle: "long" })}</p>
               </div>
               <StatusPill s={o.status} />
+              <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground">{o.payment_status === "paid" ? "Paid" : "Payment pending"}</span>
               <p className="font-display text-2xl">{inr(o.total)}</p>
             </div>
             <p className="mt-4 text-sm text-muted-foreground">{o.items.map((i) => `${i.name} × ${i.qty}`).join(" · ")}</p>

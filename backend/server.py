@@ -11,9 +11,11 @@ import secrets
 from datetime import datetime, timezone, timedelta
 from typing import List, Optional, Literal
 
+import asyncio
 import bcrypt
 import jwt
 import httpx
+import razorpay
 from fastapi import FastAPI, APIRouter, HTTPException, Request, Response, Depends
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -329,8 +331,59 @@ async def create_order(body: OrderIn, user: Optional[dict] = Depends(optional_us
              "email": body.email.lower(), "items": lines, "subtotal": subtotal, "shipping": shipping,
              "total": subtotal + shipping, "address": body.address.model_dump(), "gift_note": body.gift_note,
              "status": "pending", "payment_status": "awaiting_payment", "created_at": now().isoformat()}
+    rzp = rzp_client()
+    if rzp:
+        try:
+            ro = await asyncio.to_thread(rzp.order.create, {"amount": order["total"] * 100, "currency": "INR",
+                                                            "receipt": order["order_id"], "payment_capture": 1})
+            order["razorpay_order_id"] = ro["id"]
+        except Exception as e:
+            logger.error("Razorpay order create failed: %s", e)
     await db.orders.insert_one(dict(order))
+    if order.get("razorpay_order_id"):
+        order["razorpay"] = {"key_id": os.environ["RAZORPAY_KEY_ID"], "order_id": order["razorpay_order_id"],
+                             "amount": order["total"] * 100, "currency": "INR"}
     return order
+
+
+def rzp_client():
+    kid, sec = os.environ.get("RAZORPAY_KEY_ID"), os.environ.get("RAZORPAY_KEY_SECRET")
+    return razorpay.Client(auth=(kid, sec)) if kid and sec else None
+
+
+class PaymentVerifyIn(BaseModel):
+    order_id: str
+    razorpay_order_id: str
+    razorpay_payment_id: str
+    razorpay_signature: str
+
+
+@api.get("/payments/config")
+async def payments_config():
+    return {"enabled": rzp_client() is not None}
+
+
+@api.post("/payments/verify")
+async def payments_verify(body: PaymentVerifyIn):
+    rzp = rzp_client()
+    if not rzp:
+        raise HTTPException(status_code=400, detail="Online payments are not enabled")
+    o = await db.orders.find_one({"order_id": body.order_id}, {"_id": 0})
+    if not o or o.get("razorpay_order_id") != body.razorpay_order_id:
+        raise HTTPException(status_code=404, detail="Order not found")
+    try:
+        rzp.utility.verify_payment_signature({"razorpay_order_id": body.razorpay_order_id,
+                                              "razorpay_payment_id": body.razorpay_payment_id,
+                                              "razorpay_signature": body.razorpay_signature})
+    except razorpay.errors.SignatureVerificationError:
+        await db.orders.update_one({"order_id": body.order_id}, {"$set": {"payment_status": "failed"}})
+        raise HTTPException(status_code=400, detail="Payment could not be verified")
+    upd = {"payment_status": "paid", "razorpay_payment_id": body.razorpay_payment_id, "paid_at": now().isoformat()}
+    if o["status"] == "pending":
+        upd["status"] = "processing"
+    await db.orders.update_one({"order_id": body.order_id}, {"$set": upd})
+    o.update(upd)
+    return o
 
 
 @api.get("/orders/mine")
