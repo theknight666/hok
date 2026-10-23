@@ -24,10 +24,20 @@ User choices: payment gateway later; currency INR (₹); perfumes Blonde Amber, 
 ## Implemented (2026-10-23, iteration 2)
 - Razorpay checkout (card/UPI/netbanking): server creates Razorpay order with each order, checkout.js modal, HMAC signature verify at /api/payments/verify → payment_status paid + status processing; "Pay now" retry on confirmation; admin + account show payment status. Auto-disabled (reserve-and-pay-later) until RAZORPAY_KEY_ID / RAZORPAY_KEY_SECRET are set.
 
+## Implemented (2026-10-23, iteration 3 — Premium UI Revamp)
+- User feedback: site felt "flat and basic"; wanted premium editorial feel like buckssauce.com. Direction chosen: Bright editorial luxury, cinematic real product imagery, full-site scope.
+- Replaced the low-poly react-three-fiber 3D hero bottle with a cinematic editorial image stage (accent halo bloom, float + scroll parallax, crossfade scent switcher, overlaid ₹ price badge). Deleted now-unused BottleScene.js; r3f deps remain installed.
+- Generated 4 cohesive, brand-consistent luxury bottle renders (same faceted flacon + gold knight-crest cap, per-scent liquid colour) via Gemini image gen; overwrote /frontend/public/images/{blonde-amber,layton,angels-share,side-effect}.jpg → unified imagery across hero, collection, product, cart.
+- Product page: replaced 3D panel with cinematic sticky image panel (halo + grain + gradient); swapped duplicate lower image for atelier editorial shot.
+- Collection cards: premium lift/shadow (.lux-card), hover accent glow, grain, stronger gradients.
+- Footer: deep obsidian block with client-side newsletter signup + gilded outline "The Knight".
+- index.css: added global film-grain overlay, .halo bloom, .gold-gradient text, .lux-frame gilt hairline, .lux-card lift, floaty/halo-pulse keyframes.
+- Verified via testing_agent (frontend) — 100% pass, all flows intact (hero switcher, quick-add, cart drawer, checkout nav, product add-to-bag, theme toggle, newsletter). Fixed Radix Sheet a11y warnings (added SheetDescription to cart drawer + mobile menu).
+
 ## Placeholders (owner to confirm)
-- Prices (₹18,500 / 16,500 / 17,500 / 16,000), scent notes, taglines, stories, stock 50 each, free shipping over ₹15,000 else ₹500, footer contact email
+- Prices (₹18,500 / 16,500 / 17,500 / 16,000), scent notes, taglines, stories, stock 50 each, free shipping over ₹15,000 else ₹500, footer contact email (now concierge@houseoftheknight.com placeholder)
 
 ## Backlog
 - P0: Payment gateway (Razorpay/Stripe); owner Gmail in ADMIN_GOOGLE_EMAILS
-- P1: Order confirmation emails, coupon codes, wishlist, image upload in admin
+- P1: Order confirmation emails, coupon codes, wishlist, image upload in admin, wire newsletter signup to backend/email provider
 - P2: Gift wrapping/engraving, reviews, SEO

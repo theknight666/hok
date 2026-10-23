@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Moon, Sun, ShoppingBag, User, Menu, Crown } from "lucide-react";
-import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { KnightMark, Wordmark } from "./Logo";
 import { useTheme } from "@/context/ThemeContext";
 import { useCart } from "@/context/CartContext";
@@ -60,6 +60,7 @@ export function Header() {
           </SheetTrigger>
           <SheetContent side="left" className="w-[85%] max-w-sm bg-background">
             <SheetTitle className="sr-only">Menu</SheetTitle>
+            <SheetDescription className="sr-only">Browse the House of the Knight collection and your account.</SheetDescription>
             <div className="mt-16 flex flex-col gap-8">
               {LINKS.map((l) => (
                 <Link key={l.to} to={l.to} data-testid={`mobile-nav-${l.label.toLowerCase()}`} className="font-display text-4xl">

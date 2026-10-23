@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Minus, Plus, X } from "lucide-react";
-import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { useCart } from "@/context/CartContext";
 import { inr, FREE_SHIPPING } from "@/lib/api";
 
@@ -15,6 +15,7 @@ export function CartDrawer() {
         <div className="border-b px-7 pb-6 pt-8">
           <p className="eyebrow">Your Bag</p>
           <SheetTitle className="mt-2 font-display text-3xl font-normal">{items.length ? "Selected for you" : "Your bag is empty"}</SheetTitle>
+          <SheetDescription className="sr-only">Review the fragrances in your bag, adjust quantities, and proceed to checkout.</SheetDescription>
           {items.length > 0 && (
             <div className="mt-5">
               <p className="text-xs tracking-wide text-muted-foreground" data-testid="cart-shipping-note">

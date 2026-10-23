@@ -1,0 +1,32 @@
+{
+  "summary": "Frontend-only regression after luxury UI revamp (Hero cinematic bottle stage, Collection cards, Product page cinematic panel, obsidian Footer with newsletter). All critical flows verified: hero image switcher, scroll-to-collection, quick-add from collection cards, cart drawer inc/dec/remove with subtotal updates (₹18,500 → ₹37,000 → ₹18,500 → ₹51,500 after mixed adds), proceed-to-checkout navigation to /checkout, product detail page (qty-inc/qty-dec/add-to-bag-btn), theme toggle (light→dark), and footer newsletter success.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Hero (desktop >=lg)", "issues": ["Framer-motion warning: 'Please ensure that the container has a non-static position' - caused by useScroll target on hero section's ref container; non-blocking but should set position: relative on the scrolled container to silence."]},
+      {"screen": "Cart drawer (Radix Sheet)", "issues": ["A11y warning: Missing Description or aria-describedby for DialogContent. Add DialogDescription or aria-describedby to CartDrawer sheet content."]}
+    ]
+  },
+  "test_report_links": [],
+  "action_items": [
+    "(Low) Silence framer-motion useScroll warning by giving the Hero section's scroll target an explicit non-static position (section already has 'relative' but useScroll offset target may need the viewport container; verify).",
+    "(Low) Add DialogDescription/aria-describedby to CartDrawer Sheet to resolve Radix a11y warning.",
+    "(Info) Observed 3x 401 responses on initial home load - these appear to be from an authenticated /api/me style probe when no user is logged in; silence by not calling auth-required endpoints for guests, or treat 401 as expected and skip console.error."
+  ],
+  "critical_code_review_comments": [
+    "Hero FALLBACK list uses hard-coded INR prices; fine as fallback but ensure product.image path matches new /images/<slug>.jpg assets (verified blonde-amber/layton/side-effect loaded 200).",
+    "Collection uses product.stock to disable quick-add (sold variant) - no stock=0 product tested; works logically.",
+    "Footer newsletter is pure client-side (no API call) - acceptable per request, but no persistence; main agent may want to wire to backend later.",
+    "Old BottleScene.js remains in /components/site but unused - safe to delete to avoid dead code."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (skipped)", "frontend": "100%"},
+  "test_credentials": "Not needed (guest flow). Admin creds documented in request but not exercised.",
+  "seed_data_creation": "None.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "UI revamp verified end-to-end on desktop 1920x1080. All data-testid selectors present and working: hero-bottle-stage, hero-swatch-<slug>, hero-active-price, hero-discover-active, hero-shop-btn, product-card-<slug>, product-price-<slug>, quick-add-<slug>, cart-count, cart-drawer, cart-inc-/cart-dec-/cart-remove-, cart-subtotal, cart-checkout-btn, qty-inc, qty-dec, add-to-bag-btn, theme-toggle, newsletter-input, newsletter-submit, newsletter-success, site-footer. Cart drawer auto-opens after quick-add (so cart-open-btn click isn't necessary after add; it is however still present and visible in header). No console/page errors other than noted warnings and benign 401 probes.",
+  "rca of the issue": "N/A - no failing issues."
+}
