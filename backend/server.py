@@ -368,21 +368,50 @@ async def ensure_seeded():
         logger.error("Auto-seeding error: %s", e)
 
 
+def _seed_fallback():
+    """Return seed products from code when MongoDB is unavailable."""
+    return [
+        {**p, "price": SEED_PRICES[p["slug"]], "image": f"/images/{p['slug'].replace('-on-the-rocks', '')}.jpg",
+         "low_stock_threshold": 10, "active": True, "featured": True, "updated_at": ""}
+        for p in SEED
+    ]
+
+
 # ---------- Products ----------
 @api.get("/products")
 async def list_products():
-    await ensure_seeded()
-    items = await db.products.find({"active": True}, {"_id": 0}).sort("order", 1).to_list(100)
-    return items
+    try:
+        await ensure_seeded()
+        items = await db.products.find({"active": True}, {"_id": 0}).sort("order", 1).to_list(100)
+        if not items:
+            return _seed_fallback()
+        return items
+    except Exception as e:
+        logger.error("list_products DB error, using fallback: %s", e)
+        return _seed_fallback()
 
 
 @api.get("/products/{slug}")
 async def get_product(slug: str):
-    await ensure_seeded()
-    p = await db.products.find_one({"slug": slug, "active": True}, {"_id": 0})
-    if not p:
-        raise HTTPException(status_code=404, detail="Fragrance not found")
-    return p
+    try:
+        await ensure_seeded()
+        p = await db.products.find_one({"slug": slug, "active": True}, {"_id": 0})
+        if not p:
+            # Try fallback
+            fallback = {f["slug"]: f for f in _seed_fallback()}
+            p = fallback.get(slug)
+        if not p:
+            raise HTTPException(status_code=404, detail="Fragrance not found")
+        return p
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error("get_product DB error, using fallback: %s", e)
+        fallback = {f["slug"]: f for f in _seed_fallback()}
+        p = fallback.get(slug)
+        if not p:
+            raise HTTPException(status_code=404, detail="Fragrance not found")
+        return p
 
 
 # ---------- Orders ----------
