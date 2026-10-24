@@ -8,7 +8,7 @@ const TEXT = [
   ["name", "Name"], ["slug", "URL slug"], ["tagline", "Tagline"], ["badge", "Badge"],
   ["concentration", "Concentration"], ["volume", "Volume"], ["image", "Image URL (or upload below)"], ["color", "Liquid colour (hex)"],
 ];
-const NUM = [["price", "Price (₹)"], ["stock", "Stock"], ["low_stock_threshold", "Low-stock alert at"]];
+const NUM = [["price", "50 ml Price (₹)"], ["sample_price", "2 ml Sample Price (₹)"], ["stock", "Stock (bottles)"], ["low_stock_threshold", "Low-stock alert at"]];
 const cls = "w-full border-b border-input bg-transparent py-2 text-sm outline-none focus:border-gold";
 
 const toList = (s) => s.split(",").map((x) => x.trim()).filter(Boolean);
@@ -16,8 +16,8 @@ const toList = (s) => s.split(",").map((x) => x.trim()).filter(Boolean);
 export function ProductDialog({ product, onClose, onSaved }) {
   const isNew = !product.slug;
   const [f, setF] = useState({
-    name: "", slug: "", tagline: "", story: "", badge: "", concentration: "Eau de Parfum", volume: "100 ml",
-    image: "", color: "#C5A059", price: 0, stock: 0, low_stock_threshold: 10, active: true, featured: false, ...product,
+    name: "", slug: "", tagline: "", story: "", badge: "", concentration: "Eau de Parfum", volume: "50 ml",
+    image: "", color: "#C5A059", price: 0, sample_price: 99, stock: 0, low_stock_threshold: 10, active: true, featured: false, ...product,
     top: (product.notes?.top || []).join(", "), heart: (product.notes?.heart || []).join(", "), base: (product.notes?.base || []).join(", "),
   });
   const [busy, setBusy] = useState(false);
@@ -27,8 +27,9 @@ export function ProductDialog({ product, onClose, onSaved }) {
     e.preventDefault();
     setBusy(true);
     const body = {
-      name: f.name, tagline: f.tagline, story: f.story, badge: f.badge, concentration: f.concentration, volume: f.volume,
-      image: f.image, color: f.color, price: Number(f.price), stock: Number(f.stock), low_stock_threshold: Number(f.low_stock_threshold),
+      name: f.name, tagline: f.tagline, story: f.story, badge: f.badge, concentration: f.concentration, volume: f.volume || "50 ml",
+      image: f.image, color: f.color, price: Number(f.price), sample_price: Number(f.sample_price || 99),
+      stock: Number(f.stock), low_stock_threshold: Number(f.low_stock_threshold),
       active: f.active, featured: f.featured, notes: { top: toList(f.top), heart: toList(f.heart), base: toList(f.base) },
     };
     try {

@@ -20,18 +20,46 @@ export function CartProvider({ children }) {
     localStorage.setItem(KEY, JSON.stringify(items));
   }, [items]);
 
-  const add = (p, qty = 1) => {
+  const add = (p, qty = 1, size = "50 ml") => {
+    const unitPrice = size === "2 ml" ? (p.sample_price || 99) : p.price;
+    const key = `${p.slug}-${size}`;
     setItems((cur) => {
-      const ex = cur.find((i) => i.slug === p.slug);
-      const max = p.stock ?? 20;
-      if (ex) return cur.map((i) => (i.slug === p.slug ? { ...i, qty: Math.min(max, i.qty + qty) } : i));
-      return [...cur, { slug: p.slug, name: p.name, price: p.price, image: p.image, color: p.color, stock: max, qty }];
+      const ex = cur.find((i) => (i.key || `${i.slug}-${i.size || "50 ml"}`) === key);
+      const max = size === "2 ml" ? 20 : (p.stock ?? 20);
+      if (ex) {
+        return cur.map((i) =>
+          (i.key || `${i.slug}-${i.size || "50 ml"}`) === key
+            ? { ...i, qty: Math.min(max, i.qty + qty) }
+            : i
+        );
+      }
+      return [
+        ...cur,
+        {
+          key,
+          slug: p.slug,
+          name: p.name,
+          size,
+          price: unitPrice,
+          image: p.image,
+          color: p.color,
+          stock: max,
+          qty,
+        },
+      ];
     });
     setOpen(true);
   };
-  const update = (slug, qty) =>
-    setItems((cur) => cur.map((i) => (i.slug === slug ? { ...i, qty: Math.max(1, Math.min(i.stock ?? 20, qty)) } : i)));
-  const remove = (slug) => setItems((cur) => cur.filter((i) => i.slug !== slug));
+  const update = (keyOrSlug, qty) =>
+    setItems((cur) =>
+      cur.map((i) =>
+        (i.key === keyOrSlug || i.slug === keyOrSlug)
+          ? { ...i, qty: Math.max(1, Math.min(i.stock ?? 20, qty)) }
+          : i
+      )
+    );
+  const remove = (keyOrSlug) =>
+    setItems((cur) => cur.filter((i) => i.key !== keyOrSlug && i.slug !== keyOrSlug));
   const clear = () => setItems([]);
 
   const value = useMemo(() => {

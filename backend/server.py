@@ -190,9 +190,10 @@ class ProductIn(BaseModel):
     tagline: str = ""
     story: str = ""
     price: int = Field(ge=0)
+    sample_price: int = Field(default=99, ge=0)
     stock: int = Field(ge=0)
     low_stock_threshold: int = Field(default=10, ge=0)
-    volume: str = "100 ml"
+    volume: str = "50 ml"
     concentration: str = "Eau de Parfum"
     badge: str = ""
     color: str = "#C5A059"
@@ -208,6 +209,7 @@ class ProductPatch(BaseModel):
     tagline: Optional[str] = None
     story: Optional[str] = None
     price: Optional[int] = Field(default=None, ge=0)
+    sample_price: Optional[int] = Field(default=None, ge=0)
     stock: Optional[int] = Field(default=None, ge=0)
     low_stock_threshold: Optional[int] = Field(default=None, ge=0)
     volume: Optional[str] = None
@@ -227,6 +229,8 @@ class StockAdjust(BaseModel):
 class CartItem(BaseModel):
     slug: str
     qty: int = Field(ge=1, le=20)
+    size: Optional[str] = "50 ml"
+
 
 
 class Address(BaseModel):
@@ -427,18 +431,25 @@ async def ensure_seeded():
             else:
                 seen_slugs.add(slug)
 
-        # 2. Ensure each seed fragrance exists and is active/featured
+        # 2. Ensure each seed fragrance exists and is active/featured with 50ml and 2ml pricing
         for p in SEED:
             existing = await db.products.find_one({"slug": p["slug"]})
             if not existing:
-                doc = {**p, "price": SEED_PRICES[p["slug"]], "image": f"/images/{p['slug'].replace('-on-the-rocks', '')}.jpg",
+                doc = {**p, "price": SEED_PRICES[p["slug"]], "sample_price": SEED_SAMPLE_PRICES[p["slug"]],
+                       "volume": "50 ml", "image": f"/images/{p['slug'].replace('-on-the-rocks', '')}.jpg",
                        "low_stock_threshold": 10, "active": True, "featured": True, "updated_at": now().isoformat()}
                 await db.products.insert_one(doc)
                 logger.info("Seeded missing fragrance: %s", p["slug"])
             else:
                 await db.products.update_one(
                     {"slug": p["slug"]},
-                    {"$set": {"active": True, "featured": True}}
+                    {"$set": {
+                        "volume": "50 ml",
+                        "price": SEED_PRICES[p["slug"]],
+                        "sample_price": SEED_SAMPLE_PRICES[p["slug"]],
+                        "active": True,
+                        "featured": True
+                    }}
                 )
 
         await ensure_admin_account()
@@ -459,10 +470,12 @@ async def manual_seed():
 def _seed_fallback():
     """Return seed products from code when MongoDB is unavailable."""
     return [
-        {**p, "price": SEED_PRICES[p["slug"]], "image": f"/images/{p['slug'].replace('-on-the-rocks', '')}.jpg",
+        {**p, "price": SEED_PRICES[p["slug"]], "sample_price": SEED_SAMPLE_PRICES[p["slug"]],
+         "volume": "50 ml", "image": f"/images/{p['slug'].replace('-on-the-rocks', '')}.jpg",
          "low_stock_threshold": 10, "active": True, "featured": True, "updated_at": ""}
         for p in SEED
     ]
+
 
 
 # ---------- Products ----------
@@ -514,18 +527,30 @@ async def create_order(body: OrderIn, user: Optional[dict] = Depends(optional_us
     reserved, lines = [], []
     try:
         for it in body.items:
-            p = await db.products.find_one_and_update(
-                {"slug": it.slug, "active": True, "stock": {"$gte": it.qty}},
-                {"$inc": {"stock": -it.qty}}, projection={"_id": 0})
+            size = it.size or "50 ml"
+            p = await db.products.find_one({"slug": it.slug, "active": True}, projection={"_id": 0})
             if not p:
-                raise HTTPException(status_code=400, detail=f"Not enough stock for {it.slug}")
-            reserved.append(it)
-            lines.append({"slug": p["slug"], "name": p["name"], "price": p["price"], "qty": it.qty,
-                          "image": p.get("image", ""), "line_total": p["price"] * it.qty})
+                raise HTTPException(status_code=400, detail=f"Product {it.slug} not found")
+
+            # Apply price and stock management per size
+            if size == "2 ml":
+                unit_price = p.get("sample_price", 99)
+            else:
+                unit_price = p.get("price", SEED_PRICES.get(it.slug, 1599))
+                p_upd = await db.products.find_one_and_update(
+                    {"slug": it.slug, "active": True, "stock": {"$gte": it.qty}},
+                    {"$inc": {"stock": -it.qty}}, projection={"_id": 0})
+                if not p_upd:
+                    raise HTTPException(status_code=400, detail=f"Not enough stock for {p['name']}")
+                reserved.append(it)
+
+            lines.append({"slug": p["slug"], "name": p["name"], "size": size, "price": unit_price, "qty": it.qty,
+                          "image": p.get("image", ""), "line_total": unit_price * it.qty})
     except HTTPException:
         for r in reserved:
             await db.products.update_one({"slug": r.slug}, {"$inc": {"stock": r.qty}})
         raise
+
     subtotal = sum(line["line_total"] for line in lines)
     shipping = 0 if subtotal >= SHIPPING_FREE_OVER else SHIPPING_FEE
     order = {"order_id": f"HOTK-{secrets.token_hex(3).upper()}", "user_id": user["user_id"] if user else None,
@@ -816,25 +841,27 @@ SEED = [
     {"slug": "blonde-amber", "name": "Blonde Amber", "order": 1, "color": "#D4A24C", "badge": "The Signature",
      "tagline": "Liquid gold, warm resins and a whisper of smoke.",
      "story": "A radiant amber that glows like candlelight on gilded walls — warm, golden and unmistakably regal.",
-     "concentration": "Extrait de Parfum", "volume": "100 ml", "price": 0, "stock": 50,
+     "concentration": "Extrait de Parfum", "volume": "50 ml", "price": 1599, "sample_price": 99, "stock": 50,
      "notes": {"top": ["Bitter Orange", "Pink Pepper"], "heart": ["Blonde Tobacco", "Orris"], "base": ["Amber", "Tonka", "Vanilla"]}},
     {"slug": "layton", "name": "Layton", "order": 2, "color": "#1E2F5C", "badge": "The Noble",
      "tagline": "Crisp bergamot, lavender and warm woods.",
      "story": "Composed with the poise of a knight in court — fresh at first, then deep, warm and assured.",
-     "concentration": "Eau de Parfum", "volume": "100 ml", "price": 0, "stock": 50,
+     "concentration": "Eau de Parfum", "volume": "50 ml", "price": 1499, "sample_price": 99, "stock": 50,
      "notes": {"top": ["Apple", "Bergamot", "Lavender"], "heart": ["Jasmine", "Violet"], "base": ["Vanilla", "Sandalwood", "Guaiac Wood"]}},
     {"slug": "angels-share-on-the-rocks", "name": "Angels Share On The Rocks", "order": 3, "color": "#8A4B1F",
      "badge": "The Reserve", "tagline": "Cognac, cinnamon and oak — served over ice.",
      "story": "An ode to the spirit lost to the heavens as cognac ages in oak, poured cold over crystal ice.",
-     "concentration": "Extrait de Parfum", "volume": "100 ml", "price": 0, "stock": 50,
+     "concentration": "Extrait de Parfum", "volume": "50 ml", "price": 1549, "sample_price": 99, "stock": 50,
      "notes": {"top": ["Cognac", "Frozen Bergamot"], "heart": ["Cinnamon", "Oak"], "base": ["Praline", "Sandalwood", "Vanilla"]}},
     {"slug": "side-effect", "name": "Side Effect", "order": 4, "color": "#5A1420", "badge": "The Enigma",
      "tagline": "Tobacco, rum and dark leather after midnight.",
      "story": "A dark, addictive trail of tobacco and rum that lingers long after you have left the room.",
-     "concentration": "Eau de Parfum", "volume": "100 ml", "price": 0, "stock": 50,
+     "concentration": "Eau de Parfum", "volume": "50 ml", "price": 1499, "sample_price": 99, "stock": 50,
      "notes": {"top": ["Rum", "Tobacco"], "heart": ["Cinnamon", "Saffron"], "base": ["Leather", "Vanilla", "Woody Amber"]}},
 ]
-SEED_PRICES = {"blonde-amber": 18500, "layton": 16500, "angels-share-on-the-rocks": 17500, "side-effect": 16000}
+SEED_PRICES = {"blonde-amber": 1599, "layton": 1499, "angels-share-on-the-rocks": 1549, "side-effect": 1499}
+SEED_SAMPLE_PRICES = {"blonde-amber": 99, "layton": 99, "angels-share-on-the-rocks": 99, "side-effect": 99}
+
 
 
 @app.on_event("startup")

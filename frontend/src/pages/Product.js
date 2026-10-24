@@ -23,6 +23,7 @@ export default function Product() {
   const { products } = useProducts();
   const { add } = useCart();
   const [qty, setQty] = useState(1);
+  const [size, setSize] = useState("50 ml");
 
   if (isLoading) return <div className="min-h-screen" />;
   if (isError || !p)
@@ -37,6 +38,9 @@ export default function Product() {
 
   const world = worldOf(p);
   const others = featuredFirst(products.filter((x) => x.slug !== p.slug)).slice(0, 3);
+  const samplePrice = p.sample_price || 99;
+  const currentPrice = size === "2 ml" ? samplePrice : p.price;
+  const isSoldOut = size === "50 ml" && p.stock <= 0;
 
   return (
     <main data-testid="product-page">
@@ -67,23 +71,64 @@ export default function Product() {
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, ease: EASE, delay: 0.2 }} className="rounded-[2.5rem] bg-background p-7 text-foreground shadow-2xl sm:p-10 lg:col-span-6 lg:p-14">
             <div className="flex flex-wrap items-center gap-3">
               <span className="pill bg-foreground text-background">{p.badge}</span>
-              <span className="text-[0.66rem] font-medium uppercase tracking-[0.3em] text-muted-foreground">{p.concentration} · {p.volume}</span>
+              <span className="text-[0.66rem] font-medium uppercase tracking-[0.3em] text-muted-foreground">{p.concentration} · {size}</span>
             </div>
             <h1 className="display-lg mt-6 font-display">{p.name}</h1>
             <p className="mt-6 max-w-lg text-xl font-medium leading-snug text-muted-foreground">{p.tagline}</p>
 
-            <div className="mt-10 flex flex-wrap items-end justify-between gap-4 border-t pt-8">
-              <span className="font-display text-5xl sm:text-6xl" data-testid="product-price">{inr(p.price)}</span>
-              <StockLine p={p} />
+            {/* Volume / Size Selector */}
+            <div className="mt-8 border-t pt-6">
+              <div className="flex items-center justify-between mb-3">
+                <span className="eyebrow text-xs">Choose Size</span>
+                <span className="text-xs text-muted-foreground">{size === "2 ml" ? "Discovery Sample Vial" : "Signature Flacon"}</span>
+              </div>
+              <div className="grid grid-cols-2 gap-3" data-testid="size-selector">
+                <button
+                  type="button"
+                  onClick={() => setSize("50 ml")}
+                  data-testid="size-50ml"
+                  className={`flex flex-col items-start p-4 rounded-2xl border-2 transition-all text-left ${
+                    size === "50 ml"
+                      ? "border-gold bg-gold/10 text-foreground shadow-sm"
+                      : "border-border/60 hover:border-border text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <span className="font-display text-lg">50 ml</span>
+                  <span className="text-xs opacity-70">Signature Bottle</span>
+                  <span className="mt-2 font-bold text-foreground text-sm">{inr(p.price)}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSize("2 ml")}
+                  data-testid="size-2ml"
+                  className={`flex flex-col items-start p-4 rounded-2xl border-2 transition-all text-left ${
+                    size === "2 ml"
+                      ? "border-gold bg-gold/10 text-foreground shadow-sm"
+                      : "border-border/60 hover:border-border text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <div className="flex items-center justify-between w-full">
+                    <span className="font-display text-lg">2 ml</span>
+                    <span className="text-[10px] uppercase tracking-wider bg-gold text-background px-1.5 py-0.5 rounded font-semibold">Sample</span>
+                  </div>
+                  <span className="text-xs opacity-70">Discovery Vial</span>
+                  <span className="mt-2 font-bold text-foreground text-sm">{inr(samplePrice)}</span>
+                </button>
+              </div>
+            </div>
+
+            <div className="mt-6 flex flex-wrap items-end justify-between gap-4 border-t pt-6">
+              <span className="font-display text-5xl sm:text-6xl" data-testid="product-price">{inr(currentPrice)}</span>
+              {size === "50 ml" ? <StockLine p={p} /> : <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">In stock · Ready to dispatch</span>}
             </div>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
               <div className="flex items-center justify-between rounded-full border-2 px-2 py-1.5 sm:w-44">
                 <button onClick={() => setQty((q) => Math.max(1, q - 1))} data-testid="qty-dec" aria-label="Decrease" className="grid h-10 w-10 place-items-center rounded-full transition-colors hover:bg-foreground hover:text-background"><Minus className="h-4 w-4" strokeWidth={2.6} /></button>
                 <span className="font-display text-xl" data-testid="qty-value">{qty}</span>
-                <button onClick={() => setQty((q) => Math.min(Math.max(1, p.stock), q + 1))} data-testid="qty-inc" aria-label="Increase" className="grid h-10 w-10 place-items-center rounded-full transition-colors hover:bg-foreground hover:text-background"><Plus className="h-4 w-4" strokeWidth={2.6} /></button>
+                <button onClick={() => setQty((q) => Math.min(20, q + 1))} data-testid="qty-inc" aria-label="Increase" className="grid h-10 w-10 place-items-center rounded-full transition-colors hover:bg-foreground hover:text-background"><Plus className="h-4 w-4" strokeWidth={2.6} /></button>
               </div>
-              <button disabled={p.stock <= 0} onClick={() => add(p, qty)} className="btn-royal flex-1 disabled:opacity-50" data-testid="add-to-bag-btn">
-                {p.stock <= 0 ? "Sold out" : `Add to bag · ${inr(p.price * qty)}`}
+              <button disabled={isSoldOut} onClick={() => add(p, qty, size)} className="btn-royal flex-1 disabled:opacity-50" data-testid="add-to-bag-btn">
+                {isSoldOut ? "Sold out" : `Add to bag · ${inr(currentPrice * qty)}`}
               </button>
             </div>
 

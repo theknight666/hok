@@ -86,7 +86,7 @@ export default function Checkout() {
     e.preventDefault();
     setBusy(true);
     try {
-      const { data } = await api.post("/orders", { email: mail, address: addr, gift_note: gift, items: items.map((i) => ({ slug: i.slug, qty: i.qty })) });
+      const { data } = await api.post("/orders", { email: mail, address: addr, gift_note: gift, items: items.map((i) => ({ slug: i.slug, qty: i.qty, size: i.size || "50 ml" })) });
       setOrder(data);
       clear();
       pay(data);
@@ -152,13 +152,22 @@ export default function Checkout() {
           <aside className="lg:col-span-5">
             <div className="rounded-[2rem] bg-card p-8 shadow-xl lg:sticky lg:top-28">
               <p className="eyebrow">Summary</p>
-              {items.map((i) => (
-                <div key={i.slug} className="flex items-center gap-4 border-b py-5">
-                  <div className="flex h-16 w-12 items-center justify-center rounded-xl" style={{ background: worldOf(i).bg }}><Bottle p={i} className="h-14 w-auto" /></div>
-                  <span className="flex-1 font-display text-lg">{i.name} <span className="text-sm text-muted-foreground">× {i.qty}</span></span>
-                  <span className="text-sm">{inr(i.price * i.qty)}</span>
-                </div>
-              ))}
+              {items.map((i) => {
+                const itemKey = i.key || `${i.slug}-${i.size || "50 ml"}`;
+                return (
+                  <div key={itemKey} className="flex items-center gap-4 border-b py-5">
+                    <div className="flex h-16 w-12 items-center justify-center rounded-xl" style={{ background: worldOf(i).bg }}><Bottle p={i} className="h-14 w-auto" /></div>
+                    <div className="flex-1">
+                      <p className="font-display text-lg leading-tight">{i.name}</p>
+                      <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground bg-muted/60 px-2 py-0.5 rounded-full inline-block mt-1">
+                        {i.size || "50 ml"}
+                      </span>
+                      <span className="ml-2 text-xs text-muted-foreground">× {i.qty}</span>
+                    </div>
+                    <span className="text-sm font-semibold">{inr(i.price * i.qty)}</span>
+                  </div>
+                );
+              })}
               <div className="mt-5 space-y-2 text-sm">
                 <div className="flex justify-between"><span className="text-muted-foreground">Subtotal</span><span>{inr(subtotal)}</span></div>
                 <div className="flex justify-between"><span className="text-muted-foreground">Shipping</span><span>{shipping ? inr(shipping) : "Complimentary"}</span></div>
