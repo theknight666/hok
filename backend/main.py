@@ -716,35 +716,32 @@ SEED_PRICES = {"blonde-amber": 18500, "layton": 16500, "angels-share-on-the-rock
 
 @app.on_event("startup")
 async def startup():
-    await db.users.create_index("email", unique=True)
-    await db.users.create_index("user_id", unique=True)
-    await db.products.create_index("slug", unique=True)
-    await db.orders.create_index("order_id", unique=True)
-    await db.login_attempts.create_index("identifier")
-    await db.reviews.create_index([("product_slug", 1), ("user_id", 1)], unique=True)
-    await db.reviews.create_index("id", unique=True)
-    await db.files.create_index("storage_path", unique=True)
     try:
-        await asyncio.to_thread(storage.init_storage)
-        logger.info("Object storage initialised")
+        await db.users.create_index("email", unique=True)
+        await db.users.create_index("user_id", unique=True)
+        await db.products.create_index("slug", unique=True)
+        await db.orders.create_index("order_id", unique=True)
+        await db.login_attempts.create_index("identifier")
+        await db.reviews.create_index([("product_slug", 1), ("user_id", 1)], unique=True)
+        await db.reviews.create_index("id", unique=True)
+        await db.files.create_index("storage_path", unique=True)
+        for p in SEED:
+            if not await db.products.find_one({"slug": p["slug"]}):
+                doc = {**p, "price": SEED_PRICES[p["slug"]], "image": f"/images/{p['slug'].replace('-on-the-rocks', '')}.jpg",
+                       "low_stock_threshold": 10, "active": True, "featured": True, "updated_at": now().isoformat()}
+                await db.products.insert_one(doc)
+        await db.products.update_many({"featured": {"$exists": False}}, {"$set": {"featured": True}})
+        admin_email = os.environ.get("ADMIN_EMAIL", "admin@houseoftheknight.com").lower()
+        admin_pw = os.environ.get("ADMIN_PASSWORD", "KnightAdmin#2026")
+        existing = await db.users.find_one({"email": admin_email})
+        if not existing:
+            await db.users.insert_one({"user_id": f"user_{uuid.uuid4().hex[:12]}", "email": admin_email, "name": "House Admin",
+                                       "picture": None, "role": "admin", "password_hash": hash_password(admin_pw),
+                                       "created_at": now().isoformat()})
+        elif not existing.get("password_hash") or not verify_password(admin_pw, existing["password_hash"]):
+            await db.users.update_one({"email": admin_email}, {"$set": {"password_hash": hash_password(admin_pw), "role": "admin"}})
     except Exception as e:
-        logger.error("Object storage init failed: %s", e)
-    threading.Thread(target=storage.warm_rembg, daemon=True).start()
-    for p in SEED:
-        if not await db.products.find_one({"slug": p["slug"]}):
-            doc = {**p, "price": SEED_PRICES[p["slug"]], "image": f"/images/{p['slug'].replace('-on-the-rocks', '')}.jpg",
-                   "low_stock_threshold": 10, "active": True, "featured": True, "updated_at": now().isoformat()}
-            await db.products.insert_one(doc)
-    await db.products.update_many({"featured": {"$exists": False}}, {"$set": {"featured": True}})
-    admin_email = os.environ.get("ADMIN_EMAIL", "admin@houseoftheknight.com").lower()
-    admin_pw = os.environ.get("ADMIN_PASSWORD", "KnightAdmin#2026")
-    existing = await db.users.find_one({"email": admin_email})
-    if not existing:
-        await db.users.insert_one({"user_id": f"user_{uuid.uuid4().hex[:12]}", "email": admin_email, "name": "House Admin",
-                                   "picture": None, "role": "admin", "password_hash": hash_password(admin_pw),
-                                   "created_at": now().isoformat()})
-    elif not existing.get("password_hash") or not verify_password(admin_pw, existing["password_hash"]):
-        await db.users.update_one({"email": admin_email}, {"$set": {"password_hash": hash_password(admin_pw), "role": "admin"}})
+        logger.error("Startup error: %s", e)
 
 
 @api.get("/")
