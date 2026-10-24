@@ -12,14 +12,17 @@ from datetime import datetime, timezone, timedelta
 from typing import List, Optional, Literal
 
 import asyncio
+import threading
 import bcrypt
 import jwt
 import httpx
 import razorpay
-from fastapi import FastAPI, APIRouter, HTTPException, Request, Response, Depends
+from fastapi import FastAPI, APIRouter, HTTPException, Request, Response, Depends, File, UploadFile, Query
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel, Field, EmailStr
+
+import storage
 
 client = AsyncIOMotorClient(os.environ['MONGO_URL'])
 db = client[os.environ['DB_NAME']]
@@ -488,6 +491,128 @@ async def admin_customers(_: dict = Depends(require_admin)):
     return users
 
 
+# ---------- Media (object storage) ----------
+@api.get("/media/{path:path}")
+async def media(path: str):
+    rec = await db.files.find_one({"storage_path": path, "is_deleted": False}, {"_id": 0})
+    if not rec:
+        raise HTTPException(status_code=404, detail="File not found")
+    try:
+        data, ct = await asyncio.to_thread(storage.get_object, path)
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail="File not found")
+    return Response(content=data, media_type=rec.get("content_type", ct),
+                    headers={"Cache-Control": "public, max-age=31536000, immutable"})
+
+
+@api.post("/admin/products/{slug}/image")
+async def admin_upload_image(slug: str, file: UploadFile = File(...), remove_bg: bool = Query(True),
+                             admin: dict = Depends(require_admin)):
+    if not await db.products.find_one({"slug": slug}):
+        raise HTTPException(status_code=404, detail="Product not found")
+    if file.content_type not in storage.ALLOWED_TYPES:
+        raise HTTPException(status_code=400, detail="Upload a PNG, JPEG or WebP image")
+    data = await file.read()
+    if len(data) > storage.MAX_UPLOAD_BYTES:
+        raise HTTPException(status_code=413, detail="Image must be under 10 MB")
+    try:
+        png = await asyncio.to_thread(storage.cut_out_bottle if remove_bg else storage.to_png, data)
+    except Exception as e:
+        logger.error("Image processing failed: %s", e)
+        raise HTTPException(status_code=422, detail="Could not process that image")
+    path = f"{storage.APP_NAME}/products/{slug}/{uuid.uuid4().hex}.png"
+    try:
+        result = await asyncio.to_thread(storage.put_object, path, png, "image/png")
+    except Exception as e:
+        logger.error("Storage upload failed: %s", e)
+        raise HTTPException(status_code=502, detail="Image storage is unavailable right now")
+    url = f"/api/media/{result['path']}"
+    await db.files.insert_one({"id": f"file_{uuid.uuid4().hex[:12]}", "storage_path": result["path"],
+                               "original_filename": file.filename, "content_type": "image/png",
+                               "size": result.get("size", len(png)), "product_slug": slug, "by": admin["email"],
+                               "is_deleted": False, "created_at": now().isoformat()})
+    p = await db.products.find_one_and_update({"slug": slug}, {"$set": {"image": url, "updated_at": now().isoformat()}},
+                                              projection={"_id": 0}, return_document=True)
+    return p
+
+
+# ---------- Reviews ----------
+REVIEW_STATUSES = ["pending", "approved", "hidden"]
+
+
+class ReviewIn(BaseModel):
+    rating: int = Field(ge=1, le=5)
+    text: str = Field(min_length=3, max_length=180)
+
+
+class ReviewStatusIn(BaseModel):
+    status: Literal["pending", "approved", "hidden"]
+
+
+async def has_purchased(user: dict, slug: str) -> bool:
+    q = {"status": {"$ne": "cancelled"}, "items.slug": slug,
+         "$or": [{"user_id": user["user_id"]}, {"email": user["email"]}]}
+    return await db.orders.find_one(q, {"_id": 1}) is not None
+
+
+@api.get("/products/{slug}/reviews")
+async def product_reviews(slug: str):
+    items = await db.reviews.find({"product_slug": slug, "status": "approved"}, {"_id": 0, "user_id": 0}) \
+        .sort("created_at", -1).to_list(200)
+    avg = round(sum(r["rating"] for r in items) / len(items), 1) if items else None
+    return {"items": items, "count": len(items), "average": avg}
+
+
+@api.get("/products/{slug}/reviews/eligibility")
+async def review_eligibility(slug: str, user: dict = Depends(get_current_user)):
+    existing = await db.reviews.find_one({"product_slug": slug, "user_id": user["user_id"]}, {"_id": 0})
+    return {"can_review": await has_purchased(user, slug), "existing": existing}
+
+
+@api.post("/products/{slug}/reviews")
+async def create_review(slug: str, body: ReviewIn, user: dict = Depends(get_current_user)):
+    p = await db.products.find_one({"slug": slug, "active": True}, {"_id": 0, "name": 1})
+    if not p:
+        raise HTTPException(status_code=404, detail="Fragrance not found")
+    if not await has_purchased(user, slug):
+        raise HTTPException(status_code=403, detail="Only customers who have bought this fragrance can review it")
+    key = {"product_slug": slug, "user_id": user["user_id"]}
+    await db.reviews.update_one(key, {
+        "$set": {"product_name": p["name"], "user_name": user.get("name") or user["email"].split("@")[0],
+                 "rating": body.rating, "text": body.text.strip(), "status": "pending", "updated_at": now().isoformat()},
+        "$setOnInsert": {"id": f"rev_{uuid.uuid4().hex[:12]}", "created_at": now().isoformat(), **key},
+    }, upsert=True)
+    return await db.reviews.find_one(key, {"_id": 0})
+
+
+@api.get("/reviews/featured")
+async def featured_reviews(limit: int = Query(12, ge=1, le=50)):
+    return await db.reviews.find({"status": "approved"}, {"_id": 0, "user_id": 0}).sort("created_at", -1).to_list(limit)
+
+
+@api.get("/admin/reviews")
+async def admin_reviews(status: Optional[str] = None, _: dict = Depends(require_admin)):
+    q = {"status": status} if status in REVIEW_STATUSES else {}
+    return await db.reviews.find(q, {"_id": 0}).sort("created_at", -1).to_list(1000)
+
+
+@api.patch("/admin/reviews/{rid}")
+async def admin_review_status(rid: str, body: ReviewStatusIn, _: dict = Depends(require_admin)):
+    r = await db.reviews.find_one_and_update({"id": rid}, {"$set": {"status": body.status}}, projection={"_id": 0},
+                                             return_document=True)
+    if not r:
+        raise HTTPException(status_code=404, detail="Review not found")
+    return r
+
+
+@api.delete("/admin/reviews/{rid}")
+async def admin_review_delete(rid: str, _: dict = Depends(require_admin)):
+    res = await db.reviews.delete_one({"id": rid})
+    if not res.deleted_count:
+        raise HTTPException(status_code=404, detail="Review not found")
+    return {"deleted": rid}
+
+
 # ---------- Seed ----------
 SEED = [
     {"slug": "blonde-amber", "name": "Blonde Amber", "order": 1, "color": "#D4A24C", "badge": "The Signature",
@@ -521,6 +646,15 @@ async def startup():
     await db.products.create_index("slug", unique=True)
     await db.orders.create_index("order_id", unique=True)
     await db.login_attempts.create_index("identifier")
+    await db.reviews.create_index([("product_slug", 1), ("user_id", 1)], unique=True)
+    await db.reviews.create_index("id", unique=True)
+    await db.files.create_index("storage_path", unique=True)
+    try:
+        await asyncio.to_thread(storage.init_storage)
+        logger.info("Object storage initialised")
+    except Exception as e:
+        logger.error("Object storage init failed: %s", e)
+    threading.Thread(target=storage.warm_rembg, daemon=True).start()
     for p in SEED:
         if not await db.products.find_one({"slug": p["slug"]}):
             doc = {**p, "price": SEED_PRICES[p["slug"]], "image": f"/images/{p['slug'].replace('-on-the-rocks', '')}.jpg",

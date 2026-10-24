@@ -25,9 +25,10 @@ export const MaskLines = ({ lines, className = "", delay = 0, as = "h1", lineCla
   );
 };
 
-export const FadeUp = ({ children, delay = 0, className = "", y = 36 }) => (
+export const FadeUp = ({ children, delay = 0, className = "", y = 36, ...rest }) => (
   <motion.div
     className={className}
+    {...rest}
     initial={{ opacity: 0, y }}
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true, amount: 0.12 }}

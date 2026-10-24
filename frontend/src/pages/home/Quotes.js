@@ -1,33 +1,42 @@
-const QUOTES = [
-  { q: "Wore Side Effect to a dinner. Three people asked, one followed me to the car.", h: "@rhea.vora" },
-  { q: "Blonde Amber is the first perfume I've finished a bottle of. Finished. A whole bottle.", h: "@aarav.m" },
-  { q: "Layton smells like a tailored suit that knows it fits.", h: "@thescentedlife" },
-  { q: "Angels Share On The Rocks got me upgraded on a flight. Correlation, causation, whatever.", h: "@kabir.sh" },
-  { q: "My husband stole my Side Effect. Ordering two now.", h: "@ninaaa.k" },
-  { q: "Sprayed once at 8am. Still turning heads at midnight. Witchcraft.", h: "@prisha_notes" },
-];
+import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/api";
+import { Stars } from "@/pages/admin/Reviews";
 
-function Card({ q, h }) {
+function Card({ r }) {
   return (
-    <figure className="w-[82vw] max-w-[420px] shrink-0 rounded-[2rem] bg-background p-7 text-foreground shadow-lg sm:p-9">
-      <blockquote className="font-display text-2xl leading-tight sm:text-3xl">“{q}”</blockquote>
-      <figcaption className="mt-6 text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">{h}</figcaption>
+    <figure className="w-[82vw] max-w-[420px] shrink-0 rounded-[2rem] bg-background p-7 text-foreground shadow-lg sm:p-9" data-testid={`quote-${r.id}`}>
+      <Stars n={r.rating} />
+      <blockquote className="mt-4 font-display text-2xl leading-tight sm:text-3xl">“{r.text}”</blockquote>
+      <figcaption className="mt-6 flex flex-wrap items-center justify-between gap-2 text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">
+        <span>{r.user_name} · Verified buyer</span>
+        <Link to={`/fragrance/${r.product_slug}`} className="text-gold link-line">{r.product_name}</Link>
+      </figcaption>
     </figure>
   );
 }
 
 export function Quotes() {
+  const { data } = useQuery({ queryKey: ["featured-reviews"], queryFn: async () => (await api.get("/reviews/featured?limit=12")).data });
+  const reviews = Array.isArray(data) ? data : [];
+  const loop = reviews.length < 4 ? reviews : [...reviews, ...reviews];
+
   return (
     <section className="overflow-hidden bg-[#F2A900] py-20 text-[#1C1105] lg:py-28" data-testid="quotes-section" aria-label="What people say">
       <div className="mx-auto max-w-[1600px] px-5 sm:px-10">
-        <p className="text-xs font-bold uppercase tracking-[0.22em] opacity-70">Words from the court</p>
+        <p className="text-xs font-bold uppercase tracking-[0.22em] opacity-70">Words from the court · verified buyers only</p>
         <h2 className="display-lg mt-3 font-display">R e v i e w s</h2>
       </div>
-      <div className="mt-12 flex w-max animate-marquee-slow gap-5 px-5">
-        {[...QUOTES, ...QUOTES].map((x, i) => (
-          <Card key={i} {...x} />
-        ))}
-      </div>
+      {reviews.length ? (
+        <div className={`mt-12 flex gap-5 px-5 sm:px-10 ${reviews.length < 4 ? "flex-wrap" : "w-max animate-marquee-slow"}`}>
+          {loop.map((r, i) => <Card key={`${r.id}-${i}`} r={r} />)}
+        </div>
+      ) : (
+        <div className="mx-auto mt-12 max-w-[1600px] px-5 sm:px-10" data-testid="quotes-empty">
+          <p className="max-w-xl font-display text-3xl leading-tight sm:text-4xl">The court is quiet. Own a bottle, leave the first word.</p>
+          <Link to="/#collection" className="btn-world mt-8" style={{ "--w-ink": "#1C1105", "--w-bg": "#F2A900" }} data-testid="quotes-empty-cta">Choose your weapon</Link>
+        </div>
+      )}
     </section>
   );
 }

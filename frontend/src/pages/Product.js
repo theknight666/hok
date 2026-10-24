@@ -7,6 +7,7 @@ import { useCart } from "@/context/CartContext";
 import { Bottle } from "@/components/site/Bottle";
 import { EASE, FadeUp } from "@/components/site/Reveal";
 import { NotesPyramid } from "./home/NotesAtlas";
+import { ReviewsBlock } from "@/components/site/ReviewsBlock";
 import { worldOf, worldVars } from "@/lib/visual";
 import { inr } from "@/lib/api";
 
@@ -94,6 +95,7 @@ export default function Product() {
               <p className="eyebrow mb-6">The Composition</p>
               <NotesPyramid notes={p.notes} color={world.bg} />
             </FadeUp>
+            <ReviewsBlock slug={p.slug} name={p.name} />
           </motion.div>
         </div>
       </section>

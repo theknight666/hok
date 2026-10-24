@@ -26,7 +26,7 @@ function Row({ p, onEdit, refresh }) {
     <tr className="border-b align-middle" data-testid={`inventory-row-${p.slug}`}>
       <td className="py-4 pr-4">
         <div className="flex items-center gap-4">
-          <img src={p.image} alt="" className="h-14 w-11 object-cover" />
+          <img src={p.image} alt="" className="h-14 w-11 rounded-lg bg-muted object-contain" data-testid={`inventory-image-${p.slug}`} />
           <div>
             <p className="font-display text-xl leading-tight">{p.name}</p>
             <p className="text-xs text-muted-foreground">{p.concentration} · {p.volume}</p>
@@ -48,7 +48,7 @@ function Row({ p, onEdit, refresh }) {
       <td className="pr-4"><Switch checked={p.active} onCheckedChange={toggle} data-testid={`active-toggle-${p.slug}`} /></td>
       <td className="text-right">
         <button onClick={() => onEdit(p)} className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.25em] text-gold hover:opacity-70" data-testid={`edit-product-${p.slug}`}>
-          <Pencil className="h-3.5 w-3.5" /> Edit
+          <Pencil className="h-3.5 w-3.5" /> Edit / Photo
         </button>
       </td>
     </tr>

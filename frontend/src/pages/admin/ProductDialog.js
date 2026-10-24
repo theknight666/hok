@@ -2,10 +2,11 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { api, formatErr } from "@/lib/api";
+import { BottleUpload } from "./BottleUpload";
 
 const TEXT = [
   ["name", "Name"], ["slug", "URL slug"], ["tagline", "Tagline"], ["badge", "Badge"],
-  ["concentration", "Concentration"], ["volume", "Volume"], ["image", "Image URL"], ["color", "Liquid colour (hex)"],
+  ["concentration", "Concentration"], ["volume", "Volume"], ["image", "Image URL (or upload below)"], ["color", "Liquid colour (hex)"],
 ];
 const NUM = [["price", "Price (₹)"], ["stock", "Stock"], ["low_stock_threshold", "Low-stock alert at"]];
 const cls = "w-full border-b border-input bg-transparent py-2 text-sm outline-none focus:border-gold";
@@ -45,9 +46,12 @@ export function ProductDialog({ product, onClose, onSaved }) {
 
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto rounded-none bg-background" data-lenis-prevent data-testid="product-dialog">
+      <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto rounded-[2rem] bg-background" data-lenis-prevent data-testid="product-dialog">
         <DialogHeader><DialogTitle className="font-display text-3xl">{isNew ? "New fragrance" : `Edit ${product.name}`}</DialogTitle></DialogHeader>
         <form onSubmit={save} className="grid gap-x-6 gap-y-4 sm:grid-cols-2">
+          {!isNew && (
+            <BottleUpload slug={product.slug} image={f.image} onDone={(p) => { setF((c) => ({ ...c, image: p.image })); onSaved(); }} />
+          )}
           {TEXT.map(([k, l]) => (
             <label key={k} className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
               {l}

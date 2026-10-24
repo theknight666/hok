@@ -5,12 +5,14 @@ import { Overview } from "./admin/Overview";
 import { Inventory } from "./admin/Inventory";
 import { Orders } from "./admin/Orders";
 import { Customers } from "./admin/Customers";
+import { Reviews } from "./admin/Reviews";
 
 const TABS = [
   ["overview", "Overview", Overview],
   ["inventory", "Inventory", Inventory],
   ["orders", "Orders", Orders],
   ["customers", "Customers", Customers],
+  ["reviews", "Reviews", Reviews],
 ];
 
 export default function Admin() {
