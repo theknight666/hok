@@ -730,6 +730,12 @@ async def startup():
                 doc = {**p, "price": SEED_PRICES[p["slug"]], "image": f"/images/{p['slug'].replace('-on-the-rocks', '')}.jpg",
                        "low_stock_threshold": 10, "active": True, "featured": True, "updated_at": now().isoformat()}
                 await db.products.insert_one(doc)
+            else:
+                # Ensure seed products are always active and featured
+                await db.products.update_one(
+                    {"slug": p["slug"]},
+                    {"$set": {"active": True, "featured": True}}
+                )
         await db.products.update_many({"featured": {"$exists": False}}, {"$set": {"featured": True}})
         admin_email = os.environ.get("ADMIN_EMAIL", "admin@houseoftheknight.com").lower()
         admin_pw = os.environ.get("ADMIN_PASSWORD", "KnightAdmin#2026")
