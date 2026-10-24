@@ -21,7 +21,7 @@ export function Footer() {
 
   return (
     <footer className="relative overflow-hidden bg-foreground text-background" data-testid="site-footer">
-      <div className="mx-auto max-w-[1600px] px-5 pb-8 pt-24 sm:px-10">
+      <div className="mx-auto max-w-[1600px] px-5 pt-24 sm:px-10">
         <div className="grid gap-14 lg:grid-cols-12">
           <div className="lg:col-span-6">
             <KnightMark className="h-12 w-12 text-gold" />
@@ -59,10 +59,20 @@ export function Footer() {
             </div>
           ))}
         </div>
-        <p className="pointer-events-none mt-24 select-none whitespace-nowrap text-center font-display text-[13.5vw] leading-[0.8] tracking-tight" aria-hidden="true">
+      </div>
+
+      {/* Full-Width Mathematically Centered Giant Watermark */}
+      <div className="relative mt-20 sm:mt-24 flex w-full items-center justify-center overflow-hidden px-4">
+        <p
+          className="pointer-events-none select-none whitespace-nowrap text-center font-display leading-[0.8] tracking-tight text-[clamp(2.4rem,8.8vw,9.6rem)] text-background"
+          aria-hidden="true"
+        >
           House of the Knight
         </p>
-        <div className="mt-10 flex flex-col justify-between gap-3 border-t border-background/15 pt-6 text-xs font-semibold opacity-60 sm:flex-row">
+      </div>
+
+      <div className="mx-auto max-w-[1600px] px-5 pb-8 sm:px-10">
+        <div className="mt-8 flex flex-col justify-between gap-3 border-t border-background/15 pt-6 text-xs font-semibold opacity-60 sm:flex-row">
           <span>© {new Date().getFullYear()} House Of The Knight. All rights reserved.</span>
           <span className="uppercase tracking-[0.2em]">Extrait de Parfum · Made with obsession</span>
         </div>
