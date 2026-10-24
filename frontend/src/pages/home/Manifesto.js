@@ -11,17 +11,17 @@ export function Manifesto() {
     offset: ["start end", "end start"],
   });
 
-  // Bottle parallax transforms - smooth, graceful, contained
-  const bottleY = useTransform(scrollYProgress, [0, 0.5, 1], [40, -10, -50]);
-  const bottleRotate = useTransform(scrollYProgress, [0, 0.5, 1], [-4, 1, 4]);
-  const bottleScale = useTransform(scrollYProgress, [0, 0.45, 1], [0.95, 1.03, 0.98]);
-  const auraScale = useTransform(scrollYProgress, [0, 0.5, 1], [0.85, 1.25, 0.9]);
+  // Bottle parallax transforms - smooth, expressive, fluid
+  const bottleY = useTransform(scrollYProgress, [0, 0.5, 1], [60, -15, -75]);
+  const bottleRotate = useTransform(scrollYProgress, [0, 0.5, 1], [-6, 1, 6]);
+  const bottleScale = useTransform(scrollYProgress, [0, 0.45, 1], [0.94, 1.05, 0.96]);
+  const auraScale = useTransform(scrollYProgress, [0, 0.5, 1], [0.85, 1.35, 0.9]);
   const bottleOpacity = useTransform(scrollYProgress, [0, 0.15, 0.85, 1], [0.6, 1, 1, 0.6]);
 
   return (
     <section
       ref={ref}
-      className="relative mx-auto max-w-[1600px] px-5 py-24 sm:px-10 lg:py-36"
+      className="relative mx-auto max-w-[1600px] px-5 py-16 sm:px-10 lg:py-24"
       data-testid="manifesto-section"
     >
       {/* ======================================================== */}
@@ -68,55 +68,47 @@ export function Manifesto() {
           </FadeUp>
         </div>
 
-        {/* Right Column: Architectural Bottle Showcase */}
+        {/* Right Column: Free-Floating Unconfined Perfume Bottle */}
         <div className="relative flex items-center justify-center lg:col-span-5">
-          {/* Architectural Alcove Backdrop */}
-          <div className="relative flex w-full max-w-[460px] flex-col items-center justify-center rounded-t-[140px] rounded-b-[40px] border border-border/40 bg-gradient-to-b from-card/60 via-card/20 to-transparent p-6 backdrop-blur-[2px] sm:p-10">
-            {/* Ambient Warm Golden Aura */}
-            <motion.div
-              style={{ scale: auraScale }}
-              className="pointer-events-none absolute h-[320px] w-[320px] rounded-full bg-gold/25 blur-[100px] dark:bg-gold/35 sm:h-[420px] sm:w-[420px]"
-              aria-hidden="true"
-            />
+          {/* Ambient Warm Golden Aura */}
+          <motion.div
+            style={{ scale: auraScale }}
+            className="pointer-events-none absolute h-[360px] w-[360px] rounded-full bg-gold/25 blur-[110px] dark:bg-gold/35 sm:h-[460px] sm:w-[460px]"
+            aria-hidden="true"
+          />
 
-            <motion.div
-              style={{
-                y: bottleY,
-                rotate: bottleRotate,
-                scale: bottleScale,
-                opacity: bottleOpacity,
-              }}
-              className="relative flex flex-col items-center will-change-transform transform-gpu"
+          <motion.div
+            style={{
+              y: bottleY,
+              rotate: bottleRotate,
+              scale: bottleScale,
+              opacity: bottleOpacity,
+            }}
+            whileHover={{ scale: 1.06, rotate: 2, y: -12 }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            className="relative flex flex-col items-center will-change-transform transform-gpu cursor-pointer"
+          >
+            <Link
+              to="/fragrance/blonde-amber"
+              className="group relative block"
+              aria-label="Discover Blonde Amber - Signature Extrait"
             >
-              <Link
-                to="/fragrance/blonde-amber"
-                className="group relative block cursor-pointer transition-transform duration-700 hover:scale-[1.03]"
-                aria-label="Discover Blonde Amber - Signature Extrait"
-              >
-                <img
-                  src="/images/cut-blonde-amber.png"
-                  alt="House signature bottle - Blonde Amber"
-                  loading="lazy"
-                  draggable={false}
-                  className="bottle-shadow h-[52svh] max-h-[680px] min-h-[380px] w-auto select-none object-contain transition-all duration-700 group-hover:brightness-105 sm:h-[60svh]"
-                />
-              </Link>
-            </motion.div>
-
-            {/* Museum-Grade Specification Inscription */}
-            <div className="relative z-10 mt-6 text-center">
-              <span className="text-[0.6rem] font-medium uppercase tracking-[0.32em] text-muted-foreground/75">
-                Signature Flacon · Blonde Amber 50ml
-              </span>
-            </div>
-          </div>
+              <img
+                src="/images/cut-blonde-amber.png"
+                alt="House signature bottle - Blonde Amber"
+                loading="lazy"
+                draggable={false}
+                className="bottle-shadow h-[58svh] max-h-[740px] min-h-[420px] w-auto select-none object-contain transition-all duration-700 group-hover:brightness-110 sm:h-[66svh] lg:h-[72svh]"
+              />
+            </Link>
+          </motion.div>
         </div>
       </div>
 
       {/* ======================================================== */}
       {/* ACT II: The Sillage Credo (Editorial 3-Part Pavilion)    */}
       {/* ======================================================== */}
-      <div className="relative mt-28 sm:mt-36 lg:mt-48">
+      <div className="relative mt-10 sm:mt-12 lg:mt-14">
         {/* Ambient Warm Golden Glow in Center */}
         <div
           className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[380px] w-[620px] rounded-full bg-gold/15 blur-[130px] dark:bg-gold/20"
