@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Moon, Sun, ShoppingBag, User, Menu, Crown } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { KnightMark, Wordmark } from "./Logo";
@@ -28,23 +28,34 @@ export function Header() {
   const { count, setOpen } = useCart();
   const { user } = useAuth();
   const { pathname } = useLocation();
+  const navigate = useNavigate();
 
   const handleNavClick = (e, to) => {
     if (to.startsWith("/#")) {
+      e.preventDefault();
       const targetHash = to.replace("/", "");
-      if (pathname === "/") {
-        e.preventDefault();
-        const el = document.querySelector(targetHash);
+      const targetId = targetHash.replace("#", "");
+
+      const scroll = () => {
+        const el = document.getElementById(targetId) || document.querySelector(targetHash);
         if (el) {
           if (window.__lenis) {
-            window.__lenis.scrollTo(el, { offset: -80, duration: 0.9 });
+            window.__lenis.resize();
+            window.__lenis.scrollTo(el, { offset: -70, duration: 0.85, force: true });
           } else {
-            el.scrollIntoView({ behavior: "smooth" });
-          }
-          if (window.location.hash !== targetHash) {
-            window.history.pushState(null, "", targetHash);
+            const top = el.getBoundingClientRect().top + window.scrollY - 70;
+            window.scrollTo({ top, behavior: "smooth" });
           }
         }
+      };
+
+      if (pathname !== "/") {
+        navigate(to);
+      } else {
+        navigate(to, { replace: true });
+        scroll();
+        setTimeout(scroll, 80);
+        setTimeout(scroll, 350);
       }
     }
   };

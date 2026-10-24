@@ -32,17 +32,25 @@ export function SmoothScroll() {
 
   useEffect(() => {
     const l = window.__lenis;
-    if (hash && hash.length > 1 && !hash.includes("session_id")) {
+    const currentHash = hash || (typeof window !== "undefined" ? window.location.hash : "");
+
+    if (currentHash && currentHash.length > 1 && !currentHash.includes("session_id")) {
+      const targetId = currentHash.replace("#", "");
       const scroll = () => {
-        const el = document.querySelector(hash);
+        if (l) l.resize();
+        const el = document.getElementById(targetId) || document.querySelector(currentHash);
         if (el) {
-          if (l) l.scrollTo(el, { offset: -80, duration: 0.85 });
-          else el.scrollIntoView({ behavior: "smooth" });
+          if (l) l.scrollTo(el, { offset: -70, duration: 0.85, force: true });
+          else {
+            const top = el.getBoundingClientRect().top + window.scrollY - 70;
+            window.scrollTo({ top, behavior: "smooth" });
+          }
         }
       };
+
       scroll();
-      const t1 = setTimeout(scroll, 180);
-      const t2 = setTimeout(scroll, 550);
+      const t1 = setTimeout(scroll, 150);
+      const t2 = setTimeout(scroll, 500);
       const t3 = setTimeout(scroll, 1100);
       return () => {
         clearTimeout(t1);
@@ -50,8 +58,11 @@ export function SmoothScroll() {
         clearTimeout(t3);
       };
     }
-    if (l) l.scrollTo(0, { immediate: true });
-    else window.scrollTo(0, 0);
+
+    if (!currentHash) {
+      if (l) l.scrollTo(0, { immediate: true });
+      else window.scrollTo(0, 0);
+    }
     return undefined;
   }, [pathname, hash]);
 
