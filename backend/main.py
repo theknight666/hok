@@ -581,6 +581,73 @@ async def my_orders(user: dict = Depends(get_current_user)):
                                 {"_id": 0}).sort("created_at", -1).to_list(200)
 
 
+@api.get("/orders/track/{order_id}")
+async def track_order(order_id: str, email: Optional[str] = None):
+    oid = order_id.strip().upper()
+    q = {"order_id": oid}
+    if email:
+        q["email"] = email.strip().lower()
+    o = await db.orders.find_one(q, {"_id": 0, "razorpay_signature": 0})
+    if not o and (oid.startswith("HOTK-DEMO") or oid in ("HOTK-SAMPLE", "HOTK-ROYAL", "HOTK-VIP")):
+        return {
+            "order_id": oid,
+            "status": "dispatched",
+            "payment_status": "paid",
+            "created_at": (now() - timedelta(days=2)).isoformat(),
+            "tracking_number": "BD-982410982",
+            "courier": "BlueDart Air Express",
+            "estimated_delivery": (now() + timedelta(days=1)).strftime("%A, %d %B"),
+            "items": [
+                {"slug": "blonde-amber", "name": "Blonde Amber", "size": "50 ml", "price": 18500, "qty": 1, "image": "/images/blonde-amber.jpg"},
+                {"slug": "layton", "name": "Layton", "size": "50 ml", "price": 16500, "qty": 1, "image": "/images/layton.jpg"}
+            ],
+            "subtotal": 35000,
+            "shipping": 0,
+            "total": 35000,
+            "address": {
+                "name": "Lord Sterling",
+                "street": "74 Altamount Road, Cumballa Hill",
+                "city": "Mumbai",
+                "state": "Maharashtra",
+                "pincode": "400026",
+                "phone": "+91 98200 48291"
+            }
+        }
+    if not o:
+        raise HTTPException(status_code=404, detail=f"No dispatch record found for order '{order_id}'. Please check your order ID or email.")
+    return o
+
+
+class ContactIn(BaseModel):
+    name: str
+    email: EmailStr
+    phone: Optional[str] = None
+    subject: Optional[str] = "General Inquiry"
+    message: str
+
+
+@api.post("/contact")
+async def submit_contact(body: ContactIn):
+    ticket_id = f"HOTK-CONCIERGE-{secrets.token_hex(2).upper()}"
+    doc = {
+        "ticket_id": ticket_id,
+        "name": body.name.strip(),
+        "email": body.email.strip().lower(),
+        "phone": body.phone.strip() if body.phone else None,
+        "subject": body.subject.strip() if body.subject else "General Inquiry",
+        "message": body.message.strip(),
+        "created_at": now().isoformat(),
+        "status": "pending_reply"
+    }
+    await db.contact_inquiries.insert_one(dict(doc))
+    return {
+        "ok": True,
+        "ticket_id": ticket_id,
+        "message": "Your inquiry has been received by the House Concierge. Expect a reply within two hours."
+    }
+
+
+
 # ---------- Admin ----------
 @api.get("/admin/stats")
 async def admin_stats(_: dict = Depends(require_admin)):

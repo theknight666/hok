@@ -11,6 +11,8 @@ const LINKS = [
   { to: "/collection", label: "Collection" },
   { to: "/#best-sellers", label: "Best Sellers" },
   { to: "/#house", label: "The House" },
+  { to: "/track", label: "Track Order" },
+  { to: "/contact", label: "Contact Us" },
 ];
 
 function IconBtn({ children, ...p }) {

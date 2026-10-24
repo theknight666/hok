@@ -16,6 +16,8 @@ import Login from "@/pages/Login";
 import Account from "@/pages/Account";
 import Admin from "@/pages/Admin";
 import AuthCallback from "@/pages/AuthCallback";
+import TrackOrder from "@/pages/TrackOrder";
+import Contact from "@/pages/Contact";
 
 function AppRouter() {
   const location = useLocation();
@@ -30,6 +32,10 @@ function AppRouter() {
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/login" element={<Login />} />
         <Route path="/account" element={<Account />} />
+        <Route path="/track" element={<TrackOrder />} />
+        <Route path="/track-order" element={<TrackOrder />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/concierge" element={<Contact />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="*" element={<Home />} />
       </Routes>
