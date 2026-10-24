@@ -2,23 +2,86 @@ import { ShieldCheck, Droplets, FlaskConical, Leaf, Gem } from "lucide-react";
 import { FadeUp } from "@/components/site/Reveal";
 
 const ITEMS = [
-  { Icon: Droplets, t: "High-grade oils & naturals", d: "Absolutes, resins and woods sourced from Grasse, Mysore and Kannauj." },
-  { Icon: ShieldCheck, t: "IFRA certified", d: "Every formula complies with IFRA safety standards for skin wear." },
-  { Icon: FlaskConical, t: "Extrait strength", d: "Up to 30% concentration. One wear, a full day of presence." },
-  { Icon: Leaf, t: "Cruelty-free & vegan", d: "No animal testing, no animal-derived musks. Ever." },
-  { Icon: Gem, t: "Small batch, hand-finished", d: "Macerated for weeks, nosed by hand, crested before it leaves the House." },
+  {
+    numeral: "I",
+    Icon: Droplets,
+    t: "High-grade naturals",
+    d: "Absolutes, precious resins, and woods sourced directly from Grasse, Mysore, and Kannauj.",
+  },
+  {
+    numeral: "II",
+    Icon: ShieldCheck,
+    t: "IFRA certified",
+    d: "Every formula complies strictly with global IFRA standards for safe, non-irritating skin wear.",
+  },
+  {
+    numeral: "III",
+    Icon: FlaskConical,
+    t: "Extrait strength",
+    d: "Formulated up to 30% pure fragrance oil. A single morning application delivers all-day presence.",
+  },
+  {
+    numeral: "IV",
+    Icon: Leaf,
+    t: "Cruelty-free & vegan",
+    d: "Ethically composed without animal-derived musks or animal testing. Consciously crafted.",
+  },
+  {
+    numeral: "V",
+    Icon: Gem,
+    t: "Small-batch craft",
+    d: "Macerated for weeks in small vessels and inspected by hand before earning the house seal.",
+  },
 ];
 
 export function Credentials() {
   return (
-    <section className="relative bg-foreground text-background" data-testid="credentials-section" aria-label="Our standards">
-      <div className="mx-auto max-w-[1600px] px-5 py-14 sm:px-10 lg:py-20">
-        <div className="grid gap-px overflow-hidden rounded-[2rem] border border-background/15 bg-background/15 sm:grid-cols-2 lg:grid-cols-5">
-          {ITEMS.map(({ Icon, t, d }, i) => (
-            <FadeUp key={t} delay={i * 0.08} className="group bg-foreground p-7 transition-colors duration-500 hover:bg-background hover:text-foreground lg:p-8" data-testid={`credential-${i}`}>
-              <Icon className="h-6 w-6 text-gold transition-transform duration-500 group-hover:-translate-y-1" strokeWidth={1.4} />
-              <p className="mt-6 font-display text-base leading-snug sm:text-lg">{t}</p>
-              <p className="mt-3 text-sm font-light leading-relaxed opacity-70">{d}</p>
+    <section
+      className="relative border-y border-border/40 bg-card/30 text-foreground backdrop-blur-sm"
+      data-testid="credentials-section"
+      aria-label="House standards and credentials"
+    >
+      <div className="mx-auto max-w-[1600px] px-5 py-16 sm:px-10 lg:py-24">
+        {/* Editorial Section Header */}
+        <div className="mb-14 flex flex-col justify-between gap-4 border-b border-border/40 pb-8 lg:flex-row lg:items-end">
+          <div>
+            <p className="eyebrow">House Standards</p>
+            <h2 className="display-sm mt-3 font-display">
+              Crafted with <span className="font-display-italic text-gold">uncompromising standards.</span>
+            </h2>
+          </div>
+          <p className="max-w-md text-sm font-light leading-relaxed text-muted-foreground">
+            Our atelier honors traditional European maceration alongside certified safety standards.
+          </p>
+        </div>
+
+        {/* Minimalist Editorial Columns */}
+        <div className="grid grid-cols-1 divide-y divide-border/30 sm:grid-cols-2 sm:gap-x-8 sm:gap-y-12 sm:divide-y-0 lg:grid-cols-5 lg:divide-x lg:divide-border/30 lg:gap-0">
+          {ITEMS.map(({ numeral, Icon, t, d }, i) => (
+            <FadeUp
+              key={t}
+              delay={i * 0.08}
+              className="group flex flex-col justify-between py-8 first:pt-0 last:pb-0 sm:py-0 lg:px-7 first:lg:pl-0 last:lg:pr-0"
+              data-testid={`credential-${i}`}
+            >
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="font-display text-xs uppercase tracking-[0.28em] text-gold/80">
+                    {numeral}
+                  </span>
+                  <Icon
+                    className="h-5 w-5 text-gold/60 transition-transform duration-500 group-hover:scale-110 group-hover:text-gold"
+                    strokeWidth={1.3}
+                  />
+                </div>
+                <h3 className="mt-5 font-display text-xl leading-snug tracking-tight text-foreground transition-colors duration-300 group-hover:text-gold sm:text-2xl">
+                  {t}
+                </h3>
+                <p className="mt-3 text-sm font-light leading-relaxed text-muted-foreground">
+                  {d}
+                </p>
+              </div>
+              <div className="mt-6 h-[1px] w-0 bg-gold/50 transition-all duration-500 group-hover:w-12" />
             </FadeUp>
           ))}
         </div>
