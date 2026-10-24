@@ -120,7 +120,7 @@ export function Manifesto() {
             className="hidden flex-col justify-center border-l border-border/60 pl-8 lg:col-span-3 lg:flex"
           >
             <span className="font-display text-[0.66rem] uppercase tracking-[0.32em] text-gold">
-              N° II · The Sillage
+              The Sillage
             </span>
             <h3 className="mt-4 font-display text-2xl tracking-tight text-foreground">
               Room-Filling Presence
@@ -163,7 +163,7 @@ export function Manifesto() {
             className="hidden flex-col justify-center border-r border-border/60 pr-8 text-right lg:col-span-3 lg:flex"
           >
             <span className="font-display text-[0.66rem] uppercase tracking-[0.32em] text-gold">
-              N° III · Maturation
+              The Maturation
             </span>
             <h3 className="mt-4 font-display text-2xl tracking-tight text-foreground">
               Cold Macerated
@@ -173,7 +173,7 @@ export function Manifesto() {
             </p>
             <div className="mt-6 flex items-center justify-end gap-3">
               <span className="text-[0.64rem] font-medium uppercase tracking-[0.26em] text-foreground/80">
-                Batch N° 24-B · Hand Finished
+                Small-Batch Crafted
               </span>
               <span className="h-1.5 w-1.5 rounded-full bg-gold" />
             </div>
@@ -184,7 +184,7 @@ export function Manifesto() {
         <div className="relative z-10 mt-14 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:hidden">
           <div className="rounded-2xl border border-border/50 bg-card/40 p-6 backdrop-blur-sm">
             <span className="font-display text-[0.66rem] uppercase tracking-[0.28em] text-gold">
-              N° II · Sillage
+              The Sillage
             </span>
             <h4 className="mt-2 font-display text-xl text-foreground">Room-Filling Presence</h4>
             <p className="mt-2 text-xs font-light text-muted-foreground">
@@ -193,7 +193,7 @@ export function Manifesto() {
           </div>
           <div className="rounded-2xl border border-border/50 bg-card/40 p-6 backdrop-blur-sm">
             <span className="font-display text-[0.66rem] uppercase tracking-[0.28em] text-gold">
-              N° III · Maturation
+              The Maturation
             </span>
             <h4 className="mt-2 font-display text-xl text-foreground">Cold Macerated</h4>
             <p className="mt-2 text-xs font-light text-muted-foreground">
