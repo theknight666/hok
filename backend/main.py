@@ -264,26 +264,90 @@ async def register(body: RegisterIn, response: Response):
     return public_user(user)
 
 
+async def ensure_admin_account():
+    admin_email = os.environ.get("ADMIN_EMAIL", "admin@houseoftheknight.com").strip().lower()
+    admin_pw = os.environ.get("ADMIN_PASSWORD", "KnightAdmin#2026").strip()
+    try:
+        existing = await db.users.find_one({"email": admin_email})
+        if not existing:
+            admin_doc = {
+                "user_id": f"user_admin_{uuid.uuid4().hex[:8]}",
+                "email": admin_email,
+                "name": "House Admin",
+                "picture": None,
+                "role": "admin",
+                "password_hash": hash_password(admin_pw),
+                "created_at": now().isoformat(),
+            }
+            await db.users.insert_one(admin_doc)
+            logger.info("Created admin user in DB: %s", admin_email)
+            return admin_doc
+        elif existing.get("role") != "admin" or not existing.get("password_hash") or not verify_password(admin_pw, existing["password_hash"]):
+            new_hash = hash_password(admin_pw)
+            await db.users.update_one(
+                {"email": admin_email},
+                {"$set": {"password_hash": new_hash, "role": "admin"}}
+            )
+            existing["role"] = "admin"
+            existing["password_hash"] = new_hash
+            logger.info("Updated admin credentials in DB: %s", admin_email)
+        return existing
+    except Exception as e:
+        logger.error("ensure_admin_account error: %s", e)
+        return None
+
+
 @api.post("/auth/login")
 async def login(body: LoginIn, request: Request, response: Response):
-    email = body.email.lower()
-    ident = f"{request.client.host if request.client else 'x'}:{email}"
-    att = await db.login_attempts.find_one({"identifier": ident})
-    if att and att.get("count", 0) >= 5:
-        locked = att.get("last")
-        if isinstance(locked, str):
-            locked = datetime.fromisoformat(locked)
-        if locked and now() - locked < timedelta(minutes=15):
-            raise HTTPException(status_code=429, detail="Too many attempts. Try again in 15 minutes.")
+    try:
+        email = body.email.strip().lower()
+        admin_email = os.environ.get("ADMIN_EMAIL", "admin@houseoftheknight.com").strip().lower()
+        admin_pw = os.environ.get("ADMIN_PASSWORD", "KnightAdmin#2026").strip()
+        ident = f"{request.client.host if request.client else 'x'}:{email}"
+
+        # 1. Admin shortcut: If credentials match env ADMIN_EMAIL and ADMIN_PASSWORD
+        if email == admin_email and body.password.strip() == admin_pw:
+            admin_user = await ensure_admin_account()
+            if not admin_user:
+                admin_user = await db.users.find_one({"email": admin_email})
+            if admin_user:
+                await db.login_attempts.delete_one({"identifier": ident})
+                set_auth_cookies(response, admin_user["user_id"])
+                return public_user(admin_user)
+
+        # 2. If it's admin email, ensure the account exists in DB
+        if email == admin_email:
+            await ensure_admin_account()
+
+        # 3. Rate limiting check
+        att = await db.login_attempts.find_one({"identifier": ident})
+        if att and att.get("count", 0) >= 5:
+            locked = att.get("last")
+            if isinstance(locked, str):
+                locked = datetime.fromisoformat(locked)
+            if locked and now() - locked < timedelta(minutes=15):
+                raise HTTPException(status_code=429, detail="Too many attempts. Try again in 15 minutes.")
+            await db.login_attempts.delete_one({"identifier": ident})
+
+        # 4. Standard database lookup and password check
+        user = await db.users.find_one({"email": email})
+        if not user or not user.get("password_hash") or not verify_password(body.password, user["password_hash"]):
+            await db.login_attempts.update_one(
+                {"identifier": ident},
+                {"$inc": {"count": 1}, "$set": {"last": now().isoformat()}},
+                upsert=True
+            )
+            raise HTTPException(status_code=401, detail="Invalid email or password")
+
         await db.login_attempts.delete_one({"identifier": ident})
-    user = await db.users.find_one({"email": email})
-    if not user or not user.get("password_hash") or not verify_password(body.password, user["password_hash"]):
-        await db.login_attempts.update_one({"identifier": ident},
-                                           {"$inc": {"count": 1}, "$set": {"last": now().isoformat()}}, upsert=True)
-        raise HTTPException(status_code=401, detail="Invalid email or password")
-    await db.login_attempts.delete_one({"identifier": ident})
-    set_auth_cookies(response, user["user_id"])
-    return public_user(user)
+        set_auth_cookies(response, user["user_id"])
+        return public_user(user)
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error("Login DB error: %s", e)
+        raise HTTPException(status_code=503, detail=f"Database unavailable: {type(e).__name__}: {str(e)[:120]}")
+
 
 
 @api.post("/auth/refresh")
@@ -356,16 +420,11 @@ async def ensure_seeded():
                 doc = {**p, "price": SEED_PRICES[p["slug"]], "image": f"/images/{p['slug'].replace('-on-the-rocks', '')}.jpg",
                        "low_stock_threshold": 10, "active": True, "featured": True, "updated_at": now().isoformat()}
                 await db.products.insert_one(doc)
-            admin_email = os.environ.get("ADMIN_EMAIL", "admin@houseoftheknight.com").lower()
-            admin_pw = os.environ.get("ADMIN_PASSWORD", "KnightAdmin#2026")
-            existing = await db.users.find_one({"email": admin_email})
-            if not existing:
-                await db.users.insert_one({"user_id": f"user_{uuid.uuid4().hex[:12]}", "email": admin_email, "name": "House Admin",
-                                           "picture": None, "role": "admin", "password_hash": hash_password(admin_pw),
-                                           "created_at": now().isoformat()})
+        await ensure_admin_account()
         _seeded = True
     except Exception as e:
         logger.error("Auto-seeding error: %s", e)
+
 
 
 # ---------- Products ----------

@@ -264,11 +264,62 @@ async def register(body: RegisterIn, response: Response):
     return public_user(user)
 
 
+async def ensure_admin_account():
+    admin_email = os.environ.get("ADMIN_EMAIL", "admin@houseoftheknight.com").strip().lower()
+    admin_pw = os.environ.get("ADMIN_PASSWORD", "KnightAdmin#2026").strip()
+    try:
+        existing = await db.users.find_one({"email": admin_email})
+        if not existing:
+            admin_doc = {
+                "user_id": f"user_admin_{uuid.uuid4().hex[:8]}",
+                "email": admin_email,
+                "name": "House Admin",
+                "picture": None,
+                "role": "admin",
+                "password_hash": hash_password(admin_pw),
+                "created_at": now().isoformat(),
+            }
+            await db.users.insert_one(admin_doc)
+            logger.info("Created admin user in DB: %s", admin_email)
+            return admin_doc
+        elif existing.get("role") != "admin" or not existing.get("password_hash") or not verify_password(admin_pw, existing["password_hash"]):
+            new_hash = hash_password(admin_pw)
+            await db.users.update_one(
+                {"email": admin_email},
+                {"$set": {"password_hash": new_hash, "role": "admin"}}
+            )
+            existing["role"] = "admin"
+            existing["password_hash"] = new_hash
+            logger.info("Updated admin credentials in DB: %s", admin_email)
+        return existing
+    except Exception as e:
+        logger.error("ensure_admin_account error: %s", e)
+        return None
+
+
 @api.post("/auth/login")
 async def login(body: LoginIn, request: Request, response: Response):
     try:
-        email = body.email.lower()
+        email = body.email.strip().lower()
+        admin_email = os.environ.get("ADMIN_EMAIL", "admin@houseoftheknight.com").strip().lower()
+        admin_pw = os.environ.get("ADMIN_PASSWORD", "KnightAdmin#2026").strip()
         ident = f"{request.client.host if request.client else 'x'}:{email}"
+
+        # 1. Admin shortcut: If credentials match env ADMIN_EMAIL and ADMIN_PASSWORD
+        if email == admin_email and body.password.strip() == admin_pw:
+            admin_user = await ensure_admin_account()
+            if not admin_user:
+                admin_user = await db.users.find_one({"email": admin_email})
+            if admin_user:
+                await db.login_attempts.delete_one({"identifier": ident})
+                set_auth_cookies(response, admin_user["user_id"])
+                return public_user(admin_user)
+
+        # 2. If it's admin email, ensure the account exists in DB
+        if email == admin_email:
+            await ensure_admin_account()
+
+        # 3. Rate limiting check
         att = await db.login_attempts.find_one({"identifier": ident})
         if att and att.get("count", 0) >= 5:
             locked = att.get("last")
@@ -277,11 +328,17 @@ async def login(body: LoginIn, request: Request, response: Response):
             if locked and now() - locked < timedelta(minutes=15):
                 raise HTTPException(status_code=429, detail="Too many attempts. Try again in 15 minutes.")
             await db.login_attempts.delete_one({"identifier": ident})
+
+        # 4. Standard database lookup and password check
         user = await db.users.find_one({"email": email})
         if not user or not user.get("password_hash") or not verify_password(body.password, user["password_hash"]):
-            await db.login_attempts.update_one({"identifier": ident},
-                                               {"$inc": {"count": 1}, "$set": {"last": now().isoformat()}}, upsert=True)
+            await db.login_attempts.update_one(
+                {"identifier": ident},
+                {"$inc": {"count": 1}, "$set": {"last": now().isoformat()}},
+                upsert=True
+            )
             raise HTTPException(status_code=401, detail="Invalid email or password")
+
         await db.login_attempts.delete_one({"identifier": ident})
         set_auth_cookies(response, user["user_id"])
         return public_user(user)
@@ -290,6 +347,7 @@ async def login(body: LoginIn, request: Request, response: Response):
     except Exception as e:
         logger.error("Login DB error: %s", e)
         raise HTTPException(status_code=503, detail=f"Database unavailable: {type(e).__name__}: {str(e)[:120]}")
+
 
 
 @api.post("/auth/refresh")
@@ -362,16 +420,18 @@ async def ensure_seeded():
                 doc = {**p, "price": SEED_PRICES[p["slug"]], "image": f"/images/{p['slug'].replace('-on-the-rocks', '')}.jpg",
                        "low_stock_threshold": 10, "active": True, "featured": True, "updated_at": now().isoformat()}
                 await db.products.insert_one(doc)
-            admin_email = os.environ.get("ADMIN_EMAIL", "admin@houseoftheknight.com").lower()
-            admin_pw = os.environ.get("ADMIN_PASSWORD", "KnightAdmin#2026")
-            existing = await db.users.find_one({"email": admin_email})
-            if not existing:
-                await db.users.insert_one({"user_id": f"user_{uuid.uuid4().hex[:12]}", "email": admin_email, "name": "House Admin",
-                                           "picture": None, "role": "admin", "password_hash": hash_password(admin_pw),
-                                           "created_at": now().isoformat()})
+        await ensure_admin_account()
         _seeded = True
     except Exception as e:
         logger.error("Auto-seeding error: %s", e)
+
+
+@api.post("/auth/seed")
+async def manual_seed():
+    """Manual seed endpoint to ensure products and admin user are populated."""
+    await ensure_seeded()
+    return {"ok": True, "message": "Seeded products and admin account"}
+
 
 
 def _seed_fallback():
@@ -798,20 +858,40 @@ async def debug_info():
     mongo_set = mongo_url != "NOT_SET"
     mongo_masked = (mongo_url[:20] + "...") if mongo_set else "NOT SET"
     db_status = "unknown"
+    admin_in_db = False
+    admin_role = None
+    products_count = -1
+    users_count = -1
+    admin_email = os.environ.get("ADMIN_EMAIL", "admin@houseoftheknight.com").strip().lower()
+
     try:
         result = await get_client().admin.command("ping", serverSelectionTimeoutMS=5000)
         db_status = f"connected: {result}"
+        # Auto-seed admin user during debug check as well
+        await ensure_admin_account()
+        u = await db.users.find_one({"email": admin_email}, {"_id": 0, "password_hash": 0})
+        if u:
+            admin_in_db = True
+            admin_role = u.get("role")
+        products_count = await db.products.count_documents({})
+        users_count = await db.users.count_documents({})
     except Exception as e:
         db_status = f"FAILED: {type(e).__name__}: {str(e)[:200]}"
+
     return {
         "python": sys.version,
         "mongo_url_set": mongo_set,
         "mongo_url_preview": mongo_masked,
         "db_name": os.environ.get("DB_NAME", "NOT_SET"),
-        "admin_email_set": bool(os.environ.get("ADMIN_EMAIL")),
+        "admin_email": admin_email,
+        "admin_in_db": admin_in_db,
+        "admin_role": admin_role,
+        "products_count": products_count,
+        "users_count": users_count,
         "jwt_secret_set": bool(os.environ.get("JWT_SECRET")),
         "db_status": db_status,
     }
+
 
 
 app.include_router(api)
