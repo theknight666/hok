@@ -17,28 +17,28 @@ import { FadeUp, EASE } from "@/components/site/Reveal";
 import { KnightMark } from "@/components/site/Logo";
 
 const TOPICS = [
-  "Olfactory Guidance",
-  "Order & Dispatch",
-  "Wholesale & Corporate",
-  "Bespoke Request"
+  "Fragrance Recommendations",
+  "Order & Tracking",
+  "Wholesale Inquiry",
+  "General Question"
 ];
 
 const FAQS = [
   {
-    q: "How close are your formulations to original holy-grail niche scents?",
-    a: "We formulate at 30% pure extrait strength using gas chromatography (GC-MS) to mirror the exact molecular pyramid of the master compositions. Our extraits are designed to be indistinguishable in the air while delivering superior longevity without the synthetic alcohol screech common in mass-market clones."
+    q: "How close are your fragrances to the originals?",
+    a: "We formulate our fragrances using high-quality oils to closely match the scent profiles of popular niche fragrances, offering great longevity and projection."
   },
   {
-    q: "How long does courier dispatch take across India?",
-    a: "Orders placed before 2:00 PM IST are processed the same day. All parcels travel via express air courier in heat-isolated packaging. Metro deliveries arrive in 2–3 business days; all other locations within 3–4 business days."
+    q: "How long does shipping take?",
+    a: "Orders are processed and dispatched within 24–48 hours. Metro deliveries usually arrive within 2–4 business days, and 4–6 business days for other locations across India."
   },
   {
-    q: "Can I sample your fragrances before committing to a 50ml flacon?",
-    a: "Yes. Every fragrance in our collection is available in an official 2ml atomized sample size, or you can build a 4-piece discovery collection with complimentary priority shipping."
+    q: "Can I try a sample before buying a full bottle?",
+    a: "Yes! Every fragrance in our collection is available in a 2ml sample vial for ₹99, or you can pick up the complete 4-piece Discovery Set."
   },
   {
-    q: "What is your transit damage and exchange guarantee?",
-    a: "Every shipment is insured against transit damage. If your crystal flacon arrives broken or leaking, simply message our concierge with a photograph and a brand-new replacement flacon will be dispatched immediately."
+    q: "What if my bottle arrives damaged or leaking?",
+    a: "We pack all orders securely in protective bubble wrap and sturdy boxes. In the rare case a bottle arrives damaged or leaking, simply message us a photo on WhatsApp or email, and we will send a replacement."
   }
 ];
 
@@ -70,14 +70,13 @@ export default function Contact() {
         subject: topic,
         message
       });
-      setTicket(res.data?.ticket_id || `HOTK-CONCIERGE-${Math.random().toString(36).substring(2, 6).toUpperCase()}`);
+      setTicket(res.data?.ticket_id || `HOTK-${Math.random().toString(36).substring(2, 6).toUpperCase()}`);
       setName("");
       setEmail("");
       setPhone("");
       setMessage("");
     } catch (err) {
-      // In case server has network issues, provide graceful luxury confirmation
-      setTicket(`HOTK-CONCIERGE-${Math.random().toString(36).substring(2, 6).toUpperCase()}`);
+      setTicket(`HOTK-${Math.random().toString(36).substring(2, 6).toUpperCase()}`);
     } finally {
       setLoading(false);
     }
@@ -93,47 +92,47 @@ export default function Contact() {
           <div className="flex items-center gap-3">
             <KnightMark className="h-6 w-6 text-gold" />
             <span className="text-[0.66rem] font-medium uppercase tracking-[0.3em] text-gold">
-              House Concierge · Private Inquiry
+              Contact & Support
             </span>
           </div>
 
           <h1 className="hero-title mt-4 font-display tracking-tight text-foreground">
-            At your <span className="font-display-italic text-gold">service.</span>
+            How can we <span className="font-display-italic text-gold">help?</span>
           </h1>
 
-          <p className="mt-6 max-w-xl text-base font-light leading-relaxed text-muted-foreground sm:text-lg">
-            Whether you desire olfactory guidance to find your signature scent, need priority dispatch assistance, or wish to commission a bespoke collection — our concierge is at your disposal.
+          <p className="mt-4 max-w-xl text-base font-light leading-relaxed text-muted-foreground sm:text-lg">
+            Have a question about a fragrance, need help tracking an order, or looking for recommendations? Reach out to us below.
           </p>
         </div>
 
         {/* ======================================================== */}
         {/* SPLIT LAYOUT: DIRECT CHANNELS VS INQUIRY TERMINAL        */}
         {/* ======================================================== */}
-        <div className="mt-16 grid grid-cols-1 gap-12 lg:grid-cols-12 lg:items-start">
-          {/* Left Column: Concierge Channels */}
-          <div className="space-y-8 lg:col-span-5">
-            <div className="rounded-[2.5rem] border border-border/60 bg-card/40 p-8 shadow-xl backdrop-blur-md sm:p-10 space-y-8">
-              <h3 className="font-display text-2xl text-foreground">Direct Concierge</h3>
+        <div className="mt-12 grid grid-cols-1 gap-10 lg:grid-cols-12 lg:items-start">
+          {/* Left Column: Direct Channels */}
+          <div className="space-y-6 lg:col-span-5">
+            <div className="rounded-[2.5rem] border border-border/60 bg-card/40 p-6 shadow-xl backdrop-blur-md sm:p-8 space-y-5">
+              <h3 className="font-display text-2xl text-foreground">Direct Support</h3>
 
-              <div className="space-y-6">
+              <div className="space-y-4">
                 {/* Email */}
                 <a
-                  href="mailto:concierge@houseoftheknight.com"
+                  href="mailto:support@houseoftheknight.com"
                   className="group flex items-start gap-4 rounded-2xl border border-border/40 bg-background/50 p-4 transition-all duration-300 hover:border-gold hover:bg-background/80"
                 >
                   <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gold/15 text-gold transition-transform group-hover:scale-110">
                     <Mail className="h-5 w-5" />
                   </div>
                   <div>
-                    <p className="text-[0.62rem] font-medium uppercase tracking-[0.24em] text-gold">Concierge Desk</p>
-                    <p className="font-display text-base text-foreground mt-0.5">concierge@houseoftheknight.com</p>
-                    <p className="text-xs text-muted-foreground mt-1">Guaranteed response within 2 hours</p>
+                    <p className="text-[0.62rem] font-medium uppercase tracking-[0.24em] text-gold">Email Support</p>
+                    <p className="font-display text-base text-foreground mt-0.5">support@houseoftheknight.com</p>
+                    <p className="text-xs text-muted-foreground mt-1">Replies within 24 hours</p>
                   </div>
                 </a>
 
                 {/* WhatsApp */}
                 <a
-                  href="https://wa.me/919820048291?text=Hello%20House%20of%20the%20Knight%20Concierge,%20I%20would%20like%20guidance%20on%20a%20fragrance."
+                  href="https://wa.me/919820048291?text=Hello%20House%20of%20the%20Knight,%20I%20have%20a%20question%20about%20a%20fragrance."
                   target="_blank"
                   rel="noopener noreferrer"
                   className="group flex items-start gap-4 rounded-2xl border border-border/40 bg-background/50 p-4 transition-all duration-300 hover:border-gold hover:bg-background/80"
@@ -142,60 +141,60 @@ export default function Contact() {
                     <MessageSquare className="h-5 w-5" />
                   </div>
                   <div>
-                    <p className="text-[0.62rem] font-medium uppercase tracking-[0.24em] text-gold">WhatsApp Specialist</p>
+                    <p className="text-[0.62rem] font-medium uppercase tracking-[0.24em] text-gold">WhatsApp Chat</p>
                     <p className="font-display text-base text-foreground mt-0.5">+91 98200 48291</p>
-                    <p className="text-xs text-muted-foreground mt-1">Direct chat with a fragrance advisor</p>
+                    <p className="text-xs text-muted-foreground mt-1">Quick answers via WhatsApp</p>
                   </div>
                 </a>
 
-                {/* Atelier Location */}
+                {/* Location */}
                 <div className="flex items-start gap-4 rounded-2xl border border-border/40 bg-background/50 p-4">
                   <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gold/15 text-gold">
                     <MapPin className="h-5 w-5" />
                   </div>
                   <div>
-                    <p className="text-[0.62rem] font-medium uppercase tracking-[0.24em] text-gold">Atelier & Dispatch</p>
-                    <p className="font-display text-base text-foreground mt-0.5">The Knight Atelier</p>
+                    <p className="text-[0.62rem] font-medium uppercase tracking-[0.24em] text-gold">Location</p>
+                    <p className="font-display text-base text-foreground mt-0.5">Mumbai, Maharashtra</p>
                     <p className="text-xs text-muted-foreground mt-1">
-                      Suite 402, G-Block, Bandra Kurla Complex, Mumbai, Maharashtra 400051
+                      Online dispatch across all of India
                     </p>
                   </div>
                 </div>
 
-                {/* Operational Hours */}
+                {/* Hours */}
                 <div className="flex items-start gap-4 rounded-2xl border border-border/40 bg-background/50 p-4">
                   <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gold/15 text-gold">
                     <Clock className="h-5 w-5" />
                   </div>
                   <div>
-                    <p className="text-[0.62rem] font-medium uppercase tracking-[0.24em] text-gold">Advisory Hours</p>
-                    <p className="font-display text-base text-foreground mt-0.5">Mon – Sat: 10:00 AM – 9:00 PM IST</p>
-                    <p className="text-xs text-muted-foreground mt-1">Sunday: Reserved for private maceration runs</p>
+                    <p className="text-[0.62rem] font-medium uppercase tracking-[0.24em] text-gold">Support Hours</p>
+                    <p className="font-display text-base text-foreground mt-0.5">Mon – Sat: 10:00 AM – 8:00 PM IST</p>
+                    <p className="text-xs text-muted-foreground mt-1">Sunday: Closed</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Scent Request Card */}
-            <div className="rounded-[2.5rem] border border-gold/30 bg-gradient-to-br from-gold/10 to-transparent p-8 sm:p-10">
+            {/* Scent Suggestion Card */}
+            <div className="rounded-[2.5rem] border border-gold/30 bg-gradient-to-br from-gold/10 to-transparent p-6 sm:p-8">
               <div className="flex items-center gap-2">
                 <Sparkles className="h-5 w-5 text-gold" />
                 <span className="text-[0.64rem] font-medium uppercase tracking-[0.28em] text-gold">
-                  Olfactory Wishlist
+                  Fragrance Requests
                 </span>
               </div>
-              <h4 className="mt-3 font-display text-xl text-foreground">
-                Hunting for a specific niche clone?
+              <h4 className="mt-2 font-display text-lg text-foreground">
+                Looking for a specific clone?
               </h4>
-              <p className="mt-2 text-xs font-light leading-relaxed text-muted-foreground">
-                If there is an unreleased holy-grail formulation you desire, let our atelier know. We prioritize community requests for upcoming small-batch distillation runs.
+              <p className="mt-1 text-xs font-light leading-relaxed text-muted-foreground">
+                If there is a niche fragrance you'd like us to create next, let us know! We prioritize community suggestions for our upcoming batches.
               </p>
             </div>
           </div>
 
-          {/* Right Column: Private Inquiry Terminal */}
+          {/* Right Column: Inquiry Form */}
           <div className="lg:col-span-7">
-            <div className="rounded-[2.5rem] border border-border/60 bg-card/40 p-8 shadow-2xl backdrop-blur-md sm:p-12">
+            <div className="rounded-[2.5rem] border border-border/60 bg-card/40 p-6 shadow-2xl backdrop-blur-md sm:p-10">
               <AnimatePresence mode="wait">
                 {ticket ? (
                   <motion.div
@@ -204,37 +203,37 @@ export default function Contact() {
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.95 }}
                     transition={{ duration: 0.6, ease: EASE }}
-                    className="py-12 text-center"
+                    className="py-10 text-center"
                   >
-                    <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full border-2 border-gold bg-gold/15 text-gold shadow-lg shadow-gold/20">
-                      <CheckCircle2 className="h-10 w-10" />
+                    <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border-2 border-gold bg-gold/15 text-gold shadow-lg shadow-gold/20">
+                      <CheckCircle2 className="h-8 w-8" />
                     </div>
 
-                    <h3 className="mt-8 font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-                      Inquiry Received.
+                    <h3 className="mt-6 font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+                      Message Sent!
                     </h3>
 
-                    <p className="mx-auto mt-4 max-w-md text-sm font-light leading-relaxed text-muted-foreground">
-                      Your message has been logged directly into our concierge queue under ticket reference:
+                    <p className="mx-auto mt-3 max-w-md text-sm font-light leading-relaxed text-muted-foreground">
+                      Thank you for contacting us. We have received your message under reference:
                     </p>
 
-                    <div className="mx-auto mt-4 inline-block rounded-full border border-gold/40 bg-background/80 px-6 py-2.5 font-mono text-sm font-semibold tracking-wider text-gold">
+                    <div className="mx-auto mt-4 inline-block rounded-full border border-gold/40 bg-background/80 px-5 py-2 font-mono text-sm font-semibold tracking-wider text-gold">
                       {ticket}
                     </div>
 
                     <p className="mt-4 text-xs text-muted-foreground">
-                      A senior fragrance advisor will review your notes and respond within two hours.
+                      We will get back to you via email or WhatsApp as soon as possible.
                     </p>
 
-                    <div className="mt-10 flex flex-wrap justify-center gap-4">
+                    <div className="mt-8 flex flex-wrap justify-center gap-4">
                       <button
                         onClick={() => setTicket(null)}
                         className="btn-royal"
                       >
-                        Send Another Inquiry
+                        Send Another Message
                       </button>
                       <a href="/collection" className="btn-ghost-royal">
-                        Explore Collection
+                        Browse Fragrances
                       </a>
                     </div>
                   </motion.div>
@@ -245,32 +244,30 @@ export default function Contact() {
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     onSubmit={handleSubmit}
-                    className="space-y-8"
+                    className="space-y-6"
                   >
                     <div>
-                      <h3 className="font-display text-2xl text-foreground sm:text-3xl">
-                        Send a Private Message
-                      </h3>
-                      <p className="mt-2 text-xs font-light text-muted-foreground">
-                        Select your inquiry topic and our dedicated advisor will respond promptly.
+                      <h3 className="font-display text-2xl text-foreground">Send a Message</h3>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Fill in the details below and we'll reply shortly.
                       </p>
                     </div>
 
-                    {/* Topic Selector Pills */}
+                    {/* Topic Pills */}
                     <div>
-                      <label className="block text-[0.64rem] font-medium uppercase tracking-[0.26em] text-gold mb-3">
-                        Inquiry Topic
+                      <label className="block text-[0.66rem] font-medium uppercase tracking-[0.24em] text-gold mb-3">
+                        Topic
                       </label>
-                      <div className="flex flex-wrap gap-2.5">
+                      <div className="flex flex-wrap gap-2">
                         {TOPICS.map((t) => (
                           <button
                             key={t}
                             type="button"
                             onClick={() => setTopic(t)}
-                            className={`rounded-full px-4 py-2 text-xs font-medium uppercase tracking-[0.18em] transition-all duration-300 ${
+                            className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-all ${
                               topic === t
-                                ? "bg-foreground text-background shadow-md"
-                                : "border border-border/70 bg-background/40 text-muted-foreground hover:border-gold hover:text-foreground"
+                                ? "border-gold bg-gold text-[#0C0B0E] font-semibold shadow-sm"
+                                : "border border-border/70 bg-background/50 text-muted-foreground hover:border-foreground/50 hover:text-foreground"
                             }`}
                           >
                             {t}
@@ -279,24 +276,24 @@ export default function Contact() {
                       </div>
                     </div>
 
-                    {/* Input Grid */}
-                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                    {/* Inputs */}
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                       <div>
-                        <label className="block text-[0.64rem] font-medium uppercase tracking-[0.26em] text-gold">
-                          Your Full Name <span className="text-foreground/50">*</span>
+                        <label className="block text-[0.66rem] font-medium uppercase tracking-[0.24em] text-gold">
+                          Your Name <span className="text-foreground/50">*</span>
                         </label>
                         <input
                           type="text"
                           required
                           value={name}
                           onChange={(e) => setName(e.target.value)}
-                          placeholder="Lord Sterling"
-                          className="mt-2 w-full rounded-2xl border border-border/60 bg-background/80 px-5 py-3.5 text-sm text-foreground placeholder:text-muted-foreground/40 focus:border-gold focus:outline-none"
+                          placeholder="Your Name"
+                          className="mt-1.5 w-full rounded-2xl border border-border/60 bg-background/80 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/40 focus:border-gold focus:outline-none"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-[0.64rem] font-medium uppercase tracking-[0.26em] text-gold">
+                        <label className="block text-[0.66rem] font-medium uppercase tracking-[0.24em] text-gold">
                           Email Address <span className="text-foreground/50">*</span>
                         </label>
                         <input
@@ -304,36 +301,36 @@ export default function Contact() {
                           required
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
-                          placeholder="sterling@houseoftheknight.com"
-                          className="mt-2 w-full rounded-2xl border border-border/60 bg-background/80 px-5 py-3.5 text-sm text-foreground placeholder:text-muted-foreground/40 focus:border-gold focus:outline-none"
+                          placeholder="you@email.com"
+                          className="mt-1.5 w-full rounded-2xl border border-border/60 bg-background/80 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/40 focus:border-gold focus:outline-none"
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-[0.64rem] font-medium uppercase tracking-[0.26em] text-gold">
-                        Phone / WhatsApp <span className="text-foreground/40 font-light text-[0.6rem]">(Optional for WhatsApp reply)</span>
+                      <label className="block text-[0.66rem] font-medium uppercase tracking-[0.24em] text-gold">
+                        Phone / WhatsApp <span className="text-muted-foreground font-light text-[0.62rem]">(Optional)</span>
                       </label>
                       <input
                         type="tel"
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
-                        placeholder="+91 98200 00000"
-                        className="mt-2 w-full rounded-2xl border border-border/60 bg-background/80 px-5 py-3.5 text-sm text-foreground placeholder:text-muted-foreground/40 focus:border-gold focus:outline-none"
+                        placeholder="+91 98765 43210"
+                        className="mt-1.5 w-full rounded-2xl border border-border/60 bg-background/80 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/40 focus:border-gold focus:outline-none"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-[0.64rem] font-medium uppercase tracking-[0.26em] text-gold">
-                        Message & Olfactory Notes <span className="text-foreground/50">*</span>
+                      <label className="block text-[0.66rem] font-medium uppercase tracking-[0.24em] text-gold">
+                        Message <span className="text-foreground/50">*</span>
                       </label>
                       <textarea
                         required
-                        rows={5}
+                        rows={4}
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
-                        placeholder="Tell us about your fragrance preferences, order questions, or custom requests..."
-                        className="mt-2 w-full rounded-2xl border border-border/60 bg-background/80 p-5 text-sm leading-relaxed text-foreground placeholder:text-muted-foreground/40 focus:border-gold focus:outline-none"
+                        placeholder="Tell us what you need help with..."
+                        className="mt-1.5 w-full rounded-2xl border border-border/60 bg-background/80 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/40 focus:border-gold focus:outline-none"
                       />
                     </div>
 
@@ -344,18 +341,9 @@ export default function Contact() {
                     <button
                       type="submit"
                       disabled={loading}
-                      className="btn-royal w-full !py-4 shadow-lg hover:shadow-gold/20"
+                      className="btn-royal w-full !py-3.5 shadow-lg"
                     >
-                      {loading ? (
-                        <span className="flex items-center gap-2">
-                          <span className="h-4 w-4 animate-spin rounded-full border-2 border-background border-t-transparent" />
-                          Transmitting to Concierge...
-                        </span>
-                      ) : (
-                        <span className="flex items-center gap-2">
-                          Send Private Inquiry <ArrowRight className="h-4 w-4" />
-                        </span>
-                      )}
+                      {loading ? "Sending..." : "Send Message"}
                     </button>
                   </motion.form>
                 )}
@@ -365,49 +353,47 @@ export default function Contact() {
         </div>
 
         {/* ======================================================== */}
-        {/* FREQUENTLY CONSULTED INQUIRIES (ACCORDION)               */}
+        {/* CLIENT FAQS                                              */}
         {/* ======================================================== */}
-        <div className="mt-28 border-t border-border/40 pt-16">
-          <div className="max-w-2xl">
-            <p className="text-[0.66rem] font-medium uppercase tracking-[0.3em] text-gold">
-              Client Advisory
-            </p>
-            <h3 className="mt-2 font-display text-3xl text-foreground">
-              Frequently Consulted Inquiries
-            </h3>
-          </div>
+        <div className="mt-20 border-t border-border/40 pt-14">
+          <p className="eyebrow text-center">Frequently Asked Questions</p>
+          <h2 className="display-sm mt-2 text-center font-display text-foreground">
+            Common Questions
+          </h2>
 
-          <div className="mt-10 divide-y divide-border/40 border-y border-border/40">
-            {FAQS.map((faq, index) => {
-              const isOpen = openFaq === index;
+          <div className="mx-auto mt-8 max-w-3xl space-y-3">
+            {FAQS.map((faq, idx) => {
+              const isOpen = openFaq === idx;
               return (
-                <div key={index} className="py-6">
+                <div
+                  key={idx}
+                  className="overflow-hidden rounded-2xl border border-border/60 bg-card/40 transition-colors hover:border-border"
+                >
                   <button
-                    onClick={() => setOpenFaq(isOpen ? null : index)}
-                    className="flex w-full items-center justify-between text-left focus:outline-none group"
+                    type="button"
+                    onClick={() => setOpenFaq(isOpen ? null : idx)}
+                    className="flex w-full items-center justify-between p-5 text-left transition-colors"
                   >
-                    <span className="font-display text-lg sm:text-xl text-foreground transition-colors group-hover:text-gold">
+                    <span className="font-display text-base font-medium text-foreground sm:text-lg">
                       {faq.q}
                     </span>
                     <ChevronDown
-                      className={`h-5 w-5 shrink-0 text-gold/80 transition-transform duration-300 ${
-                        isOpen ? "rotate-180" : ""
+                      className={`h-5 w-5 text-muted-foreground transition-transform duration-300 ${
+                        isOpen ? "rotate-180 text-gold" : ""
                       }`}
                     />
                   </button>
-
                   <AnimatePresence>
                     {isOpen && (
                       <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.35, ease: EASE }}
-                        className="overflow-hidden"
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3 }}
                       >
-                        <p className="mt-4 text-sm font-light leading-relaxed text-muted-foreground sm:text-base">
+                        <div className="border-t border-border/40 p-5 pt-3 text-sm leading-relaxed text-muted-foreground">
                           {faq.a}
-                        </p>
+                        </div>
                       </motion.div>
                     )}
                   </AnimatePresence>

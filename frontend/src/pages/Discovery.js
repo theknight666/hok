@@ -8,10 +8,10 @@ import {
   ShieldCheck,
   Droplets,
   ArrowRight,
-  Gift,
   Flame,
   Clock,
-  Compass
+  Compass,
+  Smile
 } from "lucide-react";
 import { toast } from "sonner";
 import { useProducts } from "@/hooks/useProducts";
@@ -24,18 +24,18 @@ import { SplitChars, FadeUp, EASE } from "@/components/site/Reveal";
 const ADVANTAGES = [
   {
     icon: Droplets,
-    title: "30% Pure Extrait Concentration",
-    desc: "Not dilute Eau de Parfum. Every 2ml discovery vial is filled directly from our 45-day macerated extrait batch for identical projection and sillage."
+    title: "Test On Your Skin",
+    desc: "Fragrance develops differently on everyone. A 2ml sample lets you test the opening, heart, and drydown over a full day of wear."
   },
   {
-    icon: Gift,
-    title: "100% Sample Credit Back",
-    desc: "Includes an exclusive ₹500 digital House voucher with every Coffret, redeemable against any full 50ml flacon within 30 days."
+    icon: Sparkles,
+    title: "30+ Sprays Per Vial",
+    desc: "Each 2ml spray vial gives you around 30 to 35 sprays, giving you 4 to 5 wears to decide if it's the right signature for you."
   },
   {
     icon: ShieldCheck,
-    title: "Precision Micro-Mist Vials",
-    desc: "Encased in laboratory-grade glass with airtight crimped Italian atomizers, calibrated to deliver 35+ generous sprays without leakage."
+    title: "Pocket-Friendly & Travel-Ready",
+    desc: "Compact spray vials that easily slip into your pocket, gym bag, or car console for easy reapplication on the go."
   }
 ];
 
@@ -54,8 +54,8 @@ export default function DiscoveryPage() {
     signatures.forEach((p) => {
       add(p, 1, "2 ml");
     });
-    toast.success("Complete 4-Piece Discovery Coffret added to your bag", {
-      description: "Includes 4x 2ml extraits + complimentary travel presentation."
+    toast.success("Complete 4-Piece Discovery Set added to your bag", {
+      description: "Includes 4x 2ml discovery spray vials."
     });
     setTimeout(() => setAddingAll(false), 600);
   };
@@ -75,31 +75,29 @@ export default function DiscoveryPage() {
           <div className="flex items-center gap-3">
             <KnightMark className="h-6 w-6 text-gold" />
             <span className="text-[0.66rem] font-medium uppercase tracking-[0.3em] text-gold">
-              Discovery Archive · 2ml Discovery Coffrets
+              Discovery Samples · 2ml Spray Vials
             </span>
           </div>
 
           <h1 className="hero-title mt-4 font-display tracking-tight text-foreground">
-            <span className="block">Four Master Scents.</span>
-            <span className="font-display-italic text-gold">Decanted for Trial.</span>
+            <span className="block">Sample before you commit.</span>
+            <span className="font-display-italic text-gold">Four Signature Extraits.</span>
           </h1>
 
-          <p className="mt-6 text-base font-normal leading-relaxed text-muted-foreground sm:text-lg">
-            Experience the full molecular depth of House of the Knight before committing to a 50ml flacon.
-            Each 2ml discovery vial is hand-filled with authentic 30% pure extrait de parfum, delivering 35+ generous sprays
-            for multi-day skin chemistry evaluation.
+          <p className="mt-4 text-base font-normal leading-relaxed text-muted-foreground sm:text-lg">
+            Try our fragrances in handy 2ml spray vials before ordering a full 50ml bottle.
+            Each vial contains 30+ sprays of our extrait formulation, allowing you to test performance and longevity on your skin.
           </p>
 
-          <div className="mt-5 inline-flex items-center gap-2 rounded-full border border-gold/40 bg-gold/5 px-4 py-1.5 text-xs text-gold">
-            <Sparkles className="h-3.5 w-3.5" />
-            <span>Includes 100% sample rebate voucher toward your first full bottle</span>
+          <div className="mt-5 inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/40 px-4 py-1.5 text-xs text-muted-foreground">
+            <span>₹99 per 2ml vial · Available individually or as a 4-piece set</span>
           </div>
         </div>
 
         {/* ======================================================== */}
         {/* COMPLETE DISCOVERY COFFRET HERO CARD                    */}
         {/* ======================================================== */}
-        <FadeUp className="mt-14">
+        <FadeUp className="mt-12">
           <div className="relative overflow-hidden rounded-3xl border border-gold/30 bg-gradient-to-br from-card/90 via-card/50 to-gold/5 p-6 backdrop-blur-xl sm:p-10 lg:p-12 shadow-2xl">
             <div className="absolute top-0 right-0 -mr-16 -mt-16 h-72 w-72 rounded-full bg-gold/10 blur-3xl pointer-events-none" />
 
@@ -107,26 +105,25 @@ export default function DiscoveryPage() {
               <div className="lg:col-span-7">
                 <div className="flex flex-wrap items-center gap-3">
                   <span className="rounded-full bg-gold px-3 py-1 text-[0.62rem] font-bold uppercase tracking-[0.25em] text-[#0C0B0E]">
-                    The Master Quad
+                    Best Value
                   </span>
                   <span className="text-xs uppercase tracking-widest text-muted-foreground">
-                    Complete 4 × 2ml Coffret Set
+                    Complete 4 × 2ml Discovery Set
                   </span>
                 </div>
 
                 <h2 className="mt-4 font-display text-3xl sm:text-4xl text-foreground">
-                  The Knight Discovery Coffret
+                  The Complete Discovery Set
                 </h2>
 
-                <p className="mt-4 text-sm leading-relaxed text-muted-foreground sm:text-base max-w-xl">
-                  Curated for collectors and discerning noses. Contains our complete signature rotation: Blonde Amber, Layton,
-                  Angels Share On The Rocks, and Side Effect. Packaged in a bespoke matte obsidian coffret sleeve with individual olfactory profile cards.
+                <p className="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-base max-w-xl">
+                  Get all 4 of our signature fragrances in 2ml spray vials: Blonde Amber, Layton, Angels Share On The Rocks, and Side Effect. Perfect for finding your everyday favorite or layering different scent profiles.
                 </p>
 
                 <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
                   {signatures.map((p) => (
                     <div key={p.slug} className="rounded-2xl border border-border/70 bg-background/50 p-3 text-left">
-                      <span className="text-[10px] font-mono text-gold uppercase tracking-wider block">2ml Extrait</span>
+                      <span className="text-[10px] font-mono text-gold uppercase tracking-wider block">2ml Vial</span>
                       <p className="font-display text-sm font-medium mt-1 truncate">{p.name}</p>
                       <p className="text-[11px] text-muted-foreground mt-0.5 truncate">{p.tagline || "Extrait de Parfum"}</p>
                     </div>
@@ -135,7 +132,7 @@ export default function DiscoveryPage() {
 
                 <div className="mt-8 flex flex-wrap items-center gap-6">
                   <div>
-                    <span className="text-xs uppercase tracking-widest text-muted-foreground block">Coffret Price</span>
+                    <span className="text-xs uppercase tracking-widest text-muted-foreground block">Set Price</span>
                     <span className="font-display text-4xl text-foreground font-semibold">{inr(coffretPrice)}</span>
                   </div>
 
@@ -146,7 +143,7 @@ export default function DiscoveryPage() {
                     data-testid="add-coffret-btn"
                   >
                     <ShoppingBag className="h-4 w-4" />
-                    <span>{addingAll ? "Adding All 4 Vials..." : `Add Complete Coffret · ${inr(coffretPrice)}`}</span>
+                    <span>{addingAll ? "Adding All 4 Vials..." : `Add Complete Set · ${inr(coffretPrice)}`}</span>
                   </button>
                 </div>
               </div>
@@ -181,10 +178,10 @@ export default function DiscoveryPage() {
 
                   <div className="mt-4 border-t border-border/50 pt-4 flex items-center justify-between text-xs text-muted-foreground px-2">
                     <span className="flex items-center gap-1">
-                      <Flame className="h-3.5 w-3.5 text-gold" /> 30% Pure Extrait
+                      <Flame className="h-3.5 w-3.5 text-gold" /> Long Lasting
                     </span>
                     <span className="flex items-center gap-1">
-                      <Clock className="h-3.5 w-3.5 text-gold" /> 12h+ Projection
+                      <Clock className="h-3.5 w-3.5 text-gold" /> 30+ Sprays Each
                     </span>
                   </div>
                 </div>
@@ -196,20 +193,20 @@ export default function DiscoveryPage() {
         {/* ======================================================== */}
         {/* INDIVIDUAL DISCOVERY VIALS GRID                         */}
         {/* ======================================================== */}
-        <div className="mt-24">
+        <div className="mt-20">
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
             <div>
-              <p className="eyebrow">Individual Vials</p>
+              <p className="eyebrow">Individual Samples</p>
               <h2 className="display-sm mt-2 font-display text-foreground">
-                Select Your Single 2ml Vials
+                Pick Individual 2ml Vials
               </h2>
             </div>
             <p className="text-xs uppercase tracking-widest text-muted-foreground">
-              ₹99 Each · Free Shipping Over ₹1,500
+              ₹99 Each · Free Shipping Over ₹15,000
             </p>
           </div>
 
-          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {signatures.map((p) => {
               const samplePrice = p.sample_price || 99;
               return (
@@ -222,10 +219,10 @@ export default function DiscoveryPage() {
                     {/* Header Badges */}
                     <div className="flex items-center justify-between">
                       <span className="rounded-full border border-gold/40 bg-gold/10 px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-gold">
-                        2ml Sample
+                        2ml Spray
                       </span>
                       <span className="text-[11px] font-mono text-muted-foreground">
-                        35+ Sprays
+                        30+ Sprays
                       </span>
                     </div>
 
@@ -241,7 +238,7 @@ export default function DiscoveryPage() {
                     </div>
 
                     {/* Info */}
-                    <p className="eyebrow text-xs">{p.badge || "Signature Extrait"}</p>
+                    <p className="eyebrow text-xs">{p.badge || "Signature Scent"}</p>
                     <h3 className="font-display text-2xl font-medium mt-1 text-foreground">
                       <Link to={`/fragrance/${p.slug}`} className="hover:text-gold transition-colors">
                         {p.name}
@@ -266,7 +263,7 @@ export default function DiscoveryPage() {
                   {/* Price & Action */}
                   <div className="mt-6 border-t border-border/60 pt-4 flex items-center justify-between">
                     <div>
-                      <span className="text-[10px] uppercase tracking-wider text-muted-foreground block">Trial Vial</span>
+                      <span className="text-[10px] uppercase tracking-wider text-muted-foreground block">2ml Sample</span>
                       <span className="font-display text-xl font-bold text-foreground">{inr(samplePrice)}</span>
                     </div>
 
@@ -286,15 +283,15 @@ export default function DiscoveryPage() {
         </div>
 
         {/* ======================================================== */}
-        {/* THE HOUSE SAMPLING PROTOCOL                              */}
+        {/* WHY SAMPLE FIRST                                         */}
         {/* ======================================================== */}
-        <div className="mt-28 rounded-3xl border border-border/60 bg-card/30 p-8 sm:p-12">
-          <p className="eyebrow text-center">The Protocol</p>
+        <div className="mt-20 rounded-3xl border border-border/60 bg-card/30 p-8 sm:p-12">
+          <p className="eyebrow text-center">Sampling Guide</p>
           <h2 className="display-sm mt-2 text-center font-display text-foreground">
-            Why We Insist You Sample First
+            Why Try a Sample First?
           </h2>
 
-          <div className="mt-12 grid gap-8 sm:grid-cols-3">
+          <div className="mt-10 grid gap-6 sm:grid-cols-3">
             {ADVANTAGES.map((a, i) => {
               const Icon = a.icon;
               return (
@@ -309,18 +306,18 @@ export default function DiscoveryPage() {
             })}
           </div>
 
-          <div className="mt-12 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-border/50 pt-8">
+          <div className="mt-10 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-border/50 pt-8">
             <div className="flex items-center gap-3">
               <Compass className="h-5 w-5 text-gold" />
               <p className="text-xs sm:text-sm text-muted-foreground">
-                Seeking personalized guidance before choosing? Speak with our fragrance concierges.
+                Need help deciding which scent suits you best? Feel free to contact us.
               </p>
             </div>
             <Link
               to="/contact"
               className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-gold hover:underline"
             >
-              <span>Private Concierge Consultation</span>
+              <span>Contact Us</span>
               <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </div>

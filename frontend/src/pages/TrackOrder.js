@@ -8,24 +8,23 @@ import {
   CheckCircle2,
   Clock,
   ShieldCheck,
-  ThermometerSnowflake,
-  Sparkles,
   ArrowRight,
   ExternalLink,
-  HelpCircle,
   Copy,
   Check,
-  AlertCircle
+  AlertCircle,
+  HelpCircle,
+  Box
 } from "lucide-react";
 import { api, inr, formatErr } from "@/lib/api";
 import { FadeUp, EASE } from "@/components/site/Reveal";
 import { KnightMark } from "@/components/site/Logo";
 
 const STEPS = [
-  { id: "confirmed", label: "Formulation & Quality Seal", desc: "Batch verified, serialized crystal flacon filled." },
-  { id: "processing", label: "Crest & Presentation Packaging", desc: "Secured in cushioned velvet case with wax seal." },
-  { id: "dispatched", label: "Temperature-Controlled Transit", desc: "En route via express air courier in heat-isolated packaging." },
-  { id: "delivered", label: "Delivered to Recipient", desc: "Handed over with signature verification." },
+  { id: "confirmed", label: "Order Confirmed", desc: "Your order has been received and verified." },
+  { id: "processing", label: "Packed & Prepared", desc: "Carefully wrapped and boxed for safe transit." },
+  { id: "dispatched", label: "Dispatched", desc: "Handed over to courier with live tracking." },
+  { id: "delivered", label: "Delivered", desc: "Delivered to your shipping address." },
 ];
 
 export default function TrackOrder() {
@@ -54,7 +53,7 @@ export default function TrackOrder() {
       const res = await api.get(`/orders/track/${encodeURIComponent(cleanId)}`, { params });
       setOrder(res.data);
     } catch (err) {
-      // If error, check if user requested a demo/sample fallback
+      // Fallback demo for previewing tracking UI
       if (cleanId.includes("DEMO") || cleanId.includes("ROYAL") || cleanId.includes("SAMPLE")) {
         setOrder({
           order_id: cleanId,
@@ -62,26 +61,26 @@ export default function TrackOrder() {
           payment_status: "paid",
           created_at: new Date(Date.now() - 2 * 86400000).toISOString(),
           tracking_number: "BD-982410982",
-          courier: "BlueDart Air Express",
-          estimated_delivery: "Within 48 Hours",
+          courier: "BlueDart Express",
+          estimated_delivery: "Within 2–3 Days",
           items: [
-            { slug: "blonde-amber", name: "Blonde Amber", size: "50 ml", price: 18500, qty: 1, image: "/images/blonde-amber.jpg" },
-            { slug: "layton", name: "Layton", size: "50 ml", price: 16500, qty: 1, image: "/images/layton.jpg" }
+            { slug: "blonde-amber", name: "Blonde Amber", size: "50 ml", price: 1599, qty: 1, image: "/images/blonde-amber.jpg" },
+            { slug: "layton", name: "Layton", size: "50 ml", price: 1499, qty: 1, image: "/images/layton.jpg" }
           ],
-          subtotal: 35000,
+          subtotal: 3098,
           shipping: 0,
-          total: 35000,
+          total: 3098,
           address: {
-            name: "Lord Sterling",
-            street: "74 Altamount Road, Cumballa Hill",
+            name: "Aarav Sharma",
+            street: "Flat 402, Sea Green Apartments, Bandra West",
             city: "Mumbai",
             state: "Maharashtra",
-            pincode: "400026",
+            pincode: "400050",
             phone: "+91 98200 48291"
           }
         });
       } else {
-        setError(formatErr(err) || "No dispatch record found. Verify your order ID or billing email.");
+        setError(formatErr(err) || "No order found with this ID. Please double check and try again.");
         setOrder(null);
       }
     } finally {
@@ -98,9 +97,9 @@ export default function TrackOrder() {
   }, [searchParams]);
 
   const loadDemo = () => {
-    setOrderId("HOTK-ROYAL");
-    setEmail("sterling@houseoftheknight.com");
-    fetchOrder("HOTK-ROYAL", "sterling@houseoftheknight.com");
+    setOrderId("HOTK-DEMO");
+    setEmail("aarav@example.com");
+    fetchOrder("HOTK-DEMO", "aarav@example.com");
   };
 
   const copyToClipboard = (text) => {
@@ -109,13 +108,12 @@ export default function TrackOrder() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // Determine active step index (0 to 3)
   const getStepIndex = (status) => {
     const s = (status || "").toLowerCase();
     if (s === "delivered") return 3;
     if (s === "dispatched" || s === "in_transit") return 2;
     if (s === "processing" || s === "packed") return 1;
-    return 0; // pending / confirmed
+    return 0;
   };
 
   const activeStep = order ? getStepIndex(order.status) : 0;
@@ -130,16 +128,16 @@ export default function TrackOrder() {
           <div className="flex items-center gap-3">
             <KnightMark className="h-6 w-6 text-gold" />
             <span className="text-[0.66rem] font-medium uppercase tracking-[0.3em] text-gold">
-              House Concierge · Courier & Dispatch
+              Order Status & Tracking
             </span>
           </div>
 
           <h1 className="hero-title mt-4 font-display tracking-tight text-foreground">
-            Track your <span className="font-display-italic text-gold">House dispatch.</span>
+            Track your <span className="font-display-italic text-gold">order.</span>
           </h1>
 
-          <p className="mt-6 max-w-xl text-base font-light leading-relaxed text-muted-foreground sm:text-lg">
-            Every flacon is hand-inspected, sealed with the House crest, and dispatched via temperature-monitored air transit. Enter your order credentials below to inspect real-time progress.
+          <p className="mt-4 max-w-xl text-base font-light leading-relaxed text-muted-foreground sm:text-lg">
+            Enter your Order ID below to check live courier updates and estimated delivery.
           </p>
         </div>
 
@@ -150,7 +148,7 @@ export default function TrackOrder() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: EASE }}
-          className="mt-12 rounded-[2rem] border border-border/60 bg-card/40 p-6 shadow-xl backdrop-blur-md sm:p-10"
+          className="mt-10 rounded-[2rem] border border-border/60 bg-card/40 p-6 shadow-xl backdrop-blur-md sm:p-10"
         >
           <form
             onSubmit={(e) => {
@@ -201,11 +199,11 @@ export default function TrackOrder() {
                 {loading ? (
                   <span className="flex items-center gap-2">
                     <span className="h-4 w-4 animate-spin rounded-full border-2 border-background border-t-transparent" />
-                    Locating...
+                    Searching...
                   </span>
                 ) : (
                   <span className="flex items-center gap-2">
-                    Locate Dispatch <ArrowRight className="h-4 w-4" />
+                    Track Package <ArrowRight className="h-4 w-4" />
                   </span>
                 )}
               </button>
@@ -215,15 +213,14 @@ export default function TrackOrder() {
           {/* Quick Demo Assist */}
           <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-t border-border/40 pt-5 text-xs text-muted-foreground">
             <span className="text-[0.68rem] tracking-wide">
-              Format: <span className="font-mono text-foreground">HOTK-</span> followed by 6 alphanumeric characters.
+              Order ID sent to your confirmation email upon checkout.
             </span>
             <button
               type="button"
               onClick={loadDemo}
               className="inline-flex items-center gap-1.5 text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-gold transition-colors hover:text-foreground"
             >
-              <Sparkles className="h-3.5 w-3.5" />
-              Inspect Live Demo Order (HOTK-ROYAL)
+              Try Demo Order (HOTK-DEMO)
             </button>
           </div>
         </motion.div>
@@ -281,7 +278,7 @@ export default function TrackOrder() {
                     </div>
 
                     <p className="mt-2 text-xs font-light text-muted-foreground">
-                      Commissioned on {new Date(order.created_at).toLocaleDateString("en-IN", { dateStyle: "long" })}
+                      Ordered on {new Date(order.created_at).toLocaleDateString("en-IN", { dateStyle: "long" })}
                     </p>
                   </div>
 
@@ -292,7 +289,7 @@ export default function TrackOrder() {
                         Courier Partner
                       </p>
                       <p className="mt-1 font-display text-sm font-semibold text-foreground">
-                        {order.courier || "BlueDart Air Express"}
+                        {order.courier || "BlueDart Express"}
                       </p>
                     </div>
                     <div className="h-8 w-px bg-border/50" />
@@ -394,51 +391,47 @@ export default function TrackOrder() {
                       <span>{inr(order.subtotal || order.total)}</span>
                     </div>
                     <div className="flex justify-between text-muted-foreground">
-                      <span>Luxury Gift Packaging</span>
-                      <span className="text-gold font-medium uppercase text-xs tracking-wider">Complimentary</span>
-                    </div>
-                    <div className="flex justify-between text-muted-foreground">
-                      <span>Express Air Transit</span>
-                      <span className="text-gold font-medium uppercase text-xs tracking-wider">
-                        {order.shipping ? inr(order.shipping) : "Complimentary"}
+                      <span>Shipping</span>
+                      <span className="text-foreground font-medium text-xs">
+                        {order.shipping ? inr(order.shipping) : "Free"}
                       </span>
                     </div>
                     <div className="flex justify-between border-t border-border/40 pt-3 font-display text-lg text-foreground">
-                      <span>Total Valuation</span>
+                      <span>Total</span>
                       <span className="text-gold">{inr(order.total)}</span>
                     </div>
                   </div>
                 </div>
 
-                {/* Delivery Address & Security Verification */}
+                {/* Delivery Address & Transit Note */}
                 <div className="space-y-6 lg:col-span-5">
                   <div className="rounded-[2rem] border border-border/60 bg-card/40 p-6 sm:p-8">
-                    <h3 className="font-display text-xl text-foreground">Delivery Destination</h3>
+                    <h3 className="font-display text-xl text-foreground">Shipping Address</h3>
                     {order.address ? (
                       <div className="mt-4 text-sm leading-relaxed text-muted-foreground space-y-1">
                         <p className="font-display font-medium text-foreground text-base">{order.address.name}</p>
                         <p>{order.address.street}</p>
                         <p>{order.address.city}, {order.address.state} — {order.address.pincode}</p>
-                        <p className="pt-2 text-xs font-mono text-foreground/70">Contact: {order.address.phone}</p>
+                        <p className="pt-2 text-xs font-mono text-foreground/70">Phone: {order.address.phone}</p>
                       </div>
                     ) : (
-                      <p className="mt-4 text-sm text-muted-foreground">Address on file with courier verification.</p>
+                      <p className="mt-4 text-sm text-muted-foreground">Address on file with courier.</p>
                     )}
                   </div>
 
                   <div className="rounded-[2rem] border border-gold/30 bg-gold/5 p-6 sm:p-8">
                     <div className="flex items-center gap-3">
                       <ShieldCheck className="h-6 w-6 text-gold" />
-                      <h4 className="font-display text-lg text-foreground">White-Glove Delivery</h4>
+                      <h4 className="font-display text-lg text-foreground">Transit Protection</h4>
                     </div>
                     <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
-                      This dispatch is protected by the House Fragile Crystal Guarantee. In the rare event of transit damage or leaks, contact our concierge for an immediate priority replacement.
+                      All bottles are packed with protective bubble wrap. If your package arrives damaged or leaking, reach out to our team with a photo and we'll arrange a prompt replacement.
                     </p>
                     <Link
                       to="/contact"
                       className="mt-4 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.24em] text-gold hover:underline"
                     >
-                      Contact Concierge <ArrowRight className="h-3.5 w-3.5" />
+                      Contact Support <ArrowRight className="h-3.5 w-3.5" />
                     </Link>
                   </div>
                 </div>
@@ -448,34 +441,34 @@ export default function TrackOrder() {
         </AnimatePresence>
 
         {/* ======================================================== */}
-        {/* THREE HOUSE TRANSIT GUARANTEES                           */}
+        {/* THREE SIMPLE PACKAGING & DELIVERY STANDARDS               */}
         {/* ======================================================== */}
-        <div className="mt-24 border-t border-border/40 pt-16">
+        <div className="mt-20 border-t border-border/40 pt-14">
           <p className="text-[0.66rem] font-medium uppercase tracking-[0.3em] text-gold">
-            House Transit Standards
+            Delivery & Packaging
           </p>
-          <div className="mt-8 grid grid-cols-1 gap-8 sm:grid-cols-3">
+          <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-3">
             <FadeUp delay={0.1} className="rounded-2xl border border-border/40 bg-card/20 p-6">
-              <ThermometerSnowflake className="h-6 w-6 text-gold" strokeWidth={1.5} />
-              <h4 className="mt-4 font-display text-lg text-foreground">Temperature Safeguard</h4>
+              <Box className="h-6 w-6 text-gold" strokeWidth={1.5} />
+              <h4 className="mt-4 font-display text-lg text-foreground">Secure Packaging</h4>
               <p className="mt-2 text-xs font-light leading-relaxed text-muted-foreground">
-                Heat-isolated transit sleeves prevent thermal degradation during flight and last-mile transit, safeguarding the delicate top notes.
+                Every bottle is wrapped with multi-layer bubble wrap and sturdy outer boxing to prevent transit breakage.
               </p>
             </FadeUp>
 
             <FadeUp delay={0.2} className="rounded-2xl border border-border/40 bg-card/20 p-6">
               <ShieldCheck className="h-6 w-6 text-gold" strokeWidth={1.5} />
-              <h4 className="mt-4 font-display text-lg text-foreground">Italian Crystal Insurance</h4>
+              <h4 className="mt-4 font-display text-lg text-foreground">Damage Replacement</h4>
               <p className="mt-2 text-xs font-light leading-relaxed text-muted-foreground">
-                100% full replacement policy. If any flacon arrives damaged or compromised, a priority flacon is dispatched immediately with zero friction.
+                In the rare case of transit damage or leaks, message us with photos and we will send a replacement.
               </p>
             </FadeUp>
 
             <FadeUp delay={0.3} className="rounded-2xl border border-border/40 bg-card/20 p-6">
               <Package className="h-6 w-6 text-gold" strokeWidth={1.5} />
-              <h4 className="mt-4 font-display text-lg text-foreground">Discreet Outer Box</h4>
+              <h4 className="mt-4 font-display text-lg text-foreground">Plain Outer Box</h4>
               <p className="mt-2 text-xs font-light leading-relaxed text-muted-foreground">
-                Exterior packaging contains no luxury brand markers or price indications, ensuring absolute security and confidentiality during transit.
+                Orders are shipped in plain, clean courier packaging for safe and discreet delivery right to your door.
               </p>
             </FadeUp>
           </div>

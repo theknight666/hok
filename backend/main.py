@@ -595,21 +595,21 @@ async def track_order(order_id: str, email: Optional[str] = None):
             "payment_status": "paid",
             "created_at": (now() - timedelta(days=2)).isoformat(),
             "tracking_number": "BD-982410982",
-            "courier": "BlueDart Air Express",
+            "courier": "BlueDart Express",
             "estimated_delivery": (now() + timedelta(days=1)).strftime("%A, %d %B"),
             "items": [
-                {"slug": "blonde-amber", "name": "Blonde Amber", "size": "50 ml", "price": 18500, "qty": 1, "image": "/images/blonde-amber.jpg"},
-                {"slug": "layton", "name": "Layton", "size": "50 ml", "price": 16500, "qty": 1, "image": "/images/layton.jpg"}
+                {"slug": "blonde-amber", "name": "Blonde Amber", "size": "50 ml", "price": 1599, "qty": 1, "image": "/images/blonde-amber.jpg"},
+                {"slug": "layton", "name": "Layton", "size": "50 ml", "price": 1499, "qty": 1, "image": "/images/layton.jpg"}
             ],
-            "subtotal": 35000,
+            "subtotal": 3098,
             "shipping": 0,
-            "total": 35000,
+            "total": 3098,
             "address": {
-                "name": "Lord Sterling",
-                "street": "74 Altamount Road, Cumballa Hill",
+                "name": "Aarav Sharma",
+                "street": "Flat 402, Sea Green Apartments, Bandra West",
                 "city": "Mumbai",
                 "state": "Maharashtra",
-                "pincode": "400026",
+                "pincode": "400050",
                 "phone": "+91 98200 48291"
             }
         }
