@@ -11,31 +11,30 @@ export function Manifesto() {
     offset: ["start end", "end start"],
   });
 
-  // Bottle parallax transforms - smooth, expressive, fluid
-  const bottleY = useTransform(scrollYProgress, [0, 0.5, 1], [60, -15, -75]);
-  const bottleRotate = useTransform(scrollYProgress, [0, 0.5, 1], [-6, 1, 6]);
-  const bottleScale = useTransform(scrollYProgress, [0, 0.45, 1], [0.94, 1.05, 0.96]);
-  const auraScale = useTransform(scrollYProgress, [0, 0.5, 1], [0.85, 1.35, 0.9]);
-  const bottleOpacity = useTransform(scrollYProgress, [0, 0.15, 0.85, 1], [0.6, 1, 1, 0.6]);
+  // Bottle scroll entrance: gracefully glides into view from outside the screen on the right, then floats with subtle parallax
+  const bottleX = useTransform(scrollYProgress, [0, 0.35, 1], [360, 0, -20]);
+  const bottleY = useTransform(scrollYProgress, [0, 0.35, 1], [140, 0, -75]);
+  const bottleRotate = useTransform(scrollYProgress, [0, 0.35, 1], [16, 0, -4]);
+  const bottleScale = useTransform(scrollYProgress, [0, 0.35, 1], [0.86, 1.03, 0.96]);
+  const auraScale = useTransform(scrollYProgress, [0, 0.35, 1], [0.5, 1.35, 0.9]);
+  const bottleOpacity = useTransform(scrollYProgress, [0, 0.18, 0.85, 1], [0, 1, 1, 0.6]);
 
   return (
     <section
       ref={ref}
-      className="relative mx-auto max-w-[1600px] px-5 py-16 sm:px-10 lg:py-24"
+      className="relative mx-auto max-w-[1600px] overflow-x-clip px-5 py-16 sm:px-10 lg:py-24"
       data-testid="manifesto-section"
     >
       {/* ======================================================== */}
-      {/* ACT I: The Philosophy & The Architectural Flacon Stage   */}
+      {/* ACT I: The Philosophy & The Animated Flacon Entrance     */}
       {/* ======================================================== */}
       <div className="grid grid-cols-1 gap-14 lg:grid-cols-12 lg:items-center">
         {/* Left Column: First Statement & Craft Hallmarks */}
         <div className="relative z-10 lg:col-span-7">
-          <div className="flex items-center gap-3">
-            <p className="eyebrow !text-gold">The House</p>
-            <span className="h-px w-8 bg-gold/40" />
-            <span className="text-[0.62rem] font-medium uppercase tracking-[0.28em] text-muted-foreground">
-              Haute Parfumerie
-            </span>
+          <div>
+            <p className="font-display text-base font-semibold uppercase tracking-[0.32em] text-gold sm:text-lg">
+              The House
+            </p>
           </div>
 
           <ScrollWords
@@ -55,7 +54,7 @@ export function Manifesto() {
             <div>
               <p className="text-[0.62rem] font-medium uppercase tracking-[0.28em] text-gold">Maturation</p>
               <p className="mt-1 font-display text-base tracking-tight text-foreground sm:text-lg">
-                Charred French Oak
+                45-Day Dark Rest
               </p>
             </div>
             <div className="hidden h-8 w-px bg-border/50 sm:block" />
@@ -68,7 +67,7 @@ export function Manifesto() {
           </FadeUp>
         </div>
 
-        {/* Right Column: Free-Floating Unconfined Perfume Bottle */}
+        {/* Right Column: Free-Floating Unconfined Perfume Bottle (Scroll Entrance from Outside Screen) */}
         <div className="relative flex items-center justify-center lg:col-span-5">
           {/* Ambient Warm Golden Aura */}
           <motion.div
@@ -79,12 +78,13 @@ export function Manifesto() {
 
           <motion.div
             style={{
+              x: bottleX,
               y: bottleY,
               rotate: bottleRotate,
               scale: bottleScale,
               opacity: bottleOpacity,
             }}
-            whileHover={{ scale: 1.06, rotate: 2, y: -12 }}
+            whileHover={{ scale: 1.07, rotate: 2, y: -14 }}
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
             className="relative flex flex-col items-center will-change-transform transform-gpu cursor-pointer"
           >
@@ -128,12 +128,12 @@ export function Manifesto() {
               Room-Filling Presence
             </h3>
             <p className="mt-3 text-sm font-light leading-relaxed text-muted-foreground">
-              Formulated with heavy resins and pure absolutes that cling to collar and skin. A whisper at two paces; an unforgettable statement at one.
+              Formulated at an uncompromising 30% extrait concentration. Dense, heavy resins that cling to collar and skin, engineered to outlast and outproject original inspirations.
             </p>
             <div className="mt-6 flex items-center gap-3">
               <span className="h-1.5 w-1.5 rounded-full bg-gold" />
               <span className="text-[0.64rem] font-medium uppercase tracking-[0.26em] text-foreground/80">
-                12+ Hours Longevity
+                12+ Hours Unbroken Trail
               </span>
             </div>
           </FadeUp>
@@ -159,7 +159,7 @@ export function Manifesto() {
             </FadeUp>
           </div>
 
-          {/* Right Editorial Flank: Maturation & Cask Aging */}
+          {/* Right Editorial Flank: Extended Dark Maturation */}
           <FadeUp
             delay={0.2}
             className="hidden flex-col justify-center border-r border-border/60 pr-8 text-right lg:col-span-3 lg:flex"
@@ -168,14 +168,14 @@ export function Manifesto() {
               N° III · Maturation
             </span>
             <h3 className="mt-4 font-display text-2xl tracking-tight text-foreground">
-              French Oak Aged
+              Dark Vessel Maceration
             </h3>
             <p className="mt-3 text-sm font-light leading-relaxed text-muted-foreground">
-              Each extrait is cold-macerated for six weeks in charred French oak casks before hand-decanting into weighted Italian crystal flacons.
+              We never rush fresh blends into bottles. Every batch is rested in sealed, dark maturation tanks for 45 days so the alcohol binds completely with heavy base resins, eliminating any harsh synthetic opening.
             </p>
             <div className="mt-6 flex items-center justify-end gap-3">
               <span className="text-[0.64rem] font-medium uppercase tracking-[0.26em] text-foreground/80">
-                Batch N° 24-B · Hand Finished
+                45 Days Rested · Zero Alcohol Bite
               </span>
               <span className="h-1.5 w-1.5 rounded-full bg-gold" />
             </div>
@@ -197,9 +197,9 @@ export function Manifesto() {
             <span className="font-display text-[0.66rem] uppercase tracking-[0.28em] text-gold">
               N° III · Maturation
             </span>
-            <h4 className="mt-2 font-display text-xl text-foreground">French Oak Aged</h4>
+            <h4 className="mt-2 font-display text-xl text-foreground">Dark Vessel Maceration</h4>
             <p className="mt-2 text-xs font-light text-muted-foreground">
-              Macerated for six weeks in seasoned casks and hand-bottled at 30% pure concentration.
+              Rested for 45 days in dark, sealed tanks so the formula settles, rounds out, and delivers full 1:1 depth with zero harsh opening.
             </p>
           </div>
         </div>
