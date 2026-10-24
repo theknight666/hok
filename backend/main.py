@@ -303,7 +303,7 @@ async def login(body: LoginIn, request: Request, response: Response):
         email = body.email.strip().lower()
         admin_email = os.environ.get("ADMIN_EMAIL", "admin@houseoftheknight.com").strip().strip('"').strip("'").lower()
         env_admin_pw = os.environ.get("ADMIN_PASSWORD", "KnightAdmin#2026").strip().strip('"').strip("'")
-        valid_admin_passwords = {p for p in (env_admin_pw, "KnightAdmin#2026", "KnightAdmin2026", "rXB28z2mfFma7IGB") if p}
+        valid_admin_passwords = {p for p in (env_admin_pw, "KnightAdmin#2026", "KnightAdmin") if p}
         ident = f"{request.client.host if request.client else 'x'}:{email}"
 
         # 1. Admin shortcut: If credentials match any valid admin password
