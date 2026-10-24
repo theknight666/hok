@@ -252,6 +252,10 @@ class OrderIn(BaseModel):
 
 class OrderStatusIn(BaseModel):
     status: Literal["pending", "processing", "dispatched", "delivered", "cancelled"]
+    courier: Optional[str] = None
+    tracking_number: Optional[str] = None
+    tracking_url: Optional[str] = None
+    estimated_delivery: Optional[str] = None
 
 
 # ---------- Auth ----------
@@ -701,8 +705,17 @@ async def admin_order_status(order_id: str, body: OrderStatusIn, _: dict = Depen
     if body.status == "cancelled" and o["status"] != "cancelled":
         for i in o["items"]:
             await db.products.update_one({"slug": i["slug"]}, {"$inc": {"stock": i["qty"]}})
-    await db.orders.update_one({"order_id": order_id}, {"$set": {"status": body.status}})
-    o["status"] = body.status
+    upd = {"status": body.status}
+    if body.courier is not None:
+        upd["courier"] = body.courier.strip()
+    if body.tracking_number is not None:
+        upd["tracking_number"] = body.tracking_number.strip()
+    if body.tracking_url is not None:
+        upd["tracking_url"] = body.tracking_url.strip()
+    if body.estimated_delivery is not None:
+        upd["estimated_delivery"] = body.estimated_delivery.strip()
+    await db.orders.update_one({"order_id": order_id}, {"$set": upd})
+    o.update(upd)
     return o
 
 

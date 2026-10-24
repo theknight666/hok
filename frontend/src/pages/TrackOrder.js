@@ -28,6 +28,18 @@ const STEPS = [
   { id: "delivered", label: "Delivered", desc: "Delivered to your shipping address." },
 ];
 
+const getCourierUrl = (courierName, awb, customUrl) => {
+  if (customUrl) return customUrl;
+  if (!awb) return null;
+  const c = (courierName || "").toLowerCase();
+  if (c.includes("delhivery")) return `https://www.delhivery.com/track/package/${awb}`;
+  if (c.includes("bluedart") || c.includes("blue dart")) return `https://www.bluedart.com/tracking?trackNumber=${awb}`;
+  if (c.includes("dtdc")) return `https://www.dtdc.in/tracking/shipment-tracking.asp`;
+  if (c.includes("speed post") || c.includes("india post")) return `https://www.indiapost.gov.in/_layouts/15/dpt.cpt.etracking/trackconsignment.aspx`;
+  if (c.includes("shiprocket")) return `https://shiprocket.co/tracking/${awb}`;
+  return null;
+};
+
 export default function TrackOrder() {
   const [searchParams] = useSearchParams();
   const [orderId, setOrderId] = useState(searchParams.get("order_id") || searchParams.get("id") || "");
@@ -287,6 +299,31 @@ export default function TrackOrder() {
                     </div>
                   </div>
                 </div>
+
+                {/* Courier Live Tracking External Link */}
+                {(() => {
+                  const trackingLink = getCourierUrl(order.courier, order.tracking_number, order.tracking_url);
+                  if (!trackingLink) return null;
+                  return (
+                    <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-gold/30 bg-gold/10 px-5 py-3.5">
+                      <div className="flex items-center gap-2.5">
+                        <Truck className="h-4 w-4 text-gold shrink-0" />
+                        <span className="text-xs text-foreground font-medium">
+                          Package dispatched with {order.courier || "courier"}. Tracking Number: <span className="font-mono font-bold text-gold">{order.tracking_number}</span>
+                        </span>
+                      </div>
+                      <a
+                        href={trackingLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn-royal text-xs !py-2 !px-4 inline-flex items-center gap-1.5 shadow-sm"
+                      >
+                        <span>Open Live {order.courier || "Courier"} Tracking</span>
+                        <ExternalLink className="h-3.5 w-3.5" />
+                      </a>
+                    </div>
+                  );
+                })()}
 
                 {/* Status Timeline */}
                 {isCancelled ? (
