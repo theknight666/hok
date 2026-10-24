@@ -9,7 +9,7 @@ import { useAuth } from "@/context/AuthContext";
 
 const LINKS = [
   { to: "/collection", label: "Collection" },
-  { to: "/#curate", label: "Curate" },
+  { to: "/#curate", label: "Best Sellers" },
   { to: "/#house", label: "The House" },
 ];
 

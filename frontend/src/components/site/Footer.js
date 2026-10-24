@@ -4,7 +4,7 @@ import { ArrowRight } from "lucide-react";
 import { KnightMark } from "./Logo";
 
 const COLS = [
-  { t: "Shop", links: [["/collection", "All fragrances"], ["/#curate", "Curate a set"], ["/checkout", "Checkout"]] },
+  { t: "Shop", links: [["/collection", "All fragrances"], ["/#curate", "Best sellers"], ["/checkout", "Checkout"]] },
   { t: "House", links: [["/#house", "Why the House"], ["/account", "My account", "footer-account"], ["/login", "Sign in"]] },
 ];
 
