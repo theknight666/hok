@@ -9,6 +9,7 @@ import { useAuth } from "@/context/AuthContext";
 
 const LINKS = [
   { to: "/collection", label: "Collection" },
+  { to: "/discovery", label: "Discovery Sets" },
   { to: "/#best-sellers", label: "Best Sellers" },
   { to: "/#house", label: "The House" },
   { to: "/track", label: "Track Order" },
@@ -92,14 +93,14 @@ export function Header() {
           <Wordmark className="hidden sm:inline" />
         </Link>
 
-        <nav className="hidden items-center gap-1 md:flex">
+        <nav className="hidden items-center gap-0.5 lg:gap-1 md:flex">
           {LINKS.map((l) => (
             <Link
               key={l.to}
               to={l.to}
               onClick={(e) => handleNavClick(e, l.to)}
               data-testid={`nav-${l.label.toLowerCase().replace(/\s+/g, "-")}`}
-              className="rounded-full px-4 py-2 text-[0.66rem] font-medium uppercase tracking-[0.3em] transition-colors duration-300 hover:bg-foreground hover:text-background"
+              className="rounded-full px-2.5 py-1.5 lg:px-3.5 lg:py-2 text-[0.62rem] lg:text-[0.66rem] font-medium uppercase tracking-[0.18em] lg:tracking-[0.26em] transition-colors duration-300 hover:bg-foreground hover:text-background whitespace-nowrap"
             >
               {l.label}
             </Link>

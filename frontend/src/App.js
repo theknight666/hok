@@ -18,6 +18,7 @@ import Admin from "@/pages/Admin";
 import AuthCallback from "@/pages/AuthCallback";
 import TrackOrder from "@/pages/TrackOrder";
 import Contact from "@/pages/Contact";
+import Discovery from "@/pages/Discovery";
 
 function AppRouter() {
   const location = useLocation();
@@ -28,6 +29,7 @@ function AppRouter() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/collection" element={<CollectionPage />} />
+        <Route path="/discovery" element={<Discovery />} />
         <Route path="/fragrance/:slug" element={<Product />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/login" element={<Login />} />
