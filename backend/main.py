@@ -454,7 +454,13 @@ async def ensure_seeded():
 async def list_products():
     await ensure_seeded()
     items = await db.products.find({"active": True}, {"_id": 0}).sort("order", 1).to_list(100)
-    return items
+    deduped, seen = [], set()
+    for it in items:
+        if it["slug"] not in seen:
+            seen.add(it["slug"])
+            deduped.append(it)
+    return deduped
+
 
 
 @api.get("/products/{slug}")

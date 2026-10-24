@@ -473,10 +473,16 @@ async def list_products():
         items = await db.products.find({"active": True}, {"_id": 0}).sort("order", 1).to_list(100)
         if not items:
             return _seed_fallback()
-        return items
+        deduped, seen = [], set()
+        for it in items:
+            if it["slug"] not in seen:
+                seen.add(it["slug"])
+                deduped.append(it)
+        return deduped
     except Exception as e:
         logger.error("list_products DB error, using fallback: %s", e)
         return _seed_fallback()
+
 
 
 @api.get("/products/{slug}")
