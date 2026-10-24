@@ -43,14 +43,14 @@ export function Credentials() {
     >
       <div className="mx-auto max-w-[1600px] px-5 py-16 sm:px-10 lg:py-24">
         {/* Editorial Section Header */}
-        <div className="mb-14 flex flex-col justify-between gap-4 border-b border-border/40 pb-8 lg:flex-row lg:items-end">
+        <div className="mb-16 flex flex-col justify-between gap-6 border-b border-border/40 pb-10 lg:flex-row lg:items-end">
           <div>
             <p className="eyebrow">House Standards</p>
-            <h2 className="display-sm mt-3 font-display">
+            <h2 className="mt-4 font-display text-4xl leading-[1] tracking-tight sm:text-5xl lg:text-6xl">
               Crafted with <span className="font-display-italic text-gold">uncompromising standards.</span>
             </h2>
           </div>
-          <p className="max-w-md text-sm font-light leading-relaxed text-muted-foreground">
+          <p className="max-w-md text-base font-light leading-relaxed text-muted-foreground sm:text-lg lg:pb-2">
             Our atelier honors traditional European maceration alongside certified safety standards.
           </p>
         </div>
