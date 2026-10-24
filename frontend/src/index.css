@@ -124,13 +124,36 @@
   .btn-ghost-royal {
     @apply inline-flex items-center justify-center gap-3 rounded-full border px-8 py-4 text-xs font-medium uppercase tracking-[0.26em];
     border-color: currentColor;
-    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease, color 0.3s ease;
+    color: currentColor;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
     will-change: transform;
     backface-visibility: hidden;
   }
-  .btn-ghost-royal:hover { transform: translateY(-2px); background: currentColor; }
-  .btn-ghost-royal:hover > * { color: hsl(var(--background)); }
-  .btn-ghost-royal:hover { color: hsl(var(--foreground)); }
+  .btn-ghost-royal:hover {
+    transform: translateY(-2px);
+    background: hsl(var(--foreground));
+    border-color: hsl(var(--foreground));
+    color: #ffffff !important;
+  }
+  .btn-ghost-royal:hover * {
+    color: #ffffff !important;
+  }
+  .btn-ghost-royal:hover svg {
+    stroke: #ffffff !important;
+    color: #ffffff !important;
+  }
+  .dark .btn-ghost-royal:hover {
+    background: hsl(var(--foreground));
+    border-color: hsl(var(--foreground));
+    color: hsl(var(--background)) !important;
+  }
+  .dark .btn-ghost-royal:hover * {
+    color: hsl(var(--background)) !important;
+  }
+  .dark .btn-ghost-royal:hover svg {
+    stroke: hsl(var(--background)) !important;
+    color: hsl(var(--background)) !important;
+  }
 
   /* buttons living inside a colour world (inherit the world's ink) */
   .btn-world {
@@ -146,11 +169,22 @@
     @apply inline-flex items-center justify-center gap-3 rounded-full border px-8 py-4 text-xs font-medium uppercase tracking-[0.26em];
     border-color: var(--w-ink);
     color: var(--w-ink);
-    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease, color 0.3s ease;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
     will-change: transform;
     backface-visibility: hidden;
   }
-  .btn-world-ghost:hover { background: var(--w-ink); color: var(--w-bg); transform: translateY(-2px); }
+  .btn-world-ghost:hover {
+    background: var(--w-ink);
+    color: var(--w-bg) !important;
+    transform: translateY(-2px);
+  }
+  .btn-world-ghost:hover * {
+    color: var(--w-bg) !important;
+  }
+  .btn-world-ghost:hover svg {
+    stroke: var(--w-bg) !important;
+    color: var(--w-bg) !important;
+  }
 
   .pill { @apply inline-flex items-center gap-2 rounded-full px-4 py-2 text-[0.66rem] font-medium uppercase tracking-[0.28em]; }
   .link-line { background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat; transition: background-size 0.4s ease; }
