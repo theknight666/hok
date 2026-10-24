@@ -117,6 +117,7 @@ export default function Checkout() {
             {!paid && order.razorpay && (
               <button onClick={() => pay(order)} className="btn-royal" data-testid="pay-now-btn"><span>Pay {inr(order.total)} now</span></button>
             )}
+            <Link to={`/track?order_id=${order.order_id}`} className="btn-royal" data-testid="track-order-btn"><span>Track order status</span></Link>
             <Link to="/" className="btn-ghost-royal">Return home</Link>
             {user && <Link to="/account" className="btn-ghost-royal" data-testid="view-orders-btn">View my orders</Link>}
           </div>

@@ -51,7 +51,10 @@ export default function Account() {
                 <p className="font-display text-2xl">{o.order_id}</p>
                 <p className="text-xs text-muted-foreground">{new Date(o.created_at).toLocaleDateString("en-IN", { dateStyle: "long" })}</p>
               </div>
-              <StatusPill s={o.status} />
+              <div className="flex items-center gap-2">
+                <StatusPill s={o.status} />
+                <Link to={`/track?order_id=${o.order_id}`} className="rounded-full border border-gold/40 px-3 py-1 text-[0.62rem] uppercase tracking-[0.2em] text-gold hover:bg-gold hover:text-[#0C0B0E] transition-colors">Track</Link>
+              </div>
               <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground">{o.payment_status === "paid" ? "Paid" : "Payment pending"}</span>
               <p className="font-display text-2xl">{inr(o.total)}</p>
             </div>

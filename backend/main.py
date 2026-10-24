@@ -588,33 +588,8 @@ async def track_order(order_id: str, email: Optional[str] = None):
     if email:
         q["email"] = email.strip().lower()
     o = await db.orders.find_one(q, {"_id": 0, "razorpay_signature": 0})
-    if not o and (oid.startswith("HOTK-DEMO") or oid in ("HOTK-SAMPLE", "HOTK-ROYAL", "HOTK-VIP")):
-        return {
-            "order_id": oid,
-            "status": "dispatched",
-            "payment_status": "paid",
-            "created_at": (now() - timedelta(days=2)).isoformat(),
-            "tracking_number": "BD-982410982",
-            "courier": "BlueDart Express",
-            "estimated_delivery": (now() + timedelta(days=1)).strftime("%A, %d %B"),
-            "items": [
-                {"slug": "blonde-amber", "name": "Blonde Amber", "size": "50 ml", "price": 1599, "qty": 1, "image": "/images/blonde-amber.jpg"},
-                {"slug": "layton", "name": "Layton", "size": "50 ml", "price": 1499, "qty": 1, "image": "/images/layton.jpg"}
-            ],
-            "subtotal": 3098,
-            "shipping": 0,
-            "total": 3098,
-            "address": {
-                "name": "Aarav Sharma",
-                "street": "Flat 402, Sea Green Apartments, Bandra West",
-                "city": "Mumbai",
-                "state": "Maharashtra",
-                "pincode": "400050",
-                "phone": "+91 98200 48291"
-            }
-        }
     if not o:
-        raise HTTPException(status_code=404, detail=f"No dispatch record found for order '{order_id}'. Please check your order ID or email.")
+        raise HTTPException(status_code=404, detail=f"No order found with ID '{order_id}'. Please check your order ID or email address.")
     return o
 
 
