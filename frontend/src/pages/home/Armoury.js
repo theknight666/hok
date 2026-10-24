@@ -26,7 +26,8 @@ export function Armoury({ products: all }) {
   };
 
   return (
-    <section id="curate" className="relative mx-auto max-w-[1600px] px-5 py-28 sm:px-10 lg:py-40" data-testid="armoury-section">
+    <section id="best-sellers" className="relative mx-auto max-w-[1600px] scroll-mt-24 px-5 py-28 sm:px-10 lg:py-40" data-testid="armoury-section">
+      <span id="curate" className="pointer-events-none absolute -top-24 block" aria-hidden="true" />
       <span id="armoury" className="pointer-events-none absolute -top-24 block" aria-hidden="true" />
       <p className="eyebrow">Build your collection</p>
       <SplitChars text="One is a scent." className="display-lg mt-4 font-display" />

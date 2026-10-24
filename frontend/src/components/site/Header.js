@@ -9,7 +9,7 @@ import { useAuth } from "@/context/AuthContext";
 
 const LINKS = [
   { to: "/collection", label: "Collection" },
-  { to: "/#curate", label: "Best Sellers" },
+  { to: "/#best-sellers", label: "Best Sellers" },
   { to: "/#house", label: "The House" },
 ];
 
@@ -23,10 +23,31 @@ function IconBtn({ children, ...p }) {
 
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
+  const [sheetOpen, setSheetOpen] = useState(false);
   const { theme, toggle } = useTheme();
   const { count, setOpen } = useCart();
   const { user } = useAuth();
   const { pathname } = useLocation();
+
+  const handleNavClick = (e, to) => {
+    if (to.startsWith("/#")) {
+      const targetHash = to.replace("/", "");
+      if (pathname === "/") {
+        e.preventDefault();
+        const el = document.querySelector(targetHash);
+        if (el) {
+          if (window.__lenis) {
+            window.__lenis.scrollTo(el, { offset: -80, duration: 0.9 });
+          } else {
+            el.scrollIntoView({ behavior: "smooth" });
+          }
+          if (window.location.hash !== targetHash) {
+            window.history.pushState(null, "", targetHash);
+          }
+        }
+      }
+    }
+  };
 
   useEffect(() => {
     let ticking = false;
@@ -63,6 +84,7 @@ export function Header() {
             <Link
               key={l.to}
               to={l.to}
+              onClick={(e) => handleNavClick(e, l.to)}
               data-testid={`nav-${l.label.toLowerCase().replace(/\s+/g, "-")}`}
               className="rounded-full px-4 py-2 text-[0.66rem] font-medium uppercase tracking-[0.3em] transition-colors duration-300 hover:bg-foreground hover:text-background"
             >
@@ -92,7 +114,7 @@ export function Header() {
             <ShoppingBag className="h-[16px] w-[16px]" strokeWidth={2.4} />
             <span className="text-xs font-medium tabular-nums" data-testid="cart-count">{count}</span>
           </button>
-          <Sheet>
+          <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
             <SheetTrigger asChild>
               <button data-testid="mobile-menu-btn" className="grid h-10 w-10 place-items-center rounded-full md:hidden" aria-label="Menu">
                 <Menu className="h-5 w-5" strokeWidth={2.2} />
@@ -103,11 +125,20 @@ export function Header() {
               <SheetDescription className="sr-only">Browse the House of the Knight collection and your account.</SheetDescription>
               <div className="mt-16 flex flex-col gap-6">
                 {LINKS.map((l) => (
-                  <Link key={l.to} to={l.to} data-testid={`mobile-nav-${l.label.toLowerCase().replace(/\s+/g, "-")}`} className="font-display text-5xl">
+                  <Link
+                    key={l.to}
+                    to={l.to}
+                    onClick={(e) => {
+                      setSheetOpen(false);
+                      handleNavClick(e, l.to);
+                    }}
+                    data-testid={`mobile-nav-${l.label.toLowerCase().replace(/\s+/g, "-")}`}
+                    className="font-display text-5xl"
+                  >
                     {l.label}
                   </Link>
                 ))}
-                <Link to={user ? "/account" : "/login"} data-testid="mobile-nav-account" className="font-display text-5xl">
+                <Link to={user ? "/account" : "/login"} onClick={() => setSheetOpen(false)} data-testid="mobile-nav-account" className="font-display text-5xl">
                   Account
                 </Link>
               </div>

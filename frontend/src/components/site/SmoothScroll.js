@@ -33,11 +33,22 @@ export function SmoothScroll() {
   useEffect(() => {
     const l = window.__lenis;
     if (hash && hash.length > 1 && !hash.includes("session_id")) {
-      const t = setTimeout(() => {
+      const scroll = () => {
         const el = document.querySelector(hash);
-        if (el) (l ? l.scrollTo(el, { offset: -60 }) : el.scrollIntoView());
-      }, 120);
-      return () => clearTimeout(t);
+        if (el) {
+          if (l) l.scrollTo(el, { offset: -80, duration: 0.85 });
+          else el.scrollIntoView({ behavior: "smooth" });
+        }
+      };
+      scroll();
+      const t1 = setTimeout(scroll, 180);
+      const t2 = setTimeout(scroll, 550);
+      const t3 = setTimeout(scroll, 1100);
+      return () => {
+        clearTimeout(t1);
+        clearTimeout(t2);
+        clearTimeout(t3);
+      };
     }
     if (l) l.scrollTo(0, { immediate: true });
     else window.scrollTo(0, 0);
