@@ -35,7 +35,7 @@ export function Armoury({ products: all }) {
       <div className="mt-16 grid gap-12 lg:grid-cols-12">
         <div className="lg:col-span-5">
           <p className="text-lg font-medium leading-snug text-muted-foreground">
-            Tap the bottles you want in your selection. Orders over {inr(FREE_SHIPPING)} ship free, so the second bottle practically delivers itself.
+            Pick from our current best sellers to curate your personal collection. Tap the bottles below to craft your signature set.
           </p>
           <ul className="mt-8 flex flex-col gap-3">
             {products.map((p) => {
