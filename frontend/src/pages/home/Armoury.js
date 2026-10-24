@@ -26,15 +26,16 @@ export function Armoury({ products: all }) {
   };
 
   return (
-    <section id="armoury" className="mx-auto max-w-[1600px] px-5 py-28 sm:px-10 lg:py-40" data-testid="armoury-section">
-      <p className="eyebrow">Build your armoury</p>
+    <section id="curate" className="relative mx-auto max-w-[1600px] px-5 py-28 sm:px-10 lg:py-40" data-testid="armoury-section">
+      <span id="armoury" className="pointer-events-none absolute -top-24 block" aria-hidden="true" />
+      <p className="eyebrow">Build your collection</p>
       <SplitChars text="One is a scent." className="display-lg mt-4 font-display" />
       <SplitChars text="Four is a reputation." className="display-lg font-display-italic text-gold" delay={0.25} />
 
       <div className="mt-16 grid gap-12 lg:grid-cols-12">
         <div className="lg:col-span-5">
           <p className="text-lg font-medium leading-snug text-muted-foreground">
-            Tap the bottles you want in your arsenal. Orders over {inr(FREE_SHIPPING)} ship free, so the second bottle practically delivers itself.
+            Tap the bottles you want in your selection. Orders over {inr(FREE_SHIPPING)} ship free, so the second bottle practically delivers itself.
           </p>
           <ul className="mt-8 flex flex-col gap-3">
             {products.map((p) => {

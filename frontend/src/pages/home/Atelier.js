@@ -5,7 +5,7 @@ import { FadeUp, SplitChars } from "@/components/site/Reveal";
 const REASONS = [
   { n: "01", t: "Small batches", d: "Short runs, long macerations. Every batch is nosed by hand before it earns the crest — no conveyor belts, no compromises." },
   { n: "02", t: "Extrait strength", d: "Up to 30% concentration. One spray in the morning, still getting compliments at the afterparty." },
-  { n: "03", t: "Oh, this?", d: "Gilded caps, faceted crystal, a heraldic crest on every bottle. The dresser upgrade nobody asked for and everybody notices." },
+  { n: "03", t: "Oh, this?", d: "Gilded caps, faceted crystal, a signature mark on every bottle. The dresser upgrade nobody asked for and everybody notices." },
 ];
 
 export function Atelier() {

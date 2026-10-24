@@ -12,7 +12,7 @@ export function CollectionPreview({ products }) {
         <div>
           <p className="eyebrow">The Collection</p>
           <SplitChars text="Choose your" className="display-lg mt-4 font-display" />
-          <SplitChars text="weapon." className="display-lg font-display-italic text-gold" delay={0.3} />
+          <SplitChars text="signature." className="display-lg font-display-italic text-gold" delay={0.3} />
         </div>
         <FadeUp className="max-w-md">
           <p className="text-base font-light leading-relaxed text-muted-foreground sm:text-lg">

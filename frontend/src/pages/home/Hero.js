@@ -84,7 +84,7 @@ export function Hero({ products }) {
         </motion.div>
 
         <h1 className="hero-title mt-6 max-w-[14ch] font-display" data-testid="hero-headline">
-          {["Smell like", "you own", "the castle."].map((l, i) => (
+          {["Smell like", "you own", "the room."].map((l, i) => (
             <span key={l} className="block overflow-hidden pb-[0.12em] -mb-[0.12em]">
               <motion.span
                 className={`block ${i === 2 ? "font-display-italic" : ""}`}

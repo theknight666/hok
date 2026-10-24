@@ -42,7 +42,7 @@ export function Reviews() {
   return (
     <div data-testid="admin-reviews">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <p className="font-display text-2xl">Words from the court</p>
+        <p className="font-display text-2xl">Client Reviews</p>
         <div className="flex flex-wrap gap-2">
           {FILTERS.map(([v, l]) => (
             <button key={v} onClick={() => setStatus(v)} data-testid={`reviews-filter-${v || "all"}`} className={`pill border-2 transition-colors ${status === v ? "border-foreground bg-foreground text-background" : "border-border hover:border-foreground"}`}>{l}</button>

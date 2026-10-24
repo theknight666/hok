@@ -4,7 +4,7 @@ import { ArrowRight } from "lucide-react";
 import { KnightMark } from "./Logo";
 
 const COLS = [
-  { t: "Shop", links: [["/collection", "All fragrances"], ["/#armoury", "Build an armoury"], ["/checkout", "Checkout"]] },
+  { t: "Shop", links: [["/collection", "All fragrances"], ["/#curate", "Curate a set"], ["/checkout", "Checkout"]] },
   { t: "House", links: [["/#house", "Why the House"], ["/account", "My account", "footer-account"], ["/login", "Sign in"]] },
 ];
 
@@ -25,10 +25,10 @@ export function Footer() {
         <div className="grid gap-14 lg:grid-cols-12">
           <div className="lg:col-span-6">
             <KnightMark className="h-12 w-12 text-gold" />
-            <p className="mt-6 max-w-md font-display text-4xl leading-[0.95] sm:text-5xl">Join the court. First dibs on drops, zero spam, occasional swagger.</p>
+            <p className="mt-6 max-w-md font-display text-4xl leading-[0.95] sm:text-5xl">Stay in the know. New drops, rare finds, no noise.</p>
             <form onSubmit={subscribe} className="mt-10 max-w-md" data-testid="newsletter-form">
               {sent ? (
-                <p className="rounded-full border border-background/30 px-6 py-4 text-sm font-semibold" data-testid="newsletter-success">Welcome to the court. Watch your inbox.</p>
+                <p className="rounded-full border border-background/30 px-6 py-4 text-sm font-semibold" data-testid="newsletter-success">You're in. Watch your inbox.</p>
               ) : (
                 <div className="flex items-center rounded-full border-2 border-background/30 p-1.5 pl-6 focus-within:border-gold">
                   <input

@@ -31,7 +31,7 @@ function ReviewForm({ slug, existing, onSaved }) {
 
   return (
     <form onSubmit={submit} className="rounded-[1.5rem] border-2 p-6" data-testid="review-form">
-      <p className="font-display text-2xl">{existing ? "Update your verdict" : "Leave your verdict"}</p>
+      <p className="font-display text-2xl">{existing ? "Update your review" : "Leave a review"}</p>
       {existing?.status === "pending" && <p className="mt-1 text-sm text-gold" data-testid="review-pending-note">Your review is awaiting approval.</p>}
       <div className="mt-4 flex gap-1" onMouseLeave={() => setHover(0)}>
         {[1, 2, 3, 4, 5].map((i) => (
@@ -74,8 +74,8 @@ export function ReviewsBlock({ slug, name }) {
     <FadeUp className="mt-16" data-testid="reviews-block">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="eyebrow">Words from the court</p>
-          <p className="mt-3 font-display text-3xl">{data?.count ? `${data.average} / 5` : "No verdicts yet"}</p>
+          <p className="eyebrow">Words from our clients</p>
+          <p className="mt-3 font-display text-3xl">{data?.count ? `${data.average} / 5` : "No reviews yet"}</p>
         </div>
         {data?.count ? (
           <div className="flex items-center gap-2 text-sm font-semibold text-muted-foreground" data-testid="reviews-summary">
@@ -97,11 +97,11 @@ export function ReviewsBlock({ slug, name }) {
       <div className="mt-6">
         {!user && (
           <p className="text-sm text-muted-foreground" data-testid="review-login-hint">
-            Bought {name}? <Link to="/login" className="font-bold text-gold">Sign in</Link> to leave your verdict.
+            Bought {name}? <Link to="/login" className="font-bold text-gold">Sign in</Link> to leave your review.
           </p>
         )}
         {user && elig && !elig.can_review && (
-          <p className="text-sm text-muted-foreground" data-testid="review-purchase-hint">Reviews are reserved for customers who own {name}. Once it has been in your bag, your verdict is welcome here.</p>
+          <p className="text-sm text-muted-foreground" data-testid="review-purchase-hint">Reviews are reserved for customers who own {name}. Once it has been in your bag, your review is welcome here.</p>
         )}
         {user && elig?.can_review && <ReviewForm slug={slug} existing={elig.existing} onSaved={onSaved} />}
       </div>
