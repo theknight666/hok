@@ -21,7 +21,7 @@ export function Atelier() {
           <div className="lg:col-span-7">
             <p className="eyebrow">Why the House</p>
             <SplitChars text="Why House" className="display-lg mt-4 font-display" />
-            <SplitChars text="of the Knight?" className="display-lg font-display text-gold" delay={0.25} />
+            <SplitChars text="of the Knight?" className="display-lg font-display-italic text-gold" delay={0.25} />
             <p className="mt-8 max-w-md text-lg font-medium leading-snug opacity-70">
               Because big-brand perfume smells like an airport. We make scent with character — the kind that gets remembered, quoted and occasionally borrowed without asking.
             </p>

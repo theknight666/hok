@@ -20,7 +20,7 @@ export function Intro() {
         <motion.div
           key="intro"
           data-testid="intro-curtain"
-          className="fixed inset-0 z-[100] flex items-end bg-[#110e13] px-5 pb-10 text-[#F6EFE4] sm:px-10"
+          className="fixed inset-0 z-[100] flex items-end bg-[#0C0B0E] px-5 pb-10 text-[#F3EEE5] sm:px-10"
           exit={{ y: "-100%" }}
           transition={{ duration: 0.9, ease: EASE }}
         >
@@ -28,7 +28,7 @@ export function Intro() {
             {WORDS.map((w, i) => (
               <span key={w} className="block overflow-hidden">
                 <motion.span
-                  className={`display-xl block font-display ${i === 2 ? "text-[#F2A900]" : ""}`}
+                  className={`display-xl block ${i === 2 ? "font-display-italic text-[hsl(43_60%_60%)]" : "font-display"}`}
                   initial={{ y: "110%" }}
                   animate={{ y: 0 }}
                   transition={{ duration: 0.9, delay: 0.1 + i * 0.12, ease: EASE }}

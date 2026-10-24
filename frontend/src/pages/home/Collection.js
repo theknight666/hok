@@ -36,8 +36,8 @@ function Chapter({ p, idx, total }) {
         <div className="relative mx-auto grid h-full w-full max-w-[1600px] grid-cols-1 gap-6 px-5 pb-8 pt-24 sm:px-10 lg:grid-cols-12 lg:pb-12">
           <div className="z-10 flex flex-col justify-end lg:col-span-4">
             <div className="flex items-center gap-3">
-              <span className="pill border-2 border-current">{p.badge || "Signature"}</span>
-              <span className="text-xs font-bold uppercase tracking-[0.22em] opacity-70">0{idx + 1} / 0{total}</span>
+              <span className="pill border border-current">{p.badge || "Signature"}</span>
+              <span className="text-[0.66rem] font-medium uppercase tracking-[0.3em] opacity-70">0{idx + 1} / 0{total}</span>
             </div>
             <h3 className="display-lg mt-6 font-display">{p.name}</h3>
             <p className="mt-5 max-w-sm text-base font-medium leading-snug opacity-85 sm:text-lg">{p.tagline}</p>
@@ -59,7 +59,7 @@ function Chapter({ p, idx, total }) {
 
           <div className="z-10 flex flex-col justify-end gap-6 lg:col-span-4 lg:items-end lg:text-right">
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.22em] opacity-70">{p.concentration} · {p.volume}</p>
+              <p className="text-[0.66rem] font-medium uppercase tracking-[0.3em] opacity-70">{p.concentration} · {p.volume}</p>
               <p className="mt-2 font-display text-5xl sm:text-6xl" data-testid={`product-price-${p.slug}`}>{inr(p.price)}</p>
             </div>
             <div className="flex flex-wrap gap-3 lg:justify-end">
@@ -83,7 +83,7 @@ export function Collection({ products }) {
       <div className="mx-auto max-w-[1600px] px-5 pb-16 pt-28 sm:px-10 lg:pb-24 lg:pt-40">
         <p className="eyebrow">The Collection</p>
         <SplitChars text="Choose your" className="display-xl mt-4 font-display" />
-        <SplitChars text="weapon." className="display-xl font-display text-gold" delay={0.3} />
+        <SplitChars text="weapon." className="display-xl font-display-italic text-gold" delay={0.3} />
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}

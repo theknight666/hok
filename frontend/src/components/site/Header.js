@@ -55,7 +55,7 @@ export function Header() {
               key={l.to}
               to={l.to}
               data-testid={`nav-${l.label.toLowerCase().replace(/\s+/g, "-")}`}
-              className="rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.16em] transition-colors duration-300 hover:bg-foreground hover:text-background"
+              className="rounded-full px-4 py-2 text-[0.66rem] font-medium uppercase tracking-[0.3em] transition-colors duration-300 hover:bg-foreground hover:text-background"
             >
               {l.label}
             </Link>
@@ -64,7 +64,7 @@ export function Header() {
 
         <div className="flex items-center gap-1">
           {user?.role === "admin" && (
-            <Link to="/admin" data-testid="nav-admin" className="hidden items-center gap-2 rounded-full bg-gold px-4 py-2 text-xs font-bold uppercase tracking-[0.16em] text-[#110e13] sm:flex">
+            <Link to="/admin" data-testid="nav-admin" className="hidden items-center gap-2 rounded-full bg-gold px-4 py-2 text-[0.66rem] font-medium uppercase tracking-[0.3em] text-[#0C0B0E] sm:flex">
               <Crown className="h-4 w-4" strokeWidth={2.4} /> Admin
             </Link>
           )}
@@ -81,7 +81,7 @@ export function Header() {
             className="ml-1 flex h-10 items-center gap-2 rounded-full bg-foreground px-4 text-background transition-transform duration-300 hover:scale-105"
           >
             <ShoppingBag className="h-[16px] w-[16px]" strokeWidth={2.4} />
-            <span className="text-xs font-bold tabular-nums" data-testid="cart-count">{count}</span>
+            <span className="text-xs font-medium tabular-nums" data-testid="cart-count">{count}</span>
           </button>
           <Sheet>
             <SheetTrigger asChild>

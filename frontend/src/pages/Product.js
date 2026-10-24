@@ -45,7 +45,7 @@ export default function Product() {
         <div className="relative mx-auto grid max-w-[1600px] gap-10 px-5 pb-16 pt-28 sm:px-10 lg:grid-cols-12 lg:pb-24">
           <div className="lg:col-span-6">
             <div className="lg:sticky lg:top-28">
-              <Link to="/#collection" className="pill border-2 border-current" data-testid="back-to-collection">
+              <Link to="/#collection" className="pill border border-current" data-testid="back-to-collection">
                 <ArrowLeft className="h-4 w-4" strokeWidth={2.6} /> Collection
               </Link>
               <div className="relative mt-6 flex h-[56svh] items-center justify-center lg:h-[72svh]">
@@ -67,7 +67,7 @@ export default function Product() {
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, ease: EASE, delay: 0.2 }} className="rounded-[2.5rem] bg-background p-7 text-foreground shadow-2xl sm:p-10 lg:col-span-6 lg:p-14">
             <div className="flex flex-wrap items-center gap-3">
               <span className="pill bg-foreground text-background">{p.badge}</span>
-              <span className="text-xs font-bold uppercase tracking-[0.22em] text-muted-foreground">{p.concentration} · {p.volume}</span>
+              <span className="text-[0.66rem] font-medium uppercase tracking-[0.3em] text-muted-foreground">{p.concentration} · {p.volume}</span>
             </div>
             <h1 className="display-lg mt-6 font-display">{p.name}</h1>
             <p className="mt-6 max-w-lg text-xl font-medium leading-snug text-muted-foreground">{p.tagline}</p>
@@ -110,7 +110,7 @@ export default function Product() {
               return (
                 <Link key={o.slug} to={`/fragrance/${o.slug}`} className="group block" data-testid={`related-${o.slug}`}>
                   <div style={worldVars(w)} className="relative flex aspect-[4/5] items-end justify-center overflow-hidden rounded-[2rem] p-6">
-                    <span className="absolute left-5 top-5 pill border-2 border-current">{o.badge}</span>
+                    <span className="absolute left-5 top-5 pill border border-current">{o.badge}</span>
                     <ArrowUpRight className="absolute right-5 top-5 h-6 w-6 transition-transform duration-500 group-hover:-translate-y-1 group-hover:translate-x-1" strokeWidth={2.4} />
                     <Bottle p={o} className="bottle-shadow h-[78%] w-auto transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-3 group-hover:rotate-[-4deg] group-hover:scale-105" />
                   </div>

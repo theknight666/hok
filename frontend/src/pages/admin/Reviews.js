@@ -55,7 +55,7 @@ export function Reviews() {
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-3">
                 <Stars n={r.rating} />
-                <span className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">{r.product_name}</span>
+                <span className="text-[0.66rem] font-medium uppercase tracking-[0.3em] text-muted-foreground">{r.product_name}</span>
                 <span className={`pill !px-2.5 !py-1 ${r.status === "approved" ? "bg-emerald-600/15 text-emerald-700 dark:text-emerald-400" : r.status === "hidden" ? "bg-muted text-muted-foreground" : "bg-gold/15 text-gold"}`}>{r.status}</span>
               </div>
               <p className="mt-2 font-display text-xl leading-tight">“{r.text}”</p>

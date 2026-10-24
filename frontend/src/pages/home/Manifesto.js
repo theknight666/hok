@@ -11,7 +11,7 @@ export function Manifesto() {
       />
       <ScrollWords
         text="Spray it on before you walk in and act surprised when the room turns around."
-        className="display-md mt-16 max-w-[20ch] font-display text-gold lg:ml-[20%]"
+        className="display-md mt-16 max-w-[20ch] font-display-italic text-gold lg:ml-[20%]"
       />
       <FadeUp className="mt-16 flex flex-wrap gap-4 lg:ml-[20%]">
         <Link to="/#collection" className="btn-royal" data-testid="manifesto-cta">Find your signature</Link>

@@ -28,7 +28,7 @@ export function Armoury({ products }) {
     <section id="armoury" className="mx-auto max-w-[1600px] px-5 py-28 sm:px-10 lg:py-40" data-testid="armoury-section">
       <p className="eyebrow">Build your armoury</p>
       <SplitChars text="One is a scent." className="display-lg mt-4 font-display" />
-      <SplitChars text="Four is a reputation." className="display-lg font-display text-gold" delay={0.25} />
+      <SplitChars text="Four is a reputation." className="display-lg font-display-italic text-gold" delay={0.25} />
 
       <div className="mt-16 grid gap-12 lg:grid-cols-12">
         <div className="lg:col-span-5">
@@ -88,7 +88,7 @@ export function Armoury({ products }) {
             </div>
             <div className="mt-8 flex flex-col gap-5 border-t pt-8 sm:flex-row sm:items-end sm:justify-between">
               <div>
-                <p className="text-xs font-bold uppercase tracking-[0.22em] text-muted-foreground">{chosen.length} of {SLOTS} chosen</p>
+                <p className="text-[0.66rem] font-medium uppercase tracking-[0.3em] text-muted-foreground">{chosen.length} of {SLOTS} chosen</p>
                 <p className="mt-2 font-display text-5xl" data-testid="armoury-total">{inr(total)}</p>
                 <p className="mt-2 flex items-center gap-2 text-sm text-muted-foreground" data-testid="armoury-shipping">
                   <Truck className="h-4 w-4" strokeWidth={2} />

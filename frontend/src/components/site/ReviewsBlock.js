@@ -89,7 +89,7 @@ export function ReviewsBlock({ slug, name }) {
           <li key={r.id} className="rounded-[1.5rem] bg-muted/60 p-5" data-testid={`review-${r.id}`}>
             <Stars n={r.rating} />
             <p className="mt-2 font-display text-xl leading-tight">“{r.text}”</p>
-            <p className="mt-2 text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">{r.user_name} · Verified buyer</p>
+            <p className="mt-2 text-[0.66rem] font-medium uppercase tracking-[0.3em] text-muted-foreground">{r.user_name} · Verified buyer</p>
           </li>
         ))}
       </ul>

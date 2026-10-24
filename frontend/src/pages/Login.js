@@ -37,7 +37,7 @@ export default function Login() {
 
   return (
     <main className="grid min-h-screen lg:grid-cols-2" data-testid="login-page">
-      <div className="relative hidden overflow-hidden bg-[#4B0F2C] text-[#FFE4EE] lg:block">
+      <div className="relative hidden overflow-hidden bg-[#26091C] text-[#F1DCE5] lg:block">
         <p aria-hidden="true" className="pointer-events-none absolute left-6 top-28 select-none font-display text-[11vw] leading-[0.85] opacity-[0.14]">Side<br />Effect</p>
         <img src="/images/cut-side-effect.png" alt="" className="bottle-shadow animate-floaty absolute left-1/2 top-1/2 h-[62svh] w-auto -translate-x-1/2 -translate-y-1/2" style={{ "--tilt": "-5deg" }} />
         <p className="absolute bottom-16 left-16 max-w-md font-display text-6xl leading-[0.9]">Enter the House.</p>

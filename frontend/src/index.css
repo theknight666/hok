@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,300..800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Jost:ital,wght@0,300..700;1,300..700&display=swap");
 @import "lenis/dist/lenis.css";
 
 @tailwind base;
@@ -7,51 +7,51 @@
 
 @layer base {
   :root {
-    --background: 40 38% 95%;
-    --foreground: 260 14% 7%;
-    --card: 40 40% 98%;
-    --card-foreground: 260 14% 7%;
-    --popover: 40 40% 98%;
-    --popover-foreground: 260 14% 7%;
-    --primary: 260 14% 7%;
-    --primary-foreground: 40 38% 96%;
-    --secondary: 40 25% 90%;
-    --secondary-foreground: 260 14% 7%;
-    --muted: 40 25% 90%;
-    --muted-foreground: 260 6% 38%;
-    --accent: 40 30% 88%;
-    --accent-foreground: 260 14% 7%;
-    --destructive: 0 72% 46%;
+    --background: 40 33% 94%;
+    --foreground: 260 18% 6%;
+    --card: 40 36% 97%;
+    --card-foreground: 260 18% 6%;
+    --popover: 40 36% 97%;
+    --popover-foreground: 260 18% 6%;
+    --primary: 260 18% 6%;
+    --primary-foreground: 40 33% 95%;
+    --secondary: 40 22% 88%;
+    --secondary-foreground: 260 18% 6%;
+    --muted: 40 22% 88%;
+    --muted-foreground: 260 6% 36%;
+    --accent: 40 26% 86%;
+    --accent-foreground: 260 18% 6%;
+    --destructive: 0 60% 40%;
     --destructive-foreground: 0 0% 98%;
-    --border: 260 8% 82%;
-    --input: 260 8% 78%;
-    --ring: 24 96% 48%;
+    --border: 40 12% 80%;
+    --input: 40 12% 74%;
+    --ring: 41 52% 44%;
     --radius: 1.25rem;
-    --gold: 24 96% 48%;
-    --gold-soft: 40 100% 60%;
-    --ink: #110e13;
-    --paper: #f6f0e6;
+    --gold: 41 52% 44%;
+    --gold-soft: 43 60% 62%;
+    --ink: #0c0b0e;
+    --paper: #f3eee5;
   }
   .dark {
-    --background: 260 14% 6%;
-    --foreground: 40 38% 94%;
-    --card: 260 10% 10%;
-    --card-foreground: 40 38% 94%;
-    --popover: 260 10% 10%;
-    --popover-foreground: 40 38% 94%;
-    --primary: 40 38% 94%;
-    --primary-foreground: 260 14% 6%;
-    --secondary: 260 8% 14%;
-    --secondary-foreground: 40 38% 94%;
-    --muted: 260 8% 14%;
-    --muted-foreground: 40 10% 68%;
-    --accent: 260 8% 16%;
-    --accent-foreground: 40 38% 94%;
-    --border: 260 8% 20%;
-    --input: 260 8% 26%;
-    --ring: 36 100% 58%;
-    --gold: 36 100% 58%;
-    --gold-soft: 40 100% 70%;
+    --background: 260 18% 5%;
+    --foreground: 40 33% 93%;
+    --card: 260 12% 9%;
+    --card-foreground: 40 33% 93%;
+    --popover: 260 12% 9%;
+    --popover-foreground: 40 33% 93%;
+    --primary: 40 33% 93%;
+    --primary-foreground: 260 18% 5%;
+    --secondary: 260 10% 13%;
+    --secondary-foreground: 40 33% 93%;
+    --muted: 260 10% 13%;
+    --muted-foreground: 40 10% 66%;
+    --accent: 260 10% 15%;
+    --accent-foreground: 40 33% 93%;
+    --border: 260 8% 19%;
+    --input: 260 8% 25%;
+    --ring: 43 60% 60%;
+    --gold: 43 60% 60%;
+    --gold-soft: 45 70% 72%;
   }
 }
 
@@ -60,42 +60,44 @@
   html { -webkit-tap-highlight-color: transparent; }
   body {
     @apply bg-background text-foreground;
-    font-family: "Instrument Sans", sans-serif;
+    font-family: "Jost", sans-serif;
     font-weight: 400;
     -webkit-font-smoothing: antialiased;
     transition: background-color 0.6s ease, color 0.6s ease;
   }
   ::selection { background: hsl(var(--gold)); color: var(--ink); }
   h1, h2, h3, .font-display {
-    font-family: "Bricolage Grotesque", sans-serif;
-    font-variation-settings: "opsz" 96, "wdth" 88;
-    letter-spacing: -0.035em;
+    font-family: "Bodoni Moda", serif;
+    font-optical-sizing: auto;
+    font-weight: 500;
+    letter-spacing: -0.015em;
   }
 }
 
 @layer components {
-  .font-display { font-weight: 800; }
-  .display-xl { font-size: clamp(3.4rem, 10.5vw, 13rem); line-height: 0.86; }
-  .hero-title { font-size: clamp(3.2rem, min(8.6vw, 19svh), 11rem); line-height: 0.86; }
-  .display-lg { font-size: clamp(2.8rem, 7.5vw, 8.5rem); line-height: 0.88; }
-  .display-md { font-size: clamp(2.2rem, 5vw, 5.5rem); line-height: 0.92; }
+  .font-display { font-weight: 500; }
+  .font-display-italic { font-family: "Bodoni Moda", serif; font-style: italic; font-weight: 400; }
+  .display-xl { font-size: clamp(3.2rem, 9.5vw, 12rem); line-height: 0.92; }
+  .hero-title { font-size: clamp(3rem, min(8vw, 17.5svh), 10.5rem); line-height: 0.94; }
+  .display-lg { font-size: clamp(2.6rem, 6.8vw, 7.8rem); line-height: 0.94; }
+  .display-md { font-size: clamp(2rem, 4.4vw, 5rem); line-height: 1; }
 
   .text-gold { color: hsl(var(--gold)); }
   .bg-gold { background-color: hsl(var(--gold)); }
   .border-gold { border-color: hsl(var(--gold)); }
 
   .eyebrow {
-    font-family: "Instrument Sans", sans-serif;
+    font-family: "Jost", sans-serif;
     font-size: 0.7rem;
-    letter-spacing: 0.22em;
+    letter-spacing: 0.32em;
     text-transform: uppercase;
-    font-weight: 700;
+    font-weight: 500;
     color: hsl(var(--gold));
   }
 
   /* pill buttons */
   .btn-royal {
-    @apply relative inline-flex items-center justify-center gap-3 rounded-full px-8 py-4 text-sm font-bold uppercase tracking-[0.14em];
+    @apply relative inline-flex items-center justify-center gap-3 rounded-full px-8 py-4 text-xs font-medium uppercase tracking-[0.26em];
     background: hsl(var(--foreground));
     color: hsl(var(--background));
     transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.4s ease, color 0.4s ease, box-shadow 0.4s ease;
@@ -103,7 +105,7 @@
   .btn-royal:hover { transform: translateY(-2px) scale(1.02); background: hsl(var(--gold)); color: var(--ink); box-shadow: 0 18px 40px -18px hsl(var(--gold) / 0.7); }
   .btn-royal:active { transform: scale(0.98); }
   .btn-ghost-royal {
-    @apply inline-flex items-center justify-center gap-3 rounded-full border-2 px-8 py-4 text-sm font-bold uppercase tracking-[0.14em];
+    @apply inline-flex items-center justify-center gap-3 rounded-full border px-8 py-4 text-xs font-medium uppercase tracking-[0.26em];
     border-color: currentColor;
     transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.4s ease, color 0.4s ease;
   }
@@ -113,40 +115,40 @@
 
   /* buttons living inside a colour world (inherit the world's ink) */
   .btn-world {
-    @apply inline-flex items-center justify-center gap-3 rounded-full px-8 py-4 text-sm font-bold uppercase tracking-[0.14em];
+    @apply inline-flex items-center justify-center gap-3 rounded-full px-8 py-4 text-xs font-medium uppercase tracking-[0.26em];
     background: var(--w-ink);
     color: var(--w-bg);
     transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), filter 0.4s ease;
   }
   .btn-world:hover { transform: translateY(-2px) scale(1.03); filter: brightness(1.08); }
   .btn-world-ghost {
-    @apply inline-flex items-center justify-center gap-3 rounded-full border-2 px-8 py-4 text-sm font-bold uppercase tracking-[0.14em];
+    @apply inline-flex items-center justify-center gap-3 rounded-full border px-8 py-4 text-xs font-medium uppercase tracking-[0.26em];
     border-color: var(--w-ink);
     color: var(--w-ink);
     transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.4s ease, color 0.4s ease;
   }
   .btn-world-ghost:hover { background: var(--w-ink); color: var(--w-bg); transform: translateY(-2px); }
 
-  .pill { @apply inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.18em]; }
-  .link-line { background: linear-gradient(currentColor, currentColor) 0 100% / 0 2px no-repeat; transition: background-size 0.5s ease; }
-  .link-line:hover { background-size: 100% 2px; }
+  .pill { @apply inline-flex items-center gap-2 rounded-full px-4 py-2 text-[0.66rem] font-medium uppercase tracking-[0.28em]; }
+  .link-line { background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat; transition: background-size 0.5s ease; }
+  .link-line:hover { background-size: 100% 1px; }
 
-  .text-outline { color: transparent; -webkit-text-stroke: 1.5px currentColor; }
+  .text-outline { color: transparent; -webkit-text-stroke: 1px currentColor; }
 
   .grain::after {
     content: "";
     position: absolute;
     inset: 0;
     pointer-events: none;
-    opacity: 0.08;
+    opacity: 0.1;
     mix-blend-mode: overlay;
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
   }
   .bottle-shadow { filter: drop-shadow(0 40px 50px rgba(0, 0, 0, 0.35)) drop-shadow(0 6px 10px rgba(0, 0, 0, 0.18)); }
   .world-glow {
     background: radial-gradient(closest-side, var(--w-soft, #fff) 0%, transparent 70%);
-    filter: blur(40px);
-    opacity: 0.55;
+    filter: blur(60px);
+    opacity: 0.5;
   }
 }
 

@@ -80,16 +80,16 @@ export function Hero({ products }) {
 
       <div className="relative z-10 mx-auto w-full max-w-[1600px] px-5 sm:px-10">
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.8 }} className="flex flex-wrap items-center gap-3">
-          <span className="pill border-2 border-current">Extrait de Parfum</span>
-          <span className="pill border-2 border-current">Four signatures</span>
-          <span className="hidden text-xs font-semibold uppercase tracking-[0.2em] opacity-70 sm:inline">Est. for people who enter rooms</span>
+          <span className="pill border border-current">Extrait de Parfum</span>
+          <span className="pill border border-current">Four signatures</span>
+          <span className="hidden text-[0.66rem] font-normal uppercase tracking-[0.3em] opacity-70 sm:inline">Est. for people who enter rooms</span>
         </motion.div>
 
         <h1 className="hero-title mt-6 font-display" data-testid="hero-headline">
           {["Smell like", "you own", "the castle."].map((l, i) => (
             <span key={l} className="block overflow-hidden pb-[0.1em] -mb-[0.1em]">
               <motion.span
-                className="block"
+                className={`block ${i === 2 ? "font-display-italic" : ""}`}
                 initial={{ y: "110%" }}
                 animate={{ y: 0 }}
                 transition={{ duration: 1.1, ease: EASE, delay: 0.35 + i * 0.1 }}
@@ -110,7 +110,7 @@ export function Hero({ products }) {
 
       <div className="relative z-10 mx-auto mt-auto flex w-full max-w-[1600px] flex-col gap-8 px-5 pb-8 pt-10 sm:px-10 lg:flex-row lg:items-end lg:justify-between lg:pb-10">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9, duration: 0.9, ease: EASE }}>
-          <p className="text-xs font-bold uppercase tracking-[0.22em] opacity-70">Product n°0{active + 1} / 0{list.length}</p>
+          <p className="text-[0.66rem] font-medium uppercase tracking-[0.3em] opacity-70">Product n°0{active + 1} / 0{list.length}</p>
           <ul className="mt-3 flex flex-wrap gap-2">
             {list.map((p, i) => (
               <li key={p.slug}>
@@ -118,7 +118,7 @@ export function Hero({ products }) {
                   onClick={() => setActive(i)}
                   data-testid={`hero-swatch-${p.slug}`}
                   aria-pressed={i === active}
-                  className={`rounded-full border-2 border-current px-5 py-2.5 font-display text-base leading-none transition-all duration-300 sm:text-lg ${i === active ? "bg-[var(--w-ink)] text-[var(--w-bg)]" : "opacity-60 hover:opacity-100"}`}
+                  className={`rounded-full border border-current px-5 py-2.5 font-display text-base leading-none transition-all duration-300 sm:text-lg ${i === active ? "bg-[var(--w-ink)] text-[var(--w-bg)]" : "opacity-60 hover:opacity-100"}`}
                 >
                   {p.name}
                 </button>

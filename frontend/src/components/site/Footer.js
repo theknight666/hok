@@ -40,7 +40,7 @@ export function Footer() {
                     data-testid="newsletter-input"
                     className="w-full bg-transparent py-2 text-sm font-medium placeholder:opacity-50 focus:outline-none"
                   />
-                  <button type="submit" data-testid="newsletter-submit" aria-label="Subscribe" className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-gold text-[#110e13] transition-transform duration-300 hover:scale-110">
+                  <button type="submit" data-testid="newsletter-submit" aria-label="Subscribe" className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-gold text-[#0C0B0E] transition-transform duration-300 hover:scale-110">
                     <ArrowRight className="h-5 w-5" strokeWidth={2.6} />
                   </button>
                 </div>
@@ -49,7 +49,7 @@ export function Footer() {
           </div>
           {COLS.map((c) => (
             <div key={c.t} className="lg:col-span-3">
-              <p className="text-xs font-bold uppercase tracking-[0.22em] text-gold">{c.t}</p>
+              <p className="text-[0.66rem] font-medium uppercase tracking-[0.3em] text-gold">{c.t}</p>
               <ul className="mt-5 space-y-3 text-base font-semibold">
                 {c.links.map(([to, label, tid]) => (
                   <li key={to + label}><Link to={to} data-testid={tid} className="link-line opacity-80 transition-opacity hover:opacity-100">{label}</Link></li>

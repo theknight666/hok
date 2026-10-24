@@ -38,7 +38,7 @@ export function BottleUpload({ slug, image, onDone }) {
           {preview || image ? <img src={preview || image} alt="" className="h-full w-full object-contain" data-testid="bottle-upload-preview" /> : <span className="text-xs text-muted-foreground">No photo</span>}
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Bottle photo</p>
+          <p className="text-[0.66rem] font-medium uppercase tracking-[0.3em] text-muted-foreground">Bottle photo</p>
           <p className="mt-1 text-sm text-muted-foreground">Upload any photo of the bottle. We will cut it out so it floats on the site like the others.</p>
           <label className="mt-3 flex cursor-pointer items-center gap-2 text-sm font-semibold">
             <input type="checkbox" checked={removeBg} onChange={(e) => setRemoveBg(e.target.checked)} className="h-4 w-4 accent-[hsl(var(--gold))]" data-testid="bottle-upload-removebg" />

@@ -11,7 +11,7 @@ export function Marquee({ className = "" }) {
           <div key={k} className="flex items-center" aria-hidden={k === 1}>
             {row.map((w, i) => (
               <span key={`${k}-${i}`} className="flex items-center gap-8 px-8">
-                <span className={`whitespace-nowrap font-display text-5xl sm:text-7xl ${i % 2 ? "text-outline" : ""}`}>{w}</span>
+                <span className={`whitespace-nowrap font-display text-5xl sm:text-7xl ${i % 2 ? "font-display-italic text-outline" : ""}`}>{w}</span>
                 <KnightMark className="h-8 w-8 animate-spin-slow text-gold" />
               </span>
             ))}
