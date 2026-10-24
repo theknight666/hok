@@ -53,6 +53,16 @@ class DynamicDB:
 db = DynamicDB()
 
 app = FastAPI(title="House Of The Knight")
+
+
+@app.middleware("http")
+async def ensure_api_prefix(request: Request, call_next):
+    path = request.scope.get("path", "")
+    if path and not path.startswith("/api") and path != "/":
+        request.scope["path"] = "/api" + path
+    return await call_next(request)
+
+
 api = APIRouter(prefix="/api")
 logger = logging.getLogger("hotk")
 logging.basicConfig(level=logging.INFO)
@@ -323,15 +333,42 @@ async def logout(request: Request, response: Response):
     return {"ok": True}
 
 
+_seeded = False
+
+
+async def ensure_seeded():
+    global _seeded
+    if _seeded:
+        return
+    try:
+        if await db.products.count_documents({}) == 0:
+            for p in SEED:
+                doc = {**p, "price": SEED_PRICES[p["slug"]], "image": f"/images/{p['slug'].replace('-on-the-rocks', '')}.jpg",
+                       "low_stock_threshold": 10, "active": True, "featured": True, "updated_at": now().isoformat()}
+                await db.products.insert_one(doc)
+            admin_email = os.environ.get("ADMIN_EMAIL", "admin@houseoftheknight.com").lower()
+            admin_pw = os.environ.get("ADMIN_PASSWORD", "KnightAdmin#2026")
+            existing = await db.users.find_one({"email": admin_email})
+            if not existing:
+                await db.users.insert_one({"user_id": f"user_{uuid.uuid4().hex[:12]}", "email": admin_email, "name": "House Admin",
+                                           "picture": None, "role": "admin", "password_hash": hash_password(admin_pw),
+                                           "created_at": now().isoformat()})
+        _seeded = True
+    except Exception as e:
+        logger.error("Auto-seeding error: %s", e)
+
+
 # ---------- Products ----------
 @api.get("/products")
 async def list_products():
+    await ensure_seeded()
     items = await db.products.find({"active": True}, {"_id": 0}).sort("order", 1).to_list(100)
     return items
 
 
 @api.get("/products/{slug}")
 async def get_product(slug: str):
+    await ensure_seeded()
     p = await db.products.find_one({"slug": slug, "active": True}, {"_id": 0})
     if not p:
         raise HTTPException(status_code=404, detail="Fragrance not found")
