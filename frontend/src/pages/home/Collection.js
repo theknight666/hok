@@ -23,12 +23,12 @@ function Chapter({ p, idx, total }) {
     <div ref={ref} className="h-[115svh]" data-testid={`product-card-${p.slug}`}>
       <article
         style={{ ...worldVars(world), zIndex: idx + 1 }}
-        className="grain sticky top-0 flex h-[100svh] flex-col overflow-hidden rounded-t-[2.5rem] shadow-[0_-30px_80px_-30px_rgba(0,0,0,0.45)]"
+        className="grain sticky top-0 flex h-[100svh] flex-col overflow-hidden rounded-t-[2.5rem] shadow-[0_-30px_80px_-30px_rgba(0,0,0,0.45)] transform-gpu"
       >
         <motion.p
           style={{ x: ghostX }}
           aria-hidden="true"
-          className="pointer-events-none absolute left-0 top-[16%] select-none whitespace-nowrap font-display text-[15vw] leading-none opacity-[0.1]"
+          className="pointer-events-none absolute left-0 top-[16%] select-none whitespace-nowrap font-display text-[15vw] leading-none opacity-[0.1] will-change-transform"
         >
           {p.name}
         </motion.p>
@@ -50,7 +50,7 @@ function Chapter({ p, idx, total }) {
 
           <div className="relative z-10 flex items-center justify-center lg:col-span-4">
             <div className="world-glow pointer-events-none absolute left-1/2 top-1/2 h-[80%] w-[90%] -translate-x-1/2 -translate-y-1/2" />
-            <motion.div style={{ rotate, y: by }} className="relative">
+            <motion.div style={{ rotate, y: by }} className="relative will-change-transform transform-gpu">
               <Link to={`/fragrance/${p.slug}`} aria-label={`Open ${p.name}`}>
                 <Bottle p={p} className="bottle-shadow h-[38svh] w-auto transition-transform duration-700 hover:scale-105 sm:h-[48svh] lg:h-[66svh]" />
               </Link>

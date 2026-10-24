@@ -74,7 +74,7 @@ export function Armoury({ products: all }) {
                   <div key={i} className="relative flex aspect-[3/4] items-end justify-center overflow-hidden rounded-[1.5rem] border-2 border-dashed border-border" style={w ? { background: w.bg, borderColor: w.bg } : undefined} data-testid={`armoury-slot-${i}`}>
                     <AnimatePresence mode="popLayout">
                       {p ? (
-                        <motion.div key={p.slug} initial={{ y: "100%", opacity: 0, rotate: -8 }} animate={{ y: 0, opacity: 1, rotate: 0 }} exit={{ y: "100%", opacity: 0 }} transition={{ duration: 0.7, ease: EASE }} className="flex h-full items-center p-3">
+                        <motion.div key={p.slug} initial={{ y: "100%", opacity: 0, rotate: -8 }} animate={{ y: 0, opacity: 1, rotate: 0 }} exit={{ y: "100%", opacity: 0 }} transition={{ duration: 0.6, ease: EASE }} className="flex h-full items-center p-3 will-change-transform transform-gpu">
                           <Bottle p={p} className="bottle-shadow max-h-full w-auto" />
                         </motion.div>
                       ) : (

@@ -5,7 +5,7 @@ import { Stars } from "@/pages/admin/Reviews";
 
 function Card({ r }) {
   return (
-    <figure className="w-[82vw] max-w-[420px] shrink-0 rounded-[2rem] bg-background p-7 text-foreground shadow-lg sm:p-9" data-testid={`quote-${r.id}`}>
+    <figure className="w-[82vw] max-w-[420px] shrink-0 rounded-[2rem] bg-background p-7 text-foreground shadow-lg sm:p-9 will-change-transform transform-gpu" data-testid={`quote-${r.id}`}>
       <Stars n={r.rating} />
       <blockquote className="mt-4 font-display text-2xl leading-tight sm:text-3xl">“{r.text}”</blockquote>
       <figcaption className="mt-6 flex flex-wrap items-center justify-between gap-2 text-[0.66rem] font-medium uppercase tracking-[0.3em] text-muted-foreground">
@@ -28,7 +28,7 @@ export function Quotes() {
         <h2 className="display-lg mt-3 font-display">Words from <span className="font-display-italic text-gold">the court</span></h2>
       </div>
       {reviews.length ? (
-        <div className={`mt-12 flex gap-5 px-5 sm:px-10 ${reviews.length < 4 ? "flex-wrap" : "w-max animate-marquee-slow"}`}>
+        <div className={`mt-12 flex gap-5 px-5 sm:px-10 ${reviews.length < 4 ? "flex-wrap" : "w-max animate-marquee-slow will-change-transform transform-gpu"}`}>
           {loop.map((r, i) => <Card key={`${r.id}-${i}`} r={r} />)}
         </div>
       ) : (

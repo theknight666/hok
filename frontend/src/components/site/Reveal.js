@@ -27,12 +27,12 @@ export const MaskLines = ({ lines, className = "", delay = 0, as = "h1", lineCla
 
 export const FadeUp = ({ children, delay = 0, className = "", y = 36, ...rest }) => (
   <motion.div
-    className={className}
+    className={`${className} will-change-transform`}
     {...rest}
     initial={{ opacity: 0, y }}
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true, amount: 0.12 }}
-    transition={{ duration: 1, ease: EASE, delay }}
+    transition={{ duration: 0.85, ease: EASE, delay }}
   >
     {children}
   </motion.div>
@@ -46,9 +46,9 @@ export const SplitChars = ({ text, className = "", as = "h2", delay = 0 }) => {
       {text.split("").map((c, i) => (
         <span key={i} className="inline-block overflow-hidden align-bottom pb-[0.1em] -mb-[0.1em]" aria-hidden="true">
           <motion.span
-            className="inline-block"
+            className="inline-block will-change-transform"
             variants={{ hidden: { y: "110%", rotate: 6 }, show: { y: "0%", rotate: 0 } }}
-            transition={{ duration: 0.9, ease: EASE, delay: delay + i * 0.025 }}
+            transition={{ duration: 0.85, ease: EASE, delay: delay + i * 0.025 }}
           >
             {c === " " ? "\u00A0" : c}
           </motion.span>
@@ -63,7 +63,7 @@ const Word = ({ w, range, progress }) => {
   const y = useTransform(progress, range, [8, 0]);
   return (
     <span className="mr-[0.26em] inline-block">
-      <motion.span style={{ opacity, y }} className="inline-block">{w}</motion.span>
+      <motion.span style={{ opacity, y }} className="inline-block will-change-transform">{w}</motion.span>
     </span>
   );
 };

@@ -27,9 +27,9 @@ export function Atelier() {
             </p>
           </div>
           <div className="relative lg:col-span-5">
-            <motion.div style={{ rotate: rot }} className="relative mx-auto w-[80%] overflow-hidden rounded-[2rem] bg-background p-3 shadow-2xl lg:w-full">
+            <motion.div style={{ rotate: rot }} className="relative mx-auto w-[80%] overflow-hidden rounded-[2rem] bg-background p-3 shadow-2xl lg:w-full will-change-transform transform-gpu">
               <div className="relative aspect-[4/5] overflow-hidden rounded-[1.5rem]">
-                <motion.img style={{ y, scale: 1.2 }} src="/images/atelier.jpg" alt="The perfumer's atelier" loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
+                <motion.img style={{ y, scale: 1.2 }} src="/images/atelier.jpg" alt="The perfumer's atelier" loading="lazy" className="absolute inset-0 h-full w-full object-cover will-change-transform transform-gpu" />
               </div>
               <p className="px-2 pb-1 pt-4 font-display text-xl text-foreground">The atelier, 2am. Candles optional, obsession mandatory.</p>
             </motion.div>

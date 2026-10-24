@@ -6,7 +6,16 @@ export function SmoothScroll() {
   const { pathname, hash } = useLocation();
 
   useEffect(() => {
-    const lenis = new Lenis({ duration: 1.25, smoothWheel: true });
+    const lenis = new Lenis({
+      duration: 0.85,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      orientation: "vertical",
+      gestureOrientation: "vertical",
+      smoothWheel: true,
+      wheelMultiplier: 1.0,
+      touchMultiplier: 1.5,
+      infinite: false,
+    });
     window.__lenis = lenis;
     let id;
     const raf = (t) => {

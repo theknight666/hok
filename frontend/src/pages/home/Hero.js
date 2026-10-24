@@ -34,16 +34,16 @@ function Formation({ list, active, onPick }) {
             data-testid={`hero-bottle-${p.slug}`}
             aria-label={`Show ${p.name}`}
             aria-pressed={isActive}
-            className="absolute bottom-0 left-1/2 origin-bottom focus:outline-none"
+            className="absolute bottom-0 left-1/2 origin-bottom focus:outline-none will-change-transform transform-gpu"
             initial={false}
             animate={{
               x: `calc(-50% + ${off * 8}vw)`,
               y: `${-a * 6}%`,
               scale: isActive ? 1 : a === 1 ? 0.74 : 0.58,
               zIndex: 10 - a,
-              filter: isActive ? "brightness(1)" : `brightness(${0.62 - a * 0.08})`,
+              opacity: isActive ? 1 : Math.max(0.48, 0.68 - a * 0.1),
             }}
-            transition={{ duration: 0.9, ease: EASE }}
+            transition={{ duration: 0.85, ease: EASE }}
           >
             <Bottle p={p} className="bottle-shadow h-[40svh] w-auto sm:h-[46svh] lg:h-[54svh]" />
           </motion.button>
@@ -74,8 +74,8 @@ export function Hero({ products }) {
         key={cur.slug}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 1.2 }}
-        className="world-glow pointer-events-none absolute left-1/2 top-[58%] h-[60vw] w-[60vw] -translate-x-1/2 -translate-y-1/2"
+        transition={{ duration: 0.8 }}
+        className="world-glow pointer-events-none absolute left-1/2 top-[58%] h-[60vw] w-[60vw] -translate-x-1/2 -translate-y-1/2 will-change-transform"
       />
 
       <div className="relative z-10 mx-auto w-full max-w-[1600px] px-5 sm:px-10">

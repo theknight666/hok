@@ -29,7 +29,16 @@ export function Header() {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    const on = () => setScrolled(window.scrollY > 24);
+    let ticking = false;
+    const on = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          setScrolled(window.scrollY > 24);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
     on();
     window.addEventListener("scroll", on, { passive: true });
     return () => window.removeEventListener("scroll", on);
@@ -40,8 +49,8 @@ export function Header() {
   return (
     <header data-testid="site-header" className="fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-5 sm:pt-4">
       <div
-        className={`mx-auto flex h-16 max-w-[1600px] items-center justify-between rounded-full border px-3 pl-5 text-foreground transition-[background-color,border-color,box-shadow,backdrop-filter] duration-500 ${
-          compact ? "border-border/60 bg-background/80 shadow-lg backdrop-blur-xl" : "border-background/40 bg-background/60 backdrop-blur-md"
+        className={`mx-auto flex h-16 max-w-[1600px] items-center justify-between rounded-full border px-3 pl-5 text-foreground backdrop-blur-md transition-[background-color,border-color,box-shadow] duration-300 ${
+          compact ? "border-border/60 bg-background/85 shadow-lg" : "border-background/40 bg-background/60"
         }`}
       >
         <Link to="/" data-testid="brand-logo" className="flex items-center gap-3">

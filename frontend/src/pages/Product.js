@@ -44,8 +44,8 @@ export default function Product() {
 
   return (
     <main data-testid="product-page">
-      <section style={worldVars(world)} className="grain relative overflow-hidden">
-        <p aria-hidden="true" className="pointer-events-none absolute left-0 top-24 select-none whitespace-nowrap font-display text-[13vw] leading-none opacity-[0.1]">{p.name}</p>
+      <section style={worldVars(world)} className="grain relative overflow-hidden transform-gpu">
+        <p aria-hidden="true" className="pointer-events-none absolute left-0 top-24 select-none whitespace-nowrap font-display text-[13vw] leading-none opacity-[0.1] will-change-transform">{p.name}</p>
         <div className="relative mx-auto grid max-w-[1600px] gap-10 px-5 pb-16 pt-28 sm:px-10 lg:grid-cols-12 lg:pb-24">
           <div className="lg:col-span-6">
             <div className="lg:sticky lg:top-28">
@@ -53,13 +53,13 @@ export default function Product() {
                 <ArrowLeft className="h-4 w-4" strokeWidth={2.6} /> Collection
               </Link>
               <div className="relative mt-6 flex h-[56svh] items-center justify-center lg:h-[72svh]">
-                <div className="world-glow pointer-events-none absolute left-1/2 top-1/2 h-[80%] w-[80%] -translate-x-1/2 -translate-y-1/2" />
+                <div className="world-glow pointer-events-none absolute left-1/2 top-1/2 h-[80%] w-[80%] -translate-x-1/2 -translate-y-1/2 will-change-transform" />
                 <motion.div
                   key={p.slug}
                   initial={{ opacity: 0, y: 120, rotate: -10 }}
                   animate={{ opacity: 1, y: 0, rotate: 0 }}
-                  transition={{ duration: 1.2, ease: EASE }}
-                  className="animate-floaty relative"
+                  transition={{ duration: 0.9, ease: EASE }}
+                  className="animate-floaty relative will-change-transform transform-gpu"
                   style={{ "--tilt": "-3deg" }}
                 >
                   <Bottle p={p} className="bottle-shadow h-[52svh] w-auto lg:h-[66svh]" />
