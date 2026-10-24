@@ -266,24 +266,30 @@ async def register(body: RegisterIn, response: Response):
 
 @api.post("/auth/login")
 async def login(body: LoginIn, request: Request, response: Response):
-    email = body.email.lower()
-    ident = f"{request.client.host if request.client else 'x'}:{email}"
-    att = await db.login_attempts.find_one({"identifier": ident})
-    if att and att.get("count", 0) >= 5:
-        locked = att.get("last")
-        if isinstance(locked, str):
-            locked = datetime.fromisoformat(locked)
-        if locked and now() - locked < timedelta(minutes=15):
-            raise HTTPException(status_code=429, detail="Too many attempts. Try again in 15 minutes.")
+    try:
+        email = body.email.lower()
+        ident = f"{request.client.host if request.client else 'x'}:{email}"
+        att = await db.login_attempts.find_one({"identifier": ident})
+        if att and att.get("count", 0) >= 5:
+            locked = att.get("last")
+            if isinstance(locked, str):
+                locked = datetime.fromisoformat(locked)
+            if locked and now() - locked < timedelta(minutes=15):
+                raise HTTPException(status_code=429, detail="Too many attempts. Try again in 15 minutes.")
+            await db.login_attempts.delete_one({"identifier": ident})
+        user = await db.users.find_one({"email": email})
+        if not user or not user.get("password_hash") or not verify_password(body.password, user["password_hash"]):
+            await db.login_attempts.update_one({"identifier": ident},
+                                               {"$inc": {"count": 1}, "$set": {"last": now().isoformat()}}, upsert=True)
+            raise HTTPException(status_code=401, detail="Invalid email or password")
         await db.login_attempts.delete_one({"identifier": ident})
-    user = await db.users.find_one({"email": email})
-    if not user or not user.get("password_hash") or not verify_password(body.password, user["password_hash"]):
-        await db.login_attempts.update_one({"identifier": ident},
-                                           {"$inc": {"count": 1}, "$set": {"last": now().isoformat()}}, upsert=True)
-        raise HTTPException(status_code=401, detail="Invalid email or password")
-    await db.login_attempts.delete_one({"identifier": ident})
-    set_auth_cookies(response, user["user_id"])
-    return public_user(user)
+        set_auth_cookies(response, user["user_id"])
+        return public_user(user)
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error("Login DB error: %s", e)
+        raise HTTPException(status_code=503, detail=f"Database unavailable: {type(e).__name__}: {str(e)[:120]}")
 
 
 @api.post("/auth/refresh")
@@ -782,6 +788,30 @@ async def startup():
 @api.get("/")
 async def root():
     return {"house": "House Of The Knight"}
+
+
+@api.get("/debug")
+async def debug_info():
+    """Diagnose connectivity issues. Remove in production."""
+    import sys
+    mongo_url = os.environ.get("MONGO_URL", "NOT_SET")
+    mongo_set = mongo_url != "NOT_SET"
+    mongo_masked = (mongo_url[:20] + "...") if mongo_set else "NOT SET"
+    db_status = "unknown"
+    try:
+        result = await get_client().admin.command("ping", serverSelectionTimeoutMS=5000)
+        db_status = f"connected: {result}"
+    except Exception as e:
+        db_status = f"FAILED: {type(e).__name__}: {str(e)[:200]}"
+    return {
+        "python": sys.version,
+        "mongo_url_set": mongo_set,
+        "mongo_url_preview": mongo_masked,
+        "db_name": os.environ.get("DB_NAME", "NOT_SET"),
+        "admin_email_set": bool(os.environ.get("ADMIN_EMAIL")),
+        "jwt_secret_set": bool(os.environ.get("JWT_SECRET")),
+        "db_status": db_status,
+    }
 
 
 app.include_router(api)
