@@ -417,15 +417,35 @@ async def ensure_seeded():
     if _seeded:
         return
     try:
-        if await db.products.count_documents({}) == 0:
-            for p in SEED:
+        # 1. Deduplicate any existing duplicate products by slug
+        seen_slugs = set()
+        async for prod in db.products.find({}, {"_id": 1, "slug": 1}):
+            slug = prod.get("slug")
+            if slug in seen_slugs:
+                await db.products.delete_one({"_id": prod["_id"]})
+                logger.info("Deleted duplicate product: %s", slug)
+            else:
+                seen_slugs.add(slug)
+
+        # 2. Ensure each seed fragrance exists and is active/featured
+        for p in SEED:
+            existing = await db.products.find_one({"slug": p["slug"]})
+            if not existing:
                 doc = {**p, "price": SEED_PRICES[p["slug"]], "image": f"/images/{p['slug'].replace('-on-the-rocks', '')}.jpg",
                        "low_stock_threshold": 10, "active": True, "featured": True, "updated_at": now().isoformat()}
                 await db.products.insert_one(doc)
+                logger.info("Seeded missing fragrance: %s", p["slug"])
+            else:
+                await db.products.update_one(
+                    {"slug": p["slug"]},
+                    {"$set": {"active": True, "featured": True}}
+                )
+
         await ensure_admin_account()
         _seeded = True
     except Exception as e:
         logger.error("Auto-seeding error: %s", e)
+
 
 
 
