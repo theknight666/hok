@@ -1,6 +1,8 @@
 import axios from "axios";
 
-export const api = axios.create({ baseURL: `${process.env.REACT_APP_BACKEND_URL}/api`, withCredentials: true });
+const rawBase = process.env.REACT_APP_BACKEND_URL;
+const backendUrl = rawBase && rawBase !== "undefined" ? rawBase.replace(/\/+$/, "") : "";
+export const api = axios.create({ baseURL: `${backendUrl}/api`, withCredentials: true });
 
 const NO_RETRY = ["/auth/refresh", "/auth/login", "/auth/register", "/auth/google/session"];
 let refreshing = null;

@@ -24,8 +24,33 @@ from pydantic import BaseModel, Field, EmailStr
 
 import storage
 
-client = AsyncIOMotorClient(os.environ['MONGO_URL'])
-db = client[os.environ['DB_NAME']]
+_client = None
+_client_loop = None
+
+def get_client() -> AsyncIOMotorClient:
+    global _client, _client_loop
+    try:
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        loop = None
+    if _client is None or (_client_loop is not None and _client_loop != loop):
+        mongo_url = os.environ.get("MONGO_URL", "mongodb://localhost:27017")
+        _client = AsyncIOMotorClient(mongo_url, connect=False)
+        _client_loop = loop
+    return _client
+
+class DynamicDB:
+    def __getattr__(self, name):
+        c = get_client()
+        db_name = os.environ.get("DB_NAME", "house_of_the_knight")
+        return c[db_name][name]
+
+    def __getitem__(self, name):
+        c = get_client()
+        db_name = os.environ.get("DB_NAME", "house_of_the_knight")
+        return c[db_name][name]
+
+db = DynamicDB()
 
 app = FastAPI(title="House Of The Knight")
 api = APIRouter(prefix="/api")
@@ -33,6 +58,7 @@ logger = logging.getLogger("hotk")
 logging.basicConfig(level=logging.INFO)
 
 JWT_ALG = "HS256"
+JWT_SECRET = os.environ.get("JWT_SECRET", "hotk_jwt_default_secret_key_2026")
 ACCESS_MIN = 60
 REFRESH_DAYS = 7
 SHIPPING_FREE_OVER = 15000
@@ -54,7 +80,7 @@ def verify_password(p: str, h: str) -> bool:
 
 def make_token(user_id: str, kind: str) -> str:
     exp = now() + (timedelta(minutes=ACCESS_MIN) if kind == "access" else timedelta(days=REFRESH_DAYS))
-    return jwt.encode({"sub": user_id, "type": kind, "exp": exp}, os.environ["JWT_SECRET"], algorithm=JWT_ALG)
+    return jwt.encode({"sub": user_id, "type": kind, "exp": exp}, JWT_SECRET, algorithm=JWT_ALG)
 
 
 def set_cookie(resp: Response, key: str, value: str, max_age: int):
@@ -80,7 +106,7 @@ async def get_current_user(request: Request) -> dict:
     bearer = auth[7:] if auth.startswith("Bearer ") else None
     for t in filter(None, [token, bearer]):
         try:
-            payload = jwt.decode(t, os.environ["JWT_SECRET"], algorithms=[JWT_ALG])
+            payload = jwt.decode(t, JWT_SECRET, algorithms=[JWT_ALG])
             if payload.get("type") == "access":
                 user = await db.users.find_one({"user_id": payload["sub"]}, {"_id": 0, "password_hash": 0})
                 if user:
@@ -246,7 +272,7 @@ async def refresh(request: Request, response: Response):
     if not t:
         raise HTTPException(status_code=401, detail="No refresh token")
     try:
-        payload = jwt.decode(t, os.environ["JWT_SECRET"], algorithms=[JWT_ALG])
+        payload = jwt.decode(t, JWT_SECRET, algorithms=[JWT_ALG])
     except jwt.InvalidTokenError:
         raise HTTPException(status_code=401, detail="Invalid refresh token")
     if payload.get("type") != "refresh":
@@ -663,8 +689,8 @@ async def startup():
                    "low_stock_threshold": 10, "active": True, "featured": True, "updated_at": now().isoformat()}
             await db.products.insert_one(doc)
     await db.products.update_many({"featured": {"$exists": False}}, {"$set": {"featured": True}})
-    admin_email = os.environ["ADMIN_EMAIL"].lower()
-    admin_pw = os.environ["ADMIN_PASSWORD"]
+    admin_email = os.environ.get("ADMIN_EMAIL", "admin@houseoftheknight.com").lower()
+    admin_pw = os.environ.get("ADMIN_PASSWORD", "KnightAdmin#2026")
     existing = await db.users.find_one({"email": admin_email})
     if not existing:
         await db.users.insert_one({"user_id": f"user_{uuid.uuid4().hex[:12]}", "email": admin_email, "name": "House Admin",
@@ -683,7 +709,7 @@ app.include_router(api)
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=os.environ['CORS_ORIGINS'].split(','),
+    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -691,4 +717,6 @@ app.add_middleware(
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
-    client.close()
+    global _client
+    if _client:
+        _client.close()
