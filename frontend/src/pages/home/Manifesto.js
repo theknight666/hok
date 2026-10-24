@@ -57,14 +57,6 @@ export function Manifesto() {
               draggable={false}
               className="bottle-shadow h-[62svh] max-h-[920px] min-h-[460px] w-auto select-none object-contain transition-all duration-700 group-hover:brightness-105 sm:h-[72svh] lg:h-[86svh]"
             />
-
-            {/* Floating pill badge */}
-            <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border border-border/70 bg-background/90 px-5 py-2 backdrop-blur-md shadow-xl transition-transform duration-500 group-hover:scale-105">
-              <span className="flex items-center gap-2.5 text-[0.66rem] font-medium uppercase tracking-[0.28em] text-foreground">
-                <span className="h-2 w-2 rounded-full bg-gold animate-pulse" />
-                Blonde Amber · Extrait de Parfum
-              </span>
-            </div>
           </Link>
         </motion.div>
       </div>
