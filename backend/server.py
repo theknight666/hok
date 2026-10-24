@@ -35,7 +35,14 @@ def get_client() -> AsyncIOMotorClient:
         loop = None
     if _client is None or (_client_loop is not None and _client_loop != loop):
         mongo_url = os.environ.get("MONGO_URL", "mongodb://localhost:27017")
-        _client = AsyncIOMotorClient(mongo_url, connect=False)
+        kwargs = {"connect": False}
+        try:
+            import certifi
+            if "mongodb+srv://" in mongo_url:
+                kwargs["tlsCAFile"] = certifi.where()
+        except ImportError:
+            pass
+        _client = AsyncIOMotorClient(mongo_url, **kwargs)
         _client_loop = loop
     return _client
 
