@@ -1,11 +1,11 @@
 export const WORLDS = {
-  "blonde-amber": { bg: "#A8741F", ink: "#1C1205", soft: "#F2CB6E" },
-  layton: { bg: "#0E1B45", ink: "#E7ECFA", soft: "#3C5FC4" },
-  "angels-share-on-the-rocks": { bg: "#46200F", ink: "#F6E4D2", soft: "#B4651F" },
-  "side-effect": { bg: "#26091C", ink: "#F1DCE5", soft: "#7A2552" },
+  "blonde-amber": { bg: "#F2A900", ink: "#1C1105", soft: "#FFD766" },
+  layton: { bg: "#2338DB", ink: "#F3F5FF", soft: "#93A4FF" },
+  "angels-share-on-the-rocks": { bg: "#C9471B", ink: "#FFF1E4", soft: "#FFA06A" },
+  "side-effect": { bg: "#4B0F2C", ink: "#FFE4EE", soft: "#D13C78" },
 };
 
-const DEFAULT_WORLD = { bg: "#0C0B0E", ink: "#F3EEE5", soft: "#B08D3C" };
+const DEFAULT_WORLD = { bg: "#110E13", ink: "#F6EFE4", soft: "#8c8c8c" };
 
 export const worldOf = (p) => WORLDS[p?.slug] || { ...DEFAULT_WORLD, bg: p?.color || DEFAULT_WORLD.bg };
 

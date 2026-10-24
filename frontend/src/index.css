@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&family=Italiana&family=Jost:ital,wght@0,300..700;1,300..700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,300..800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap");
 @import "lenis/dist/lenis.css";
 
 @tailwind base;
@@ -25,12 +25,12 @@
     --destructive-foreground: 0 0% 98%;
     --border: 40 12% 80%;
     --input: 40 12% 74%;
-    --ring: 41 52% 44%;
+    --ring: 24 96% 48%;
     --radius: 1.25rem;
-    --gold: 41 52% 44%;
-    --gold-soft: 43 60% 62%;
-    --ink: #0c0b0e;
-    --paper: #f3eee5;
+    --gold: 24 96% 48%;
+    --gold-soft: 40 100% 60%;
+    --ink: #110e13;
+    --paper: #f6f0e6;
   }
   .dark {
     --background: 260 18% 5%;
@@ -49,9 +49,9 @@
     --accent-foreground: 40 33% 93%;
     --border: 260 8% 19%;
     --input: 260 8% 25%;
-    --ring: 43 60% 60%;
-    --gold: 43 60% 60%;
-    --gold-soft: 45 70% 72%;
+    --ring: 36 100% 58%;
+    --gold: 36 100% 58%;
+    --gold-soft: 40 100% 70%;
   }
 }
 
@@ -60,37 +60,38 @@
   html { -webkit-tap-highlight-color: transparent; }
   body {
     @apply bg-background text-foreground;
-    font-family: "Jost", sans-serif;
+    font-family: "Instrument Sans", sans-serif;
     font-weight: 400;
     -webkit-font-smoothing: antialiased;
     transition: background-color 0.6s ease, color 0.6s ease;
   }
   ::selection { background: hsl(var(--gold)); color: var(--ink); }
   h1, h2, h3, .font-display {
-    font-family: "Cinzel", serif;
-    font-weight: 500;
-    letter-spacing: 0.02em;
+    font-family: "Bricolage Grotesque", sans-serif;
+    font-variation-settings: "opsz" 96, "wdth" 88;
+    font-weight: 800;
+    letter-spacing: -0.035em;
   }
 }
 
 @layer components {
-  .font-display { font-weight: 500; }
-  .font-display-italic { font-family: "Italiana", serif; font-weight: 400; letter-spacing: 0.02em; }
-  .display-xl { font-size: clamp(2.5rem, 7vw, 8.5rem); line-height: 1.02; }
-  .hero-title { font-size: clamp(2.3rem, min(5.6vw, 13svh), 7.5rem); line-height: 1.05; }
-  .display-lg { font-size: clamp(2.1rem, 5vw, 5.8rem); line-height: 1.05; }
-  .display-md { font-size: clamp(1.6rem, 3.2vw, 3.6rem); line-height: 1.14; }
+  .font-display { font-weight: 800; }
+  .font-display-italic { font-family: "Bricolage Grotesque", sans-serif; font-variation-settings: "opsz" 96, "wdth" 80; font-weight: 300; letter-spacing: -0.02em; }
+  .display-xl { font-size: clamp(3.4rem, 10.5vw, 13rem); line-height: 0.86; }
+  .hero-title { font-size: clamp(3rem, min(8vw, 17svh), 10rem); line-height: 0.88; }
+  .display-lg { font-size: clamp(2.8rem, 7.5vw, 8.5rem); line-height: 0.88; }
+  .display-md { font-size: clamp(2.2rem, 5vw, 5.5rem); line-height: 0.92; }
 
   .text-gold { color: hsl(var(--gold)); }
   .bg-gold { background-color: hsl(var(--gold)); }
   .border-gold { border-color: hsl(var(--gold)); }
 
   .eyebrow {
-    font-family: "Jost", sans-serif;
+    font-family: "Instrument Sans", sans-serif;
     font-size: 0.7rem;
-    letter-spacing: 0.32em;
+    letter-spacing: 0.22em;
     text-transform: uppercase;
-    font-weight: 500;
+    font-weight: 700;
     color: hsl(var(--gold));
   }
 

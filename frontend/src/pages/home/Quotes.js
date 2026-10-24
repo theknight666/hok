@@ -22,7 +22,7 @@ export function Quotes() {
   const loop = reviews.length < 4 ? reviews : [...reviews, ...reviews];
 
   return (
-    <section className="overflow-hidden bg-[#E8DECB] py-20 text-[#0C0B0E] lg:py-28" data-testid="quotes-section" aria-label="What people say">
+    <section className="overflow-hidden bg-[#F2A900] py-20 text-[#1C1105] lg:py-28" data-testid="quotes-section" aria-label="What people say">
       <div className="mx-auto max-w-[1600px] px-5 sm:px-10">
         <p className="text-[0.66rem] font-medium uppercase tracking-[0.3em] opacity-70">Words from the court · verified buyers only</p>
         <h2 className="display-lg mt-3 font-display">Words from <span className="font-display-italic text-gold">the court</span></h2>
@@ -34,7 +34,7 @@ export function Quotes() {
       ) : (
         <div className="mx-auto mt-12 max-w-[1600px] px-5 sm:px-10" data-testid="quotes-empty">
           <p className="max-w-xl font-display text-3xl leading-tight sm:text-4xl">The court is quiet. Own a bottle, leave the first word.</p>
-          <Link to="/#collection" className="btn-world mt-8" style={{ "--w-ink": "#0C0B0E", "--w-bg": "#E8DECB" }} data-testid="quotes-empty-cta">Choose your weapon</Link>
+          <Link to="/#collection" className="btn-world mt-8" style={{ "--w-ink": "#1C1105", "--w-bg": "#F2A900" }} data-testid="quotes-empty-cta">Choose your weapon</Link>
         </div>
       )}
     </section>

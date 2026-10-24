@@ -28,7 +28,7 @@ export function Intro() {
             {WORDS.map((w, i) => (
               <span key={w} className="block overflow-hidden">
                 <motion.span
-                  className={`display-xl block ${i === 2 ? "font-display-italic text-[hsl(43_60%_60%)]" : "font-display"}`}
+                  className={`display-xl block ${i === 2 ? "font-display-italic text-[#F2A900]" : "font-display"}`}
                   initial={{ y: "110%" }}
                   animate={{ y: 0 }}
                   transition={{ duration: 0.9, delay: 0.1 + i * 0.12, ease: EASE }}

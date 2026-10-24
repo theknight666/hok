@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { Bottle } from "@/components/site/Bottle";
 import { EASE } from "@/components/site/Reveal";
-import { worldOf, noteImages } from "@/lib/visual";
+import { worldOf } from "@/lib/visual";
 import { useCart } from "@/context/CartContext";
 import { inr } from "@/lib/api";
 
@@ -37,9 +37,9 @@ function Formation({ list, active, onPick }) {
             className="absolute bottom-0 left-1/2 origin-bottom focus:outline-none"
             initial={false}
             animate={{
-              x: `calc(-50% + ${off * 12}vw)`,
-              y: `${-a * 8}%`,
-              scale: isActive ? 1 : a === 1 ? 0.7 : 0.52,
+              x: `calc(-50% + ${off * 8}vw)`,
+              y: `${-a * 6}%`,
+              scale: isActive ? 1 : a === 1 ? 0.74 : 0.58,
               zIndex: 10 - a,
               filter: isActive ? "brightness(1)" : `brightness(${0.62 - a * 0.08})`,
             }}
@@ -49,38 +49,6 @@ function Formation({ list, active, onPick }) {
           </motion.button>
         );
       })}
-    </div>
-  );
-}
-
-const NOTE_SPOTS = [
-  { x: "-150%", r: -8, size: "clamp(60px, 7vw, 120px)" },
-  { x: "130%", r: 6, size: "clamp(54px, 6.4vw, 110px)" },
-  { x: "-25%", r: 2, size: "clamp(44px, 5vw, 86px)" },
-];
-
-function RawNotes({ p }) {
-  const notes = noteImages(p.notes, 3);
-  return (
-    <div className="pointer-events-none absolute inset-x-0 -bottom-2 z-20 h-[18svh]" aria-hidden="true">
-      <AnimatePresence mode="wait">
-        <motion.div key={p.slug} className="relative mx-auto h-full w-full max-w-[720px]">
-          {notes.map((nt, i) => (
-            <motion.figure
-              key={nt.name}
-              className="absolute bottom-0 left-1/2 flex flex-col items-center"
-              style={{ width: NOTE_SPOTS[i].size }}
-              initial={{ opacity: 0, y: 40, scale: 0.7, rotate: NOTE_SPOTS[i].r * 2, x: NOTE_SPOTS[i].x }}
-              animate={{ opacity: 1, y: 0, scale: 1, rotate: NOTE_SPOTS[i].r, x: NOTE_SPOTS[i].x }}
-              exit={{ opacity: 0, y: 24, scale: 0.8, transition: { duration: 0.35 } }}
-              transition={{ duration: 0.9, ease: EASE, delay: 0.15 + i * 0.1 }}
-            >
-              <img src={nt.src} alt="" className="w-full drop-shadow-[0_18px_22px_rgba(0,0,0,0.35)]" draggable={false} />
-              <figcaption className="mt-1 whitespace-nowrap text-[0.58rem] font-medium uppercase tracking-[0.3em] opacity-80">{nt.name}</figcaption>
-            </motion.figure>
-          ))}
-        </motion.div>
-      </AnimatePresence>
     </div>
   );
 }
@@ -113,7 +81,7 @@ export function Hero({ products }) {
       <div className="relative z-10 mx-auto w-full max-w-[1600px] px-5 sm:px-10">
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.8 }} className="flex flex-wrap items-center gap-3">
           <span className="pill border border-current">Extrait de Parfum</span>
-          <span className="pill border border-current">Maison de Parfum · India</span>
+          <span className="pill border border-current">Maison de Parfum</span>
         </motion.div>
 
         <h1 className="hero-title mt-6 max-w-[14ch] font-display" data-testid="hero-headline">
@@ -132,10 +100,9 @@ export function Hero({ products }) {
         </h1>
       </div>
 
-      <div className="relative z-10 mx-auto mt-4 w-full max-w-[1600px] px-5 sm:px-10 lg:absolute lg:bottom-[19svh] lg:left-[60%] lg:mt-0 lg:w-[64%] lg:-translate-x-1/2 lg:px-0">
+      <div className="relative z-10 mx-auto mt-4 w-full max-w-[1600px] px-5 sm:px-10 lg:absolute lg:bottom-[17svh] lg:left-[68%] lg:mt-0 lg:w-[56%] lg:-translate-x-1/2 lg:px-0">
         <div className="relative">
           <Formation list={list} active={active % list.length} onPick={setActive} />
-          <RawNotes p={cur} />
         </div>
       </div>
 
