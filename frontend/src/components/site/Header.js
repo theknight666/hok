@@ -41,9 +41,9 @@ export function Header() {
         if (el) {
           if (window.__lenis) {
             window.__lenis.resize();
-            window.__lenis.scrollTo(el, { offset: -70, duration: 0.85, force: true });
+            window.__lenis.scrollTo(el, { offset: -85, duration: 0.85, force: true });
           } else {
-            const top = el.getBoundingClientRect().top + window.scrollY - 70;
+            const top = el.getBoundingClientRect().top + window.scrollY - 85;
             window.scrollTo({ top, behavior: "smooth" });
           }
         }

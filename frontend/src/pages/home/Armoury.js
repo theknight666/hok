@@ -26,9 +26,10 @@ export function Armoury({ products: all }) {
   };
 
   return (
-    <section id="best-sellers" className="relative mx-auto max-w-[1600px] scroll-mt-24 px-5 py-28 sm:px-10 lg:py-40" data-testid="armoury-section">
-      <span id="curate" className="pointer-events-none absolute -top-24 block" aria-hidden="true" />
-      <span id="armoury" className="pointer-events-none absolute -top-24 block" aria-hidden="true" />
+    <section className="relative mx-auto max-w-[1600px] px-5 pt-12 pb-24 sm:px-10 sm:pt-16 sm:pb-32 lg:pt-16 lg:pb-36" data-testid="armoury-section">
+      <div id="best-sellers" className="pointer-events-none -mt-4 block h-0 w-full" />
+      <span id="curate" className="pointer-events-none block h-0" />
+      <span id="armoury" className="pointer-events-none block h-0" />
       <p className="eyebrow">Build your collection</p>
       <SplitChars text="One is a scent." className="display-lg mt-4 font-display" />
       <SplitChars text="Four is a reputation." className="display-lg font-display-italic text-gold" delay={0.25} />

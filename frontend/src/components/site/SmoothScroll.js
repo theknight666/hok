@@ -40,9 +40,9 @@ export function SmoothScroll() {
         if (l) l.resize();
         const el = document.getElementById(targetId) || document.querySelector(currentHash);
         if (el) {
-          if (l) l.scrollTo(el, { offset: -70, duration: 0.85, force: true });
+          if (l) l.scrollTo(el, { offset: -85, duration: 0.85, force: true });
           else {
-            const top = el.getBoundingClientRect().top + window.scrollY - 70;
+            const top = el.getBoundingClientRect().top + window.scrollY - 85;
             window.scrollTo({ top, behavior: "smooth" });
           }
         }
