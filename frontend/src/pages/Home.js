@@ -16,11 +16,11 @@ export default function Home() {
     <main data-testid="home-page">
       <Intro />
       <Hero products={products} />
-      <Credentials />
       <Manifesto />
       {isError && <p className="px-10 py-20 text-center text-muted-foreground">The collection is momentarily unavailable.</p>}
       <Collection products={featured} />
       <CollectionPreview products={products} />
+      <Credentials />
       <Armoury products={products} />
       <Atelier />
       <Quotes />
