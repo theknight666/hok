@@ -8,7 +8,7 @@ import { Bottle } from "@/components/site/Bottle";
 import { EASE, FadeUp } from "@/components/site/Reveal";
 import { NotesPyramid } from "./home/NotesAtlas";
 import { ReviewsBlock } from "@/components/site/ReviewsBlock";
-import { worldOf, worldVars } from "@/lib/visual";
+import { worldOf, worldVars, featuredFirst } from "@/lib/visual";
 import { inr } from "@/lib/api";
 
 function StockLine({ p }) {
@@ -36,12 +36,12 @@ export default function Product() {
     );
 
   const world = worldOf(p);
-  const others = products.filter((x) => x.slug !== p.slug);
+  const others = featuredFirst(products.filter((x) => x.slug !== p.slug)).slice(0, 3);
 
   return (
     <main data-testid="product-page">
       <section style={worldVars(world)} className="grain relative overflow-hidden">
-        <p aria-hidden="true" className="pointer-events-none absolute left-0 top-24 select-none whitespace-nowrap font-display text-[22vw] leading-none opacity-[0.12]">{p.name}</p>
+        <p aria-hidden="true" className="pointer-events-none absolute left-0 top-24 select-none whitespace-nowrap font-display text-[13vw] leading-none opacity-[0.1]">{p.name}</p>
         <div className="relative mx-auto grid max-w-[1600px] gap-10 px-5 pb-16 pt-28 sm:px-10 lg:grid-cols-12 lg:pb-24">
           <div className="lg:col-span-6">
             <div className="lg:sticky lg:top-28">
@@ -102,8 +102,8 @@ export default function Product() {
 
       {others.length > 0 && (
         <section className="mx-auto max-w-[1600px] px-5 py-24 sm:px-10 lg:py-32">
-          <p className="eyebrow">Complete the armoury</p>
-          <h2 className="display-md mt-4 font-display">The other three.</h2>
+          <p className="eyebrow">Continue exploring</p>
+          <div className="flex flex-wrap items-end justify-between gap-6"><h2 className="display-md mt-4 font-display">More from the House.</h2><Link to="/collection" className="btn-ghost-royal" data-testid="related-view-all"><span>All fragrances</span></Link></div>
           <div className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-3">
             {others.map((o) => {
               const w = worldOf(o);

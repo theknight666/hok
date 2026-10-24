@@ -14,7 +14,7 @@ export function Manifesto() {
         className="display-md mt-16 max-w-[20ch] font-display-italic text-gold lg:ml-[20%]"
       />
       <FadeUp className="mt-16 flex flex-wrap gap-4 lg:ml-[20%]">
-        <Link to="/#collection" className="btn-royal" data-testid="manifesto-cta">Find your signature</Link>
+        <Link to="/collection" className="btn-royal" data-testid="manifesto-cta">Find your signature</Link>
         <Link to="/#armoury" className="btn-ghost-royal" data-testid="manifesto-armoury-cta">
           <span>Build an armoury</span>
         </Link>

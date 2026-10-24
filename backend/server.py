@@ -153,6 +153,7 @@ class ProductIn(BaseModel):
     image: str = ""
     notes: Notes = Notes()
     active: bool = True
+    featured: bool = False
     order: int = 0
 
 
@@ -170,6 +171,7 @@ class ProductPatch(BaseModel):
     image: Optional[str] = None
     notes: Optional[Notes] = None
     active: Optional[bool] = None
+    featured: Optional[bool] = None
 
 
 class StockAdjust(BaseModel):
@@ -658,8 +660,9 @@ async def startup():
     for p in SEED:
         if not await db.products.find_one({"slug": p["slug"]}):
             doc = {**p, "price": SEED_PRICES[p["slug"]], "image": f"/images/{p['slug'].replace('-on-the-rocks', '')}.jpg",
-                   "low_stock_threshold": 10, "active": True, "updated_at": now().isoformat()}
+                   "low_stock_threshold": 10, "active": True, "featured": True, "updated_at": now().isoformat()}
             await db.products.insert_one(doc)
+    await db.products.update_many({"featured": {"$exists": False}}, {"$set": {"featured": True}})
     admin_email = os.environ["ADMIN_EMAIL"].lower()
     admin_pw = os.environ["ADMIN_PASSWORD"]
     existing = await db.users.find_one({"email": admin_email})

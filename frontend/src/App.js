@@ -10,6 +10,7 @@ import { CartDrawer } from "@/components/site/CartDrawer";
 import { SmoothScroll } from "@/components/site/SmoothScroll";
 import Home from "@/pages/Home";
 import Product from "@/pages/Product";
+import CollectionPage from "@/pages/Collection";
 import Checkout from "@/pages/Checkout";
 import Login from "@/pages/Login";
 import Account from "@/pages/Account";
@@ -24,6 +25,7 @@ function AppRouter() {
       <Header />
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/collection" element={<CollectionPage />} />
         <Route path="/fragrance/:slug" element={<Product />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/login" element={<Login />} />

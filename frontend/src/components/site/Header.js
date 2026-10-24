@@ -8,7 +8,7 @@ import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 
 const LINKS = [
-  { to: "/#collection", label: "Collection" },
+  { to: "/collection", label: "Collection" },
   { to: "/#armoury", label: "Armoury" },
   { to: "/#house", label: "The House" },
 ];

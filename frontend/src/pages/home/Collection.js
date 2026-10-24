@@ -28,7 +28,7 @@ function Chapter({ p, idx, total }) {
         <motion.p
           style={{ x: ghostX }}
           aria-hidden="true"
-          className="pointer-events-none absolute left-0 top-[18%] select-none whitespace-nowrap font-display text-[24vw] leading-none opacity-[0.12]"
+          className="pointer-events-none absolute left-0 top-[16%] select-none whitespace-nowrap font-display text-[15vw] leading-none opacity-[0.1]"
         >
           {p.name}
         </motion.p>
@@ -78,12 +78,13 @@ function Chapter({ p, idx, total }) {
 }
 
 export function Collection({ products }) {
+  if (!products.length) return null;
   return (
-    <section id="collection" className="relative" data-testid="collection-section">
+    <section id="signatures" className="relative" data-testid="collection-section">
       <div className="mx-auto max-w-[1600px] px-5 pb-16 pt-28 sm:px-10 lg:pb-24 lg:pt-40">
-        <p className="eyebrow">The Collection</p>
-        <SplitChars text="Choose your" className="display-xl mt-4 font-display" />
-        <SplitChars text="weapon." className="display-xl font-display-italic text-gold" delay={0.3} />
+        <p className="eyebrow">House Signatures</p>
+        <SplitChars text="The ones" className="display-xl mt-4 font-display" />
+        <SplitChars text="they ask about." className="display-xl font-display-italic text-gold" delay={0.3} />
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -91,7 +92,7 @@ export function Collection({ products }) {
           transition={{ duration: 0.9, ease: EASE, delay: 0.5 }}
           className="mt-8 max-w-xl text-lg font-medium leading-snug text-muted-foreground"
         >
-          Four extraits, four moods, zero subtlety. Each one is built to be noticed from across the hall — pick the one that sounds like you.
+          The signatures of the season — the bottles that get stopped in corridors. Each is built to be noticed from across the hall.
         </motion.p>
       </div>
       <div className="relative">

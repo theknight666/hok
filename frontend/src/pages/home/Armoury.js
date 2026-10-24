@@ -5,12 +5,13 @@ import { toast } from "sonner";
 import { useCart } from "@/context/CartContext";
 import { Bottle } from "@/components/site/Bottle";
 import { SplitChars, FadeUp, EASE } from "@/components/site/Reveal";
-import { worldOf } from "@/lib/visual";
+import { worldOf, featuredFirst } from "@/lib/visual";
 import { inr, FREE_SHIPPING } from "@/lib/api";
 
 const SLOTS = 4;
 
-export function Armoury({ products }) {
+export function Armoury({ products: all }) {
+  const products = featuredFirst(all).slice(0, 8);
   const { add } = useCart();
   const [picked, setPicked] = useState([]);
   const toggle = (slug) => setPicked((c) => (c.includes(slug) ? c.filter((s) => s !== slug) : c.length < SLOTS ? [...c, slug] : c));
