@@ -16,7 +16,7 @@ export function CollectionPreview({ products }) {
         </div>
         <FadeUp className="max-w-md">
           <p className="text-base font-light leading-relaxed text-muted-foreground sm:text-lg">
-            An ever-growing library of extraits, each with its own colour, character and raw materials. Built to be noticed from across the hall.
+            An ever-growing library of eau de parfums, each with its own colour, character and raw materials. Built to be noticed from across the hall.
           </p>
           <Link to="/collection" className="btn-royal mt-6" data-testid="view-all-fragrances">
             All fragrances <ArrowRight className="h-4 w-4" strokeWidth={1.8} />

@@ -449,12 +449,14 @@ async def ensure_seeded():
                     {"slug": p["slug"]},
                     {"$set": {
                         "volume": "50 ml",
+                        "concentration": "Eau de Parfum",
                         "price": SEED_PRICES[p["slug"]],
                         "sample_price": SEED_SAMPLE_PRICES[p["slug"]],
                         "active": True,
                         "featured": True
                     }}
                 )
+        await db.products.update_many({"concentration": "Extrait de Parfum"}, {"$set": {"concentration": "Eau de Parfum"}})
 
         await ensure_admin_account()
         _seeded = True
@@ -920,7 +922,7 @@ SEED = [
     {"slug": "blonde-amber", "name": "Blonde Amber", "order": 1, "color": "#D4A24C", "badge": "The Signature",
      "tagline": "Liquid gold, warm resins and a whisper of smoke.",
      "story": "A radiant amber that glows like candlelight on gilded walls — warm, golden and unmistakably regal.",
-     "concentration": "Extrait de Parfum", "volume": "50 ml", "price": 1599, "sample_price": 99, "stock": 50,
+     "concentration": "Eau de Parfum", "volume": "50 ml", "price": 1599, "sample_price": 99, "stock": 50,
      "notes": {"top": ["Bitter Orange", "Pink Pepper"], "heart": ["Blonde Tobacco", "Orris"], "base": ["Amber", "Tonka", "Vanilla"]}},
     {"slug": "layton", "name": "Layton", "order": 2, "color": "#1E2F5C", "badge": "The Noble",
      "tagline": "Crisp bergamot, lavender and warm woods.",
@@ -930,7 +932,7 @@ SEED = [
     {"slug": "angels-share-on-the-rocks", "name": "Angels Share On The Rocks", "order": 3, "color": "#8A4B1F",
      "badge": "The Reserve", "tagline": "Cognac, cinnamon and oak — served over ice.",
      "story": "An ode to the spirit lost to the heavens as cognac ages in oak, poured cold over crystal ice.",
-     "concentration": "Extrait de Parfum", "volume": "50 ml", "price": 1549, "sample_price": 99, "stock": 50,
+     "concentration": "Eau de Parfum", "volume": "50 ml", "price": 1549, "sample_price": 99, "stock": 50,
      "notes": {"top": ["Cognac", "Frozen Bergamot"], "heart": ["Cinnamon", "Oak"], "base": ["Praline", "Sandalwood", "Vanilla"]}},
     {"slug": "side-effect", "name": "Side Effect", "order": 4, "color": "#5A1420", "badge": "The Enigma",
      "tagline": "Tobacco, rum and dark leather after midnight.",
@@ -963,9 +965,10 @@ async def startup():
                 # Ensure seed products are always active and featured
                 await db.products.update_one(
                     {"slug": p["slug"]},
-                    {"$set": {"active": True, "featured": True}}
+                    {"$set": {"active": True, "featured": True, "concentration": "Eau de Parfum"}}
                 )
         await db.products.update_many({"featured": {"$exists": False}}, {"$set": {"featured": True}})
+        await db.products.update_many({"concentration": "Extrait de Parfum"}, {"$set": {"concentration": "Eau de Parfum"}})
         admin_email = os.environ.get("ADMIN_EMAIL", "admin@houseoftheknight.com").lower()
         admin_pw = os.environ.get("ADMIN_PASSWORD", "KnightAdmin#2026")
         existing = await db.users.find_one({"email": admin_email})

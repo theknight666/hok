@@ -45,7 +45,7 @@ export function Manifesto() {
             <div>
               <p className="text-[0.62rem] font-medium uppercase tracking-[0.28em] text-gold">Extraction</p>
               <p className="mt-1 font-display text-base tracking-tight text-foreground sm:text-lg">
-                30% Pure Extrait
+                30% Oil Concentration
               </p>
             </div>
             <div className="hidden h-8 w-px bg-border/50 sm:block" />
@@ -89,7 +89,7 @@ export function Manifesto() {
             <Link
               to="/fragrance/blonde-amber"
               className="group relative block"
-              aria-label="Discover Blonde Amber - Signature Extrait"
+              aria-label="Discover Blonde Amber - Signature Eau de Parfum"
             >
               <img
                 src="/images/cut-blonde-amber.png"
@@ -169,7 +169,7 @@ export function Manifesto() {
               Cold Macerated
             </h3>
             <p className="mt-3 text-sm font-light leading-relaxed text-muted-foreground">
-              Each extrait is cold-macerated for six weeks in sealed dark vessels before hand-decanting into weighted Italian crystal flacons.
+              Each fragrance is cold-macerated for six weeks in sealed dark vessels before hand-decanting into weighted Italian crystal flacons.
             </p>
             <div className="mt-6 flex items-center justify-end gap-3">
               <span className="text-[0.64rem] font-medium uppercase tracking-[0.26em] text-foreground/80">

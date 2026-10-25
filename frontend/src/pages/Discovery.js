@@ -80,12 +80,12 @@ export default function DiscoveryPage() {
 
           <h1 className="hero-title mt-4 font-display tracking-tight text-foreground">
             <span className="block">Sample before you commit.</span>
-            <span className="font-display-italic text-gold">Four Signature Extraits.</span>
+            <span className="font-display-italic text-gold">Four Signature Eau de Parfums.</span>
           </h1>
 
           <p className="mt-4 text-base font-normal leading-relaxed text-muted-foreground sm:text-lg">
             Try our fragrances in handy 2ml spray vials before ordering a full 50ml bottle.
-            Each vial contains 30+ sprays of our extrait formulation, allowing you to test performance and longevity on your skin.
+            Each vial contains 30+ sprays of our eau de parfum formulation, allowing you to test performance and longevity on your skin.
           </p>
 
           <div className="mt-5 inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/40 px-4 py-1.5 text-xs text-muted-foreground">
@@ -124,7 +124,7 @@ export default function DiscoveryPage() {
                     <div key={p.slug} className="rounded-2xl border border-border/70 bg-background/50 p-3 text-left">
                       <span className="text-[10px] font-mono text-gold uppercase tracking-wider block">2ml Vial</span>
                       <p className="font-display text-sm font-medium mt-1 truncate">{p.name}</p>
-                      <p className="text-[11px] text-muted-foreground mt-0.5 truncate">{p.tagline || "Extrait de Parfum"}</p>
+                      <p className="text-[11px] text-muted-foreground mt-0.5 truncate">{p.tagline || "Eau de Parfum"}</p>
                     </div>
                   ))}
                 </div>

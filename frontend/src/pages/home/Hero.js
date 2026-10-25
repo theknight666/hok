@@ -80,7 +80,7 @@ export function Hero({ products }) {
 
       <div className="relative z-10 mx-auto w-full max-w-[1600px] px-5 sm:px-10">
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.8 }} className="flex flex-wrap items-center gap-3">
-          <span className="pill border border-current">Extrait de Parfum</span>
+          <span className="pill border border-current">Eau de Parfum</span>
         </motion.div>
 
         <h1 className="hero-title mt-6 max-w-[14ch] font-display" data-testid="hero-headline">

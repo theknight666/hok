@@ -125,7 +125,7 @@ export function Footer() {
             <span>Made with ❤️ in India</span>
             <IndianFlag />
           </span>
-          <span className="text-center sm:flex-1 sm:text-right uppercase tracking-[0.2em]">Extrait de Parfum · Made with obsession</span>
+          <span className="text-center sm:flex-1 sm:text-right uppercase tracking-[0.2em]">Eau de Parfum · Made with obsession</span>
         </div>
       </div>
     </footer>

@@ -10,7 +10,7 @@ export const FALLBACK_PRODUCTS = [
     badge: "The Signature",
     tagline: "Liquid gold, warm resins and a whisper of smoke.",
     story: "A radiant amber that glows like candlelight on gilded walls — warm, golden and unmistakably regal.",
-    concentration: "Extrait de Parfum",
+    concentration: "Eau de Parfum",
     volume: "50 ml",
     price: 1599,
     stock: 44,
@@ -56,7 +56,7 @@ export const FALLBACK_PRODUCTS = [
     badge: "The Reserve",
     tagline: "Cognac, cinnamon and oak — served over ice.",
     story: "An ode to the spirit lost to the heavens as cognac ages in oak, poured cold over crystal ice.",
-    concentration: "Extrait de Parfum",
+    concentration: "Eau de Parfum",
     volume: "50 ml",
     price: 1549,
     stock: 50,
@@ -96,7 +96,7 @@ export const FALLBACK_PRODUCTS = [
   },
 ];
 
-const CACHE_KEY = "hotk_catalog_cache_v2";
+const CACHE_KEY = "hotk_catalog_cache_v3";
 
 export function getCachedCatalog() {
   if (typeof window === "undefined") return FALLBACK_PRODUCTS;
