@@ -16,11 +16,11 @@ export function Footer() {
 
   const { scrollYProgress } = useScroll({
     target: footerRef,
-    offset: ["start 0.95", "end end"],
+    offset: ["start end", "end end"],
   });
 
-  // Enhanced parallax by 150% with high scroll sensitivity (150px vertical travel range)
-  const textY = useTransform(scrollYProgress, [0, 1], [105, -45]);
+  // Smooth parallax moving from down to up on scroll, landing at resting position (0) at page bottom
+  const textY = useTransform(scrollYProgress, [0, 1], [80, 0]);
 
   const subscribe = (e) => {
     e.preventDefault();
@@ -73,7 +73,7 @@ export function Footer() {
       </div>
 
       {/* Full-Width End-to-End Giant Screen-Fitting Banner with Parallax */}
-      <div className="relative mt-6 sm:mt-8 w-full overflow-hidden select-none pointer-events-none pb-0 pt-0">
+      <div className="relative mt-4 sm:mt-6 w-full select-none pointer-events-none pt-4 sm:pt-6 pb-0">
         <motion.div
           style={{ y: textY }}
           className="w-full will-change-transform transform-gpu flex items-center justify-center"
@@ -87,8 +87,8 @@ export function Footer() {
         </motion.div>
       </div>
 
-      <div className="mx-auto max-w-[1600px] px-5 pb-8 sm:px-10">
-        <div className="mt-1 flex flex-col justify-between gap-3 border-t border-background/15 pt-5 text-xs font-semibold opacity-60 sm:flex-row">
+      <div className="mx-auto max-w-[1600px] px-5 pb-8 sm:px-10 -mt-2 sm:-mt-4">
+        <div className="flex flex-col justify-between gap-3 border-t border-background/15 pt-5 text-xs font-semibold opacity-60 sm:flex-row">
           <span>© {new Date().getFullYear()} House Of The Knight. All rights reserved.</span>
           <span className="uppercase tracking-[0.2em]">Extrait de Parfum · Made with obsession</span>
         </div>
