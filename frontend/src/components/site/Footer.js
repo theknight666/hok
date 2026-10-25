@@ -88,9 +88,10 @@ export function Footer() {
       </div>
 
       <div className="mx-auto max-w-[1600px] px-5 pb-8 sm:px-10 -mt-2 sm:-mt-4">
-        <div className="flex flex-col justify-between gap-3 border-t border-background/15 pt-5 text-xs font-semibold opacity-60 sm:flex-row">
-          <span>© {new Date().getFullYear()} House Of The Knight. All rights reserved.</span>
-          <span className="uppercase tracking-[0.2em]">Extrait de Parfum · Made with obsession</span>
+        <div className="flex flex-col items-center justify-between gap-3 border-t border-background/15 pt-5 text-xs font-semibold opacity-60 sm:flex-row">
+          <span className="text-center sm:flex-1 sm:text-left">© {new Date().getFullYear()} House Of The Knight. All rights reserved.</span>
+          <span className="text-center sm:flex-1">Made with ❤️ in 🇮🇳</span>
+          <span className="text-center sm:flex-1 sm:text-right uppercase tracking-[0.2em]">Extrait de Parfum · Made with obsession</span>
         </div>
       </div>
     </footer>
