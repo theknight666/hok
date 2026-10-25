@@ -19,8 +19,7 @@ export function Footer() {
     offset: ["start end", "end end"],
   });
 
-  const textY = useTransform(scrollYProgress, [0, 1], [40, -8]);
-  const textScale = useTransform(scrollYProgress, [0, 1], [0.97, 1.01]);
+  const textY = useTransform(scrollYProgress, [0, 1], [40, -20]);
 
   const subscribe = (e) => {
     e.preventDefault();
@@ -73,13 +72,13 @@ export function Footer() {
       </div>
 
       {/* Full-Width End-to-End Giant Screen-Fitting Banner with Parallax */}
-      <div className="relative mt-12 sm:mt-16 w-full overflow-hidden select-none pointer-events-none pb-4 sm:pb-6 pt-1">
+      <div className="relative mt-4 sm:mt-6 w-full overflow-hidden select-none pointer-events-none pb-2 sm:pb-3 pt-0">
         <motion.div
-          style={{ y: textY, scale: textScale }}
+          style={{ y: textY }}
           className="w-full will-change-transform transform-gpu flex items-center justify-center"
         >
           <p
-            className="w-full text-center font-display font-bold leading-[1.05] tracking-tight whitespace-nowrap text-[14.8vw] text-background selection:bg-transparent"
+            className="w-full text-center font-display font-bold leading-[0.92] tracking-tight whitespace-nowrap text-[13.6vw] sm:text-[13.7vw] lg:text-[13.8vw] text-background selection:bg-transparent"
             aria-hidden="true"
           >
             House of the Knight
