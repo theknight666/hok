@@ -24,7 +24,7 @@ export function Footer() {
       <div className="mx-auto max-w-[1600px] px-5 pt-24 sm:px-10">
         <div className="grid gap-14 lg:grid-cols-12">
           <div className="lg:col-span-6">
-            <KnightMark className="h-12 w-12 text-gold" />
+            <KnightMark className="h-28 w-28 sm:h-36 sm:w-36 text-gold" />
             <p className="mt-6 max-w-md font-display text-4xl leading-[0.95] sm:text-5xl">Stay in the know. New drops, rare finds, no noise.</p>
             <form onSubmit={subscribe} className="mt-10 max-w-md" data-testid="newsletter-form">
               {sent ? (
@@ -61,10 +61,10 @@ export function Footer() {
         </div>
       </div>
 
-      {/* Full-Width Mathematically Centered Giant Watermark */}
-      <div className="relative mt-20 sm:mt-24 flex w-full items-center justify-center overflow-hidden px-4">
+      {/* Full-Width End-to-End Giant Screen-Fitting Banner */}
+      <div className="relative mt-16 sm:mt-24 w-full overflow-hidden select-none pointer-events-none flex justify-center px-2">
         <p
-          className="pointer-events-none select-none whitespace-nowrap text-center font-display leading-[0.8] tracking-tight text-[clamp(2.4rem,8.8vw,9.6rem)] text-background"
+          className="w-full text-center font-display font-bold leading-[0.78] tracking-tight whitespace-nowrap text-[13.1vw] text-background"
           aria-hidden="true"
         >
           House of the Knight
