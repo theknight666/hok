@@ -139,7 +139,7 @@ export function Manifesto() {
           {/* Centerpiece: The Bold Statement & Call to Action */}
           <div className="text-center lg:col-span-6 lg:px-4">
             <div className="mb-6 inline-flex items-center justify-center">
-              <KnightMark className="h-9 w-9 text-gold/70 transition-transform duration-500 hover:scale-110" />
+              <KnightMark className="h-[72px] w-[72px] sm:h-20 sm:w-20 transition-transform duration-500 hover:scale-110" />
             </div>
 
             <ScrollWords
