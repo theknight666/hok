@@ -19,8 +19,8 @@ export function Footer() {
     offset: ["start end", "end end"],
   });
 
-  // Parallax sensitivity enhanced by 500% (400px travel), landing at -3px resting position (moved up by 3px)
-  const textY = useTransform(scrollYProgress, [0, 1], [397, -3]);
+  // Parallax sensitivity enhanced by 500% (400px travel), landing at -5px resting position (moved up by 2px more)
+  const textY = useTransform(scrollYProgress, [0, 1], [395, -5]);
 
   const subscribe = (e) => {
     e.preventDefault();
@@ -79,7 +79,7 @@ export function Footer() {
           className="w-full will-change-transform transform-gpu flex items-center justify-center"
         >
           <p
-            className="w-full text-center font-display font-bold leading-[0.92] tracking-tight whitespace-nowrap text-[13.6vw] sm:text-[13.7vw] lg:text-[13.8vw] text-background selection:bg-transparent"
+            className="w-full text-center font-display font-bold leading-[0.92] tracking-tight whitespace-nowrap text-[13.6vw] sm:text-[13.7vw] lg:text-[13.8vw] text-[#F0D8BB] dark:text-[#110E13] selection:bg-transparent"
             aria-hidden="true"
           >
             House of the Knight
