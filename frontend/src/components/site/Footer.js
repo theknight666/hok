@@ -9,6 +9,37 @@ const COLS = [
   { t: "House", links: [["/#house", "Why the House"], ["/contact", "Contact concierge"], ["/account", "My account", "footer-account"], ["/login", "Sign in"]] },
 ];
 
+function IndianFlag({ className = "inline-block h-3.5 w-5 rounded-[2px] shadow-sm overflow-hidden shrink-0 align-middle" }) {
+  return (
+    <svg
+      viewBox="0 0 225 150"
+      className={className}
+      aria-label="India"
+      role="img"
+    >
+      <rect width="225" height="50" fill="#FF9933" />
+      <rect y="50" width="225" height="50" fill="#FFFFFF" />
+      <rect y="100" width="225" height="50" fill="#138808" />
+      <g transform="translate(112.5, 75)">
+        <circle r="19" fill="none" stroke="#000080" strokeWidth="2" />
+        <circle r="3.5" fill="#000080" />
+        {[...Array(24)].map((_, i) => (
+          <line
+            key={i}
+            x1="0"
+            y1="0"
+            x2="0"
+            y2="-19"
+            stroke="#000080"
+            strokeWidth="1.2"
+            transform={`rotate(${i * 15})`}
+          />
+        ))}
+      </g>
+    </svg>
+  );
+}
+
 export function Footer() {
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
@@ -90,7 +121,9 @@ export function Footer() {
       <div className="mx-auto max-w-[1600px] px-5 pb-8 sm:px-10 -mt-2 sm:-mt-4">
         <div className="flex flex-col items-center justify-between gap-3 border-t border-background/15 pt-5 text-xs font-semibold opacity-60 sm:flex-row">
           <span className="text-center sm:flex-1 sm:text-left">© {new Date().getFullYear()} House Of The Knight. All rights reserved.</span>
-          <span className="text-center sm:flex-1">Made with ❤️ in 🇮🇳</span>
+          <span className="inline-flex items-center justify-center gap-1.5 text-center sm:flex-1">
+            Made with <span className="text-red-500">❤️</span> in <IndianFlag />
+          </span>
           <span className="text-center sm:flex-1 sm:text-right uppercase tracking-[0.2em]">Extrait de Parfum · Made with obsession</span>
         </div>
       </div>
