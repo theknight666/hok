@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Moon, Sun, ShoppingBag, User, Menu, Crown } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from "@/components/ui/sheet";
-import { KnightMark, Wordmark } from "./Logo";
+import { KnightMark } from "./Logo";
 import { useTheme } from "@/context/ThemeContext";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
@@ -88,9 +88,8 @@ export function Header() {
           compact ? "border-border/60 bg-background/85 shadow-lg" : "border-background/40 bg-background/60"
         }`}
       >
-        <Link to="/" data-testid="brand-logo" className="flex items-center gap-3">
-          <KnightMark className="h-8 w-8" />
-          <Wordmark className="hidden sm:inline" />
+        <Link to="/" data-testid="brand-logo" className="flex items-center" aria-label="House of the Knight">
+          <KnightMark className="h-9 w-9 sm:h-10 sm:w-10" />
         </Link>
 
         <nav className="hidden items-center gap-0.5 lg:gap-1 md:flex">
@@ -141,10 +140,10 @@ export function Header() {
                 <Link
                   to="/"
                   onClick={() => setSheetOpen(false)}
-                  className="mb-2 flex items-center gap-3"
+                  className="mb-2 inline-flex items-center"
+                  aria-label="House of the Knight"
                 >
-                  <KnightMark className="h-10 w-10 text-gold" />
-                  <Wordmark className="text-xl" />
+                  <KnightMark className="h-12 w-12" />
                 </Link>
                 {LINKS.map((l) => (
                   <Link
