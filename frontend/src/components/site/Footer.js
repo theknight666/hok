@@ -9,7 +9,7 @@ const COLS = [
   { t: "House", links: [["/#house", "Why the House"], ["/contact", "Contact concierge"], ["/account", "My account", "footer-account"], ["/login", "Sign in"]] },
 ];
 
-function IndianFlag({ className = "inline-block h-3.5 w-5 rounded-[2px] shadow-sm overflow-hidden shrink-0 align-middle" }) {
+function IndianFlag({ className = "inline-block h-3 w-[18px] rounded-[1.5px] shadow-sm overflow-hidden shrink-0 -translate-y-[1px]" }) {
   return (
     <svg
       viewBox="0 0 225 150"
@@ -122,7 +122,8 @@ export function Footer() {
         <div className="flex flex-col items-center justify-between gap-3 border-t border-background/15 pt-5 text-xs font-semibold opacity-60 sm:flex-row">
           <span className="text-center sm:flex-1 sm:text-left">© {new Date().getFullYear()} House Of The Knight. All rights reserved.</span>
           <span className="inline-flex items-center justify-center gap-1.5 text-center sm:flex-1">
-            Made with <span className="text-red-500">❤️</span> in INDIA<IndianFlag />
+            <span>Made with ❤️ in India</span>
+            <IndianFlag />
           </span>
           <span className="text-center sm:flex-1 sm:text-right uppercase tracking-[0.2em]">Extrait de Parfum · Made with obsession</span>
         </div>
