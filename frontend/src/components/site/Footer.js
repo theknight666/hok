@@ -122,7 +122,7 @@ export function Footer() {
         <div className="flex flex-col items-center justify-between gap-3 border-t border-background/15 pt-5 text-xs font-semibold opacity-60 sm:flex-row">
           <span className="text-center sm:flex-1 sm:text-left">© {new Date().getFullYear()} House Of The Knight. All rights reserved.</span>
           <span className="inline-flex items-center justify-center gap-1.5 text-center sm:flex-1">
-            Made with <span className="text-red-500">❤️</span> in <IndianFlag />
+            Made with <span className="text-red-500">❤️</span> in INDIA<IndianFlag />
           </span>
           <span className="text-center sm:flex-1 sm:text-right uppercase tracking-[0.2em]">Extrait de Parfum · Made with obsession</span>
         </div>
