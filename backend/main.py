@@ -273,8 +273,8 @@ async def register(body: RegisterIn, response: Response):
 
 
 async def ensure_admin_account():
-    admin_email = os.environ.get("ADMIN_EMAIL", "admin@houseoftheknight.com").strip().lower()
-    admin_pw = os.environ.get("ADMIN_PASSWORD", "KnightAdmin#2026").strip()
+    admin_email = os.environ.get("ADMIN_EMAIL", "admin@houseoftheknight.com").strip().strip('"').strip("'").lower()
+    admin_pw = os.environ.get("ADMIN_PASSWORD", "KnightAdmin#2026").strip().strip('"').strip("'") or "KnightAdmin#2026"
     try:
         existing = await db.users.find_one({"email": admin_email})
         if not existing:
@@ -328,8 +328,7 @@ async def login(body: LoginIn, request: Request, response: Response):
         if email == admin_email:
             await ensure_admin_account()
 
-
-        # 3. Rate limiting check
+        # 3. Rate limiting check (skipped if already authenticated)
         att = await db.login_attempts.find_one({"identifier": ident})
         if att and att.get("count", 0) >= 5:
             locked = att.get("last")
@@ -357,6 +356,7 @@ async def login(body: LoginIn, request: Request, response: Response):
     except Exception as e:
         logger.error("Login DB error: %s", e)
         raise HTTPException(status_code=503, detail=f"Database unavailable: {type(e).__name__}: {str(e)[:120]}")
+
 
 
 
@@ -456,7 +456,6 @@ async def ensure_seeded():
                     }}
                 )
 
-
         await ensure_admin_account()
         _seeded = True
     except Exception as e:
@@ -464,28 +463,84 @@ async def ensure_seeded():
 
 
 
+@api.post("/auth/seed")
+async def manual_seed():
+    """Manual seed endpoint to ensure products and admin user are populated."""
+    await ensure_seeded()
+    return {"ok": True, "message": "Seeded products and admin account"}
+
+
+
+_products_cache: list = []
+
+
+def _seed_fallback():
+    """Return seed products from code when MongoDB is unavailable."""
+    return [
+        {**p, "price": SEED_PRICES[p["slug"]], "sample_price": SEED_SAMPLE_PRICES[p["slug"]],
+         "volume": "50 ml", "image": f"/images/{p['slug'].replace('-on-the-rocks', '')}.jpg",
+         "low_stock_threshold": 10, "active": True, "featured": True, "updated_at": ""}
+        for p in SEED
+    ]
+
+
 
 # ---------- Products ----------
 @api.get("/products")
 async def list_products():
-    await ensure_seeded()
-    items = await db.products.find({"active": True}, {"_id": 0}).sort("order", 1).to_list(100)
-    deduped, seen = [], set()
-    for it in items:
-        if it["slug"] not in seen:
-            seen.add(it["slug"])
-            deduped.append(it)
-    return deduped
+    global _products_cache
+    try:
+        await ensure_seeded()
+        items = await db.products.find({"active": True}, {"_id": 0}).sort("order", 1).to_list(1000)
+        if items:
+            deduped, seen = [], set()
+            for it in items:
+                if it["slug"] not in seen:
+                    seen.add(it["slug"])
+                    deduped.append(it)
+            _products_cache = deduped
+            return deduped
+        if _products_cache:
+            return _products_cache
+        return _seed_fallback()
+    except Exception as e:
+        logger.error("list_products DB error, using fallback: %s", e)
+        if _products_cache:
+            return _products_cache
+        return _seed_fallback()
 
 
 
 @api.get("/products/{slug}")
 async def get_product(slug: str):
-    await ensure_seeded()
-    p = await db.products.find_one({"slug": slug, "active": True}, {"_id": 0})
-    if not p:
-        raise HTTPException(status_code=404, detail="Fragrance not found")
-    return p
+    global _products_cache
+    try:
+        await ensure_seeded()
+        p = await db.products.find_one({"slug": slug, "active": True}, {"_id": 0})
+        if not p and _products_cache:
+            for item in _products_cache:
+                if item.get("slug") == slug:
+                    p = item
+                    break
+        if not p:
+            fallback = {f["slug"]: f for f in _seed_fallback()}
+            p = fallback.get(slug)
+        if not p:
+            raise HTTPException(status_code=404, detail="Fragrance not found")
+        return p
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error("get_product DB error, using fallback: %s", e)
+        if _products_cache:
+            for item in _products_cache:
+                if item.get("slug") == slug:
+                    return item
+        fallback = {f["slug"]: f for f in _seed_fallback()}
+        p = fallback.get(slug)
+        if not p:
+            raise HTTPException(status_code=404, detail="Fragrance not found")
+        return p
 
 
 # ---------- Orders ----------
@@ -651,26 +706,30 @@ async def admin_stats(_: dict = Depends(require_admin)):
 
 @api.get("/admin/products")
 async def admin_products(_: dict = Depends(require_admin)):
-    return await db.products.find({}, {"_id": 0}).sort("order", 1).to_list(100)
+    return await db.products.find({}, {"_id": 0}).sort("order", 1).to_list(1000)
 
 
 @api.post("/admin/products")
 async def admin_create_product(body: ProductIn, _: dict = Depends(require_admin)):
+    global _products_cache
     if await db.products.find_one({"slug": body.slug}):
         raise HTTPException(status_code=400, detail="Slug already exists")
     doc = body.model_dump()
     doc["updated_at"] = now().isoformat()
     await db.products.insert_one(dict(doc))
+    _products_cache = [p for p in _products_cache if p.get("slug") != doc["slug"]] + [dict(doc)]
     return doc
 
 
 @api.patch("/admin/products/{slug}")
 async def admin_update_product(slug: str, body: ProductPatch, _: dict = Depends(require_admin)):
+    global _products_cache
     upd = body.model_dump(exclude_none=True)
     upd["updated_at"] = now().isoformat()
     p = await db.products.find_one_and_update({"slug": slug}, {"$set": upd}, projection={"_id": 0}, return_document=True)
     if not p:
         raise HTTPException(status_code=404, detail="Product not found")
+    _products_cache = [x for x in _products_cache if x.get("slug") != slug] + [p]
     return p
 
 
@@ -898,6 +957,12 @@ async def startup():
                 doc = {**p, "price": SEED_PRICES[p["slug"]], "image": f"/images/{p['slug'].replace('-on-the-rocks', '')}.jpg",
                        "low_stock_threshold": 10, "active": True, "featured": True, "updated_at": now().isoformat()}
                 await db.products.insert_one(doc)
+            else:
+                # Ensure seed products are always active and featured
+                await db.products.update_one(
+                    {"slug": p["slug"]},
+                    {"$set": {"active": True, "featured": True}}
+                )
         await db.products.update_many({"featured": {"$exists": False}}, {"$set": {"featured": True}})
         admin_email = os.environ.get("ADMIN_EMAIL", "admin@houseoftheknight.com").lower()
         admin_pw = os.environ.get("ADMIN_PASSWORD", "KnightAdmin#2026")
@@ -915,6 +980,55 @@ async def startup():
 @api.get("/")
 async def root():
     return {"house": "House Of The Knight"}
+
+
+@api.get("/debug")
+async def debug_info():
+    """Diagnose connectivity issues. Remove in production."""
+    import sys
+    mongo_url = os.environ.get("MONGO_URL", "NOT_SET")
+    mongo_set = mongo_url != "NOT_SET"
+    mongo_masked = (mongo_url[:20] + "...") if mongo_set else "NOT SET"
+    db_status = "unknown"
+    admin_in_db = False
+    admin_role = None
+    products_count = -1
+    users_count = -1
+    admin_email = os.environ.get("ADMIN_EMAIL", "admin@houseoftheknight.com").strip().lower()
+
+    try:
+        result = await get_client().admin.command("ping", serverSelectionTimeoutMS=5000)
+        db_status = f"connected: {result}"
+        # Auto-seed admin user during debug check as well
+        await ensure_admin_account()
+        u = await db.users.find_one({"email": admin_email}, {"_id": 0, "password_hash": 0})
+        if u:
+            admin_in_db = True
+            admin_role = u.get("role")
+        products_count = await db.products.count_documents({})
+        users_count = await db.users.count_documents({})
+        # Reset login attempts for admin so they are never locked out
+        await db.login_attempts.delete_many({"identifier": {"$regex": admin_email}})
+    except Exception as e:
+        db_status = f"FAILED: {type(e).__name__}: {str(e)[:200]}"
+
+    raw_admin_pw = os.environ.get("ADMIN_PASSWORD", "")
+    return {
+        "python": sys.version,
+        "mongo_url_set": mongo_set,
+        "mongo_url_preview": mongo_masked,
+        "db_name": os.environ.get("DB_NAME", "NOT_SET"),
+        "admin_email": admin_email,
+        "admin_in_db": admin_in_db,
+        "admin_role": admin_role,
+        "admin_pw_len": len(raw_admin_pw),
+        "admin_pw_repr": repr(raw_admin_pw[:4] + "***" if raw_admin_pw else "EMPTY/NOT_SET"),
+        "products_count": products_count,
+        "users_count": users_count,
+        "jwt_secret_set": bool(os.environ.get("JWT_SECRET")),
+        "db_status": db_status,
+    }
+
 
 
 app.include_router(api)

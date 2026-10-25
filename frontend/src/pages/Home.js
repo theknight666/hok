@@ -11,7 +11,7 @@ import { useProducts } from "@/hooks/useProducts";
 
 export default function Home() {
   const { products, isError } = useProducts();
-  const featured = products.filter((p) => p.featured).slice(0, 4);
+  const featured = products.filter((p) => p.featured);
   return (
     <main data-testid="home-page">
       <Intro />

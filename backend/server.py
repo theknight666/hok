@@ -471,6 +471,9 @@ async def manual_seed():
 
 
 
+_products_cache: list = []
+
+
 def _seed_fallback():
     """Return seed products from code when MongoDB is unavailable."""
     return [
@@ -485,30 +488,41 @@ def _seed_fallback():
 # ---------- Products ----------
 @api.get("/products")
 async def list_products():
+    global _products_cache
     try:
         await ensure_seeded()
-        items = await db.products.find({"active": True}, {"_id": 0}).sort("order", 1).to_list(100)
-        if not items:
-            return _seed_fallback()
-        deduped, seen = [], set()
-        for it in items:
-            if it["slug"] not in seen:
-                seen.add(it["slug"])
-                deduped.append(it)
-        return deduped
+        items = await db.products.find({"active": True}, {"_id": 0}).sort("order", 1).to_list(1000)
+        if items:
+            deduped, seen = [], set()
+            for it in items:
+                if it["slug"] not in seen:
+                    seen.add(it["slug"])
+                    deduped.append(it)
+            _products_cache = deduped
+            return deduped
+        if _products_cache:
+            return _products_cache
+        return _seed_fallback()
     except Exception as e:
         logger.error("list_products DB error, using fallback: %s", e)
+        if _products_cache:
+            return _products_cache
         return _seed_fallback()
 
 
 
 @api.get("/products/{slug}")
 async def get_product(slug: str):
+    global _products_cache
     try:
         await ensure_seeded()
         p = await db.products.find_one({"slug": slug, "active": True}, {"_id": 0})
+        if not p and _products_cache:
+            for item in _products_cache:
+                if item.get("slug") == slug:
+                    p = item
+                    break
         if not p:
-            # Try fallback
             fallback = {f["slug"]: f for f in _seed_fallback()}
             p = fallback.get(slug)
         if not p:
@@ -518,6 +532,10 @@ async def get_product(slug: str):
         raise
     except Exception as e:
         logger.error("get_product DB error, using fallback: %s", e)
+        if _products_cache:
+            for item in _products_cache:
+                if item.get("slug") == slug:
+                    return item
         fallback = {f["slug"]: f for f in _seed_fallback()}
         p = fallback.get(slug)
         if not p:
@@ -688,26 +706,30 @@ async def admin_stats(_: dict = Depends(require_admin)):
 
 @api.get("/admin/products")
 async def admin_products(_: dict = Depends(require_admin)):
-    return await db.products.find({}, {"_id": 0}).sort("order", 1).to_list(100)
+    return await db.products.find({}, {"_id": 0}).sort("order", 1).to_list(1000)
 
 
 @api.post("/admin/products")
 async def admin_create_product(body: ProductIn, _: dict = Depends(require_admin)):
+    global _products_cache
     if await db.products.find_one({"slug": body.slug}):
         raise HTTPException(status_code=400, detail="Slug already exists")
     doc = body.model_dump()
     doc["updated_at"] = now().isoformat()
     await db.products.insert_one(dict(doc))
+    _products_cache = [p for p in _products_cache if p.get("slug") != doc["slug"]] + [dict(doc)]
     return doc
 
 
 @api.patch("/admin/products/{slug}")
 async def admin_update_product(slug: str, body: ProductPatch, _: dict = Depends(require_admin)):
+    global _products_cache
     upd = body.model_dump(exclude_none=True)
     upd["updated_at"] = now().isoformat()
     p = await db.products.find_one_and_update({"slug": slug}, {"$set": upd}, projection={"_id": 0}, return_document=True)
     if not p:
         raise HTTPException(status_code=404, detail="Product not found")
+    _products_cache = [x for x in _products_cache if x.get("slug") != slug] + [p]
     return p
 
 

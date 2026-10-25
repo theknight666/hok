@@ -206,7 +206,7 @@ export default function DiscoveryPage() {
           </div>
 
           <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {signatures.map((p) => {
+            {products.map((p) => {
               const samplePrice = p.sample_price || 99;
               return (
                 <div

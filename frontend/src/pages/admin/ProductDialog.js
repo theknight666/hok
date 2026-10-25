@@ -4,6 +4,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { api, formatErr } from "@/lib/api";
 import { BottleUpload } from "./BottleUpload";
 
+import { getCachedCatalog, setCachedCatalog } from "@/hooks/useProducts";
+
 const TEXT = [
   ["name", "Name"], ["slug", "URL slug"], ["tagline", "Tagline"], ["badge", "Badge"],
   ["concentration", "Concentration"], ["volume", "Volume"], ["image", "Image URL (or upload below)"], ["color", "Liquid colour (hex)"],
@@ -33,8 +35,21 @@ export function ProductDialog({ product, onClose, onSaved }) {
       active: f.active, featured: f.featured, notes: { top: toList(f.top), heart: toList(f.heart), base: toList(f.base) },
     };
     try {
-      if (isNew) await api.post("/admin/products", { ...body, slug: f.slug.trim().toLowerCase().replace(/\s+/g, "-") });
+      const savedSlug = isNew ? f.slug.trim().toLowerCase().replace(/\s+/g, "-") : product.slug;
+      if (isNew) await api.post("/admin/products", { ...body, slug: savedSlug });
       else await api.patch(`/admin/products/${product.slug}`, body);
+
+      try {
+        const current = [...getCachedCatalog()];
+        const fullSaved = { ...body, slug: savedSlug };
+        const idx = current.findIndex((p) => p.slug === savedSlug);
+        if (idx >= 0) current[idx] = { ...current[idx], ...fullSaved };
+        else current.push(fullSaved);
+        setCachedCatalog(current);
+      } catch (err) {
+        // Non-blocking cache sync
+      }
+
       toast.success("Fragrance saved");
       onSaved();
       onClose();

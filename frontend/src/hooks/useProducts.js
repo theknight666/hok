@@ -96,33 +96,79 @@ export const FALLBACK_PRODUCTS = [
   },
 ];
 
+const CACHE_KEY = "hotk_catalog_cache_v2";
+
+export function getCachedCatalog() {
+  if (typeof window === "undefined") return FALLBACK_PRODUCTS;
+  try {
+    const raw = window.localStorage.getItem(CACHE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed;
+      }
+    }
+  } catch (e) {
+    // Quota or parse issue
+  }
+  return FALLBACK_PRODUCTS;
+}
+
+export function setCachedCatalog(products) {
+  if (typeof window === "undefined") return;
+  try {
+    if (Array.isArray(products) && products.length > 0) {
+      window.localStorage.setItem(CACHE_KEY, JSON.stringify(products));
+    }
+  } catch (e) {
+    // Storage full or private browsing
+  }
+}
+
 export function useProducts() {
   const q = useQuery({
     queryKey: ["products"],
     queryFn: async () => {
       try {
         const res = await api.get("/products");
-        return Array.isArray(res.data) && res.data.length ? res.data : FALLBACK_PRODUCTS;
+        if (Array.isArray(res.data) && res.data.length > 0) {
+          setCachedCatalog(res.data);
+          return res.data;
+        }
+        return getCachedCatalog();
       } catch (err) {
-        return FALLBACK_PRODUCTS;
+        return getCachedCatalog();
       }
     },
-    initialData: FALLBACK_PRODUCTS,
+    initialData: () => getCachedCatalog(),
     staleTime: 1000 * 60 * 2,
   });
 
-  const products = Array.isArray(q.data) && q.data.length ? q.data : FALLBACK_PRODUCTS;
+  const products = Array.isArray(q.data) && q.data.length ? q.data : getCachedCatalog();
   return { ...q, products };
 }
 
 export function useProduct(slug) {
-  const fallback = FALLBACK_PRODUCTS.find((p) => p.slug === slug);
+  const cachedCatalog = getCachedCatalog();
+  const fallback = cachedCatalog.find((p) => p.slug === slug) || FALLBACK_PRODUCTS.find((p) => p.slug === slug);
   const q = useQuery({
     queryKey: ["product", slug],
     queryFn: async () => {
       try {
         const res = await api.get(`/products/${slug}`);
-        return res.data || fallback;
+        if (res.data) {
+          // If updated, sync into cached catalog
+          const catalog = [...getCachedCatalog()];
+          const idx = catalog.findIndex((p) => p.slug === slug);
+          if (idx >= 0) {
+            catalog[idx] = { ...catalog[idx], ...res.data };
+          } else {
+            catalog.push(res.data);
+          }
+          setCachedCatalog(catalog);
+          return res.data;
+        }
+        return fallback;
       } catch (err) {
         return fallback;
       }
