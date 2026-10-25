@@ -2,6 +2,7 @@ import { Navigate, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { LogOut } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { KnightMark } from "@/components/site/Logo";
 import { api, inr } from "@/lib/api";
 
 export const STATUS_STYLE = {
@@ -27,7 +28,10 @@ export default function Account() {
     <main className="mx-auto min-h-screen max-w-[1200px] px-5 pb-24 pt-[130px] sm:px-10" data-testid="account-page">
       <div className="flex flex-col justify-between gap-6 border-b pb-10 sm:flex-row sm:items-end">
         <div>
-          <p className="eyebrow">Your account</p>
+          <div className="flex items-center gap-3">
+            <KnightMark className="h-6 w-6 text-gold" />
+            <p className="eyebrow">Your account</p>
+          </div>
           <h1 className="mt-4 font-display text-5xl sm:text-6xl" data-testid="account-name">{user.name}</h1>
           <p className="mt-2 text-muted-foreground">{user.email}</p>
         </div>

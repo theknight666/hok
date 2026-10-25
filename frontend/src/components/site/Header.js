@@ -137,7 +137,15 @@ export function Header() {
             <SheetContent side="left" className="w-[85%] max-w-sm bg-background">
               <SheetTitle className="sr-only">Menu</SheetTitle>
               <SheetDescription className="sr-only">Browse the House of the Knight collection and your account.</SheetDescription>
-              <div className="mt-16 flex flex-col gap-6">
+              <div className="mt-12 flex flex-col gap-6">
+                <Link
+                  to="/"
+                  onClick={() => setSheetOpen(false)}
+                  className="mb-2 flex items-center gap-3"
+                >
+                  <KnightMark className="h-10 w-10 text-gold" />
+                  <Wordmark className="text-xl" />
+                </Link>
                 {LINKS.map((l) => (
                   <Link
                     key={l.to}
