@@ -29,8 +29,8 @@ export default function Admin() {
 
   return (
     <main className="mx-auto min-h-screen max-w-[1500px] px-5 pb-24 pt-[120px] sm:px-10" data-testid="admin-page">
-      <div className="flex items-center gap-3">
-        <KnightMark className="h-6 w-6 text-gold" />
+      <div className="flex items-center gap-2.5">
+        <KnightMark className="h-4 w-4 -translate-y-[1px]" />
         <p className="eyebrow">The Keep · Admin</p>
       </div>
       <h1 className="mt-3 font-display text-5xl">House ledger</h1>

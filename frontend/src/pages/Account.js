@@ -28,8 +28,8 @@ export default function Account() {
     <main className="mx-auto min-h-screen max-w-[1200px] px-5 pb-24 pt-[130px] sm:px-10" data-testid="account-page">
       <div className="flex flex-col justify-between gap-6 border-b pb-10 sm:flex-row sm:items-end">
         <div>
-          <div className="flex items-center gap-3">
-            <KnightMark className="h-6 w-6 text-gold" />
+          <div className="flex items-center gap-2.5">
+            <KnightMark className="h-4 w-4 -translate-y-[1px]" />
             <p className="eyebrow">Your account</p>
           </div>
           <h1 className="mt-4 font-display text-5xl sm:text-6xl" data-testid="account-name">{user.name}</h1>

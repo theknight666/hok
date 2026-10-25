@@ -89,8 +89,8 @@ export default function Contact() {
         {/* HERO TITLE & INTRO                                       */}
         {/* ======================================================== */}
         <div className="max-w-3xl">
-          <div className="flex items-center gap-3">
-            <KnightMark className="h-6 w-6 text-gold" />
+          <div className="flex items-center gap-2.5">
+            <KnightMark className="h-4 w-4 -translate-y-[1px]" />
             <span className="text-[0.66rem] font-medium uppercase tracking-[0.3em] text-gold">
               Contact & Support
             </span>
