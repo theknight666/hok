@@ -130,9 +130,9 @@ export default function Contact() {
                   </div>
                 </a>
 
-                {/* WhatsApp */}
+                {/* WhatsApp & Phone Support */}
                 <a
-                  href="https://wa.me/919820048291?text=Hello%20House%20of%20the%20Knight,%20I%20have%20a%20question%20about%20a%20fragrance."
+                  href="https://wa.me/918796422715?text=Hello%20House%20of%20the%20Knight,%20I%20have%20a%20question%20about%20a%20fragrance."
                   target="_blank"
                   rel="noopener noreferrer"
                   className="group flex items-start gap-4 rounded-2xl border border-border/40 bg-background/50 p-4 transition-all duration-300 hover:border-gold hover:bg-background/80"
@@ -141,9 +141,9 @@ export default function Contact() {
                     <MessageSquare className="h-5 w-5" />
                   </div>
                   <div>
-                    <p className="text-[0.62rem] font-medium uppercase tracking-[0.24em] text-gold">WhatsApp Chat</p>
-                    <p className="font-display text-base text-foreground mt-0.5">+91 98200 48291</p>
-                    <p className="text-xs text-muted-foreground mt-1">Quick answers via WhatsApp</p>
+                    <p className="text-[0.62rem] font-medium uppercase tracking-[0.24em] text-gold">WhatsApp & Phone Support</p>
+                    <p className="font-display text-base text-foreground mt-0.5">+91 87964 22715</p>
+                    <p className="text-xs text-muted-foreground mt-1">Quick answers via WhatsApp or call</p>
                   </div>
                 </a>
 
@@ -154,7 +154,7 @@ export default function Contact() {
                   </div>
                   <div>
                     <p className="text-[0.62rem] font-medium uppercase tracking-[0.24em] text-gold">Location</p>
-                    <p className="font-display text-base text-foreground mt-0.5">Mumbai, Maharashtra</p>
+                    <p className="font-display text-base text-foreground mt-0.5">Dwarka, Delhi</p>
                     <p className="text-xs text-muted-foreground mt-1">
                       Online dispatch across all of India
                     </p>
