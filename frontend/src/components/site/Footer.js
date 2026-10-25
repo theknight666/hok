@@ -21,10 +21,11 @@ export function Footer() {
 
   return (
     <footer className="relative overflow-hidden bg-foreground text-background" data-testid="site-footer">
-      <div className="mx-auto max-w-[1600px] px-5 pt-24 sm:px-10">
+      <div className="mx-auto max-w-[1600px] px-5 pt-6 sm:pt-8 sm:px-10">
         <div className="grid gap-14 lg:grid-cols-12">
           <div className="lg:col-span-6">
-            <KnightMark className="h-28 w-28 sm:h-36 sm:w-36 text-gold" />
+            <KnightMark variant="dark" className="h-28 w-28 sm:h-36 sm:w-36 hidden dark:inline-flex" />
+            <KnightMark variant="gold" className="h-28 w-28 sm:h-36 sm:w-36 inline-flex dark:hidden" />
             <p className="mt-6 max-w-md font-display text-4xl leading-[0.95] sm:text-5xl">Stay in the know. New drops, rare finds, no noise.</p>
             <form onSubmit={subscribe} className="mt-10 max-w-md" data-testid="newsletter-form">
               {sent ? (

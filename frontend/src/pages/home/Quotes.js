@@ -22,7 +22,7 @@ export function Quotes() {
   const loop = reviews.length < 4 ? reviews : [...reviews, ...reviews];
 
   return (
-    <section className="overflow-hidden bg-[#F2A900] py-20 text-[#1C1105] lg:py-28" data-testid="quotes-section" aria-label="What people say">
+    <section className="overflow-hidden bg-[#F2A900] pt-16 pb-10 text-[#1C1105] lg:pt-20 lg:pb-12" data-testid="quotes-section" aria-label="What people say">
       <div className="mx-auto max-w-[1600px] px-5 sm:px-10">
         <p className="text-[0.66rem] font-medium uppercase tracking-[0.3em] opacity-70">Client impressions · verified buyers only</p>
         <h2 className="display-lg mt-3 font-display">Stories from <span className="font-display-italic opacity-90">our clients</span></h2>
