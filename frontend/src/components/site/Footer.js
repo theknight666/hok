@@ -19,8 +19,8 @@ export function Footer() {
     offset: ["start end", "end end"],
   });
 
-  // Parallax sensitivity enhanced by 500% (400px travel), landing at -6px resting position (moved up by 1px more)
-  const textY = useTransform(scrollYProgress, [0, 1], [394, -6]);
+  // Parallax sensitivity enhanced by 500% (400px travel), landing at -8px resting position (moved up by 2px more)
+  const textY = useTransform(scrollYProgress, [0, 1], [392, -8]);
 
   const subscribe = (e) => {
     e.preventDefault();
