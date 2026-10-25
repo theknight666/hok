@@ -19,8 +19,8 @@ export function Footer() {
     offset: ["start end", "end end"],
   });
 
-  // Smooth parallax moving from down to up on scroll, landing at resting position (0) at page bottom
-  const textY = useTransform(scrollYProgress, [0, 1], [80, 0]);
+  // Parallax sensitivity enhanced by 500% (400px travel), landing at -3px resting position (moved up by 3px)
+  const textY = useTransform(scrollYProgress, [0, 1], [397, -3]);
 
   const subscribe = (e) => {
     e.preventDefault();
