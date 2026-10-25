@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { KnightMark } from "./Logo";
 
 const COLS = [
@@ -11,6 +12,15 @@ const COLS = [
 export function Footer() {
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
+  const footerRef = useRef(null);
+
+  const { scrollYProgress } = useScroll({
+    target: footerRef,
+    offset: ["start end", "end end"],
+  });
+
+  const textY = useTransform(scrollYProgress, [0, 1], [40, -8]);
+  const textScale = useTransform(scrollYProgress, [0, 1], [0.97, 1.01]);
 
   const subscribe = (e) => {
     e.preventDefault();
@@ -20,7 +30,7 @@ export function Footer() {
   };
 
   return (
-    <footer className="relative overflow-hidden bg-foreground text-background" data-testid="site-footer">
+    <footer ref={footerRef} className="relative overflow-hidden bg-foreground text-background" data-testid="site-footer">
       <div className="mx-auto max-w-[1600px] px-5 pt-6 sm:pt-8 sm:px-10">
         <div className="grid gap-14 lg:grid-cols-12">
           <div className="lg:col-span-6">
@@ -62,14 +72,19 @@ export function Footer() {
         </div>
       </div>
 
-      {/* Full-Width End-to-End Giant Screen-Fitting Banner */}
-      <div className="relative mt-16 sm:mt-24 w-full overflow-hidden select-none pointer-events-none flex justify-center px-2">
-        <p
-          className="w-full text-center font-display font-bold leading-[0.78] tracking-tight whitespace-nowrap text-[13.1vw] text-background"
-          aria-hidden="true"
+      {/* Full-Width End-to-End Giant Screen-Fitting Banner with Parallax */}
+      <div className="relative mt-12 sm:mt-16 w-full overflow-hidden select-none pointer-events-none pb-4 sm:pb-6 pt-1">
+        <motion.div
+          style={{ y: textY, scale: textScale }}
+          className="w-full will-change-transform transform-gpu flex items-center justify-center"
         >
-          House of the Knight
-        </p>
+          <p
+            className="w-full text-center font-display font-bold leading-[1.05] tracking-tight whitespace-nowrap text-[14.8vw] text-background selection:bg-transparent"
+            aria-hidden="true"
+          >
+            House of the Knight
+          </p>
+        </motion.div>
       </div>
 
       <div className="mx-auto max-w-[1600px] px-5 pb-8 sm:px-10">
