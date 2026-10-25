@@ -655,19 +655,21 @@ async def track_order(order_id: str, email: Optional[str] = None):
 class ContactIn(BaseModel):
     name: str
     email: EmailStr
-    phone: Optional[str] = None
+    phone: str
     subject: Optional[str] = "General Inquiry"
     message: str
 
 
 @api.post("/contact")
 async def submit_contact(body: ContactIn):
+    if not body.phone or not body.phone.strip():
+        raise HTTPException(status_code=400, detail="Phone number is compulsory.")
     ticket_id = f"HOTK-CONCIERGE-{secrets.token_hex(2).upper()}"
     doc = {
         "ticket_id": ticket_id,
         "name": body.name.strip(),
         "email": body.email.strip().lower(),
-        "phone": body.phone.strip() if body.phone else None,
+        "phone": body.phone.strip(),
         "subject": body.subject.strip() if body.subject else "General Inquiry",
         "message": body.message.strip(),
         "created_at": now().isoformat(),

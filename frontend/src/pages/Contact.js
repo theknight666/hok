@@ -55,8 +55,8 @@ export default function Contact() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!name.trim() || !email.trim() || !message.trim()) {
-      setError("Please fill in your name, email, and message.");
+    if (!name.trim() || !email.trim() || !phone.trim() || !message.trim()) {
+      setError("Please fill in your name, email, phone number, and message.");
       return;
     }
     setError(null);
@@ -309,10 +309,11 @@ export default function Contact() {
 
                     <div>
                       <label className="block text-[0.66rem] font-medium uppercase tracking-[0.24em] text-gold">
-                        Phone / WhatsApp <span className="text-muted-foreground font-light text-[0.62rem]">(Optional)</span>
+                        Phone / WhatsApp <span className="text-foreground/50">*</span>
                       </label>
                       <input
                         type="tel"
+                        required
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
                         placeholder="+91 98765 43210"
