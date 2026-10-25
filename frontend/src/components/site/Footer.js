@@ -24,9 +24,9 @@ export function Footer() {
       <div className="mx-auto max-w-[1600px] px-5 pt-6 sm:pt-8 sm:px-10">
         <div className="grid gap-14 lg:grid-cols-12">
           <div className="lg:col-span-6">
-            <KnightMark variant="dark" className="h-28 w-28 sm:h-36 sm:w-36 hidden dark:inline-flex" />
-            <KnightMark variant="gold" className="h-28 w-28 sm:h-36 sm:w-36 inline-flex dark:hidden" />
-            <p className="mt-6 max-w-md font-display text-4xl leading-[0.95] sm:text-5xl">Stay in the know. New drops, rare finds, no noise.</p>
+            <KnightMark variant="dark" className="h-36 w-36 sm:h-48 sm:w-48 hidden dark:inline-flex" />
+            <KnightMark variant="gold" className="h-36 w-36 sm:h-48 sm:w-48 inline-flex dark:hidden" />
+            <p className="mt-2 sm:mt-3 max-w-md font-display text-4xl leading-[0.95] sm:text-5xl">Stay in the know. New drops, rare finds, no noise.</p>
             <form onSubmit={subscribe} className="mt-10 max-w-md" data-testid="newsletter-form">
               {sent ? (
                 <p className="rounded-full border border-background/30 px-6 py-4 text-sm font-semibold" data-testid="newsletter-success">You're in. Watch your inbox.</p>
