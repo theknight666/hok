@@ -88,7 +88,7 @@ export function Header() {
           compact ? "border-border/60 bg-background/85 shadow-lg" : "border-background/40 bg-background/60"
         }`}
       >
-        <Link to="/" data-testid="brand-logo" className="flex items-center" aria-label="House of the Knight">
+        <Link to="/" data-testid="brand-logo" className="flex items-center -translate-y-[2px]" aria-label="House of the Knight">
           <KnightMark className="h-9 w-9 sm:h-10 sm:w-10" />
         </Link>
 
