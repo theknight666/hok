@@ -458,6 +458,16 @@ async def ensure_seeded():
                 )
         await db.products.update_many({"concentration": "Extrait de Parfum"}, {"$set": {"concentration": "Eau de Parfum"}})
 
+        # One-time cleanup of initial development dummy/test orders and customers
+        dummy_cleaned = await db.meta.find_one({"_id": "initial_dummy_cleaned_v1"})
+        if not dummy_cleaned:
+            await db.orders.delete_many({})
+            await db.users.delete_many({"role": {"$ne": "admin"}})
+            await db.inventory_log.delete_many({})
+            await db.products.update_many({}, {"$set": {"stock": 50}})
+            await db.meta.insert_one({"_id": "initial_dummy_cleaned_v1", "at": now().isoformat()})
+            logger.info("Cleared initial development dummy orders and test customers")
+
         await ensure_admin_account()
         _seeded = True
     except Exception as e:
@@ -753,6 +763,23 @@ async def admin_adjust_stock(slug: str, body: StockAdjust, admin: dict = Depends
 @api.get("/admin/inventory-log")
 async def admin_inventory_log(_: dict = Depends(require_admin)):
     return await db.inventory_log.find({}, {"_id": 0}).sort("at", -1).to_list(50)
+
+
+@api.post("/admin/reset-demo-data")
+async def admin_reset_demo_data(_: dict = Depends(require_admin)):
+    o_res = await db.orders.delete_many({})
+    u_res = await db.users.delete_many({"role": {"$ne": "admin"}})
+    l_res = await db.inventory_log.delete_many({})
+    await db.products.update_many({}, {"$set": {"stock": 50}})
+    global _products_cache
+    for p in _products_cache:
+        p["stock"] = 50
+    return {
+        "ok": True,
+        "deleted_orders": o_res.deleted_count,
+        "deleted_customers": u_res.deleted_count,
+        "deleted_logs": l_res.deleted_count,
+    }
 
 
 @api.get("/admin/orders")
