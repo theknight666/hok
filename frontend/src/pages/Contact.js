@@ -5,7 +5,7 @@ import {
   MessageSquare,
   MapPin,
   Clock,
-  Sparkles,
+  Compass,
   ArrowRight,
   CheckCircle2,
   Phone,
@@ -178,7 +178,7 @@ export default function Contact() {
             {/* Scent Suggestion Card */}
             <div className="rounded-[2.5rem] border border-gold/30 bg-gradient-to-br from-gold/10 to-transparent p-6 sm:p-8">
               <div className="flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-gold" />
+                <Compass className="h-5 w-5 text-gold" />
                 <span className="text-[0.64rem] font-medium uppercase tracking-[0.28em] text-gold">
                   Fragrance Requests
                 </span>

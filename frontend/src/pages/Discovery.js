@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
-  Sparkles,
   ShoppingBag,
   Check,
   ShieldCheck,
@@ -28,7 +27,7 @@ const ADVANTAGES = [
     desc: "Fragrance develops differently on everyone. A 2ml sample lets you test the opening, heart, and drydown over a full day of wear."
   },
   {
-    icon: Sparkles,
+    icon: Clock,
     title: "30+ Sprays Per Vial",
     desc: "Each 2ml spray vial gives you around 30 to 35 sprays, giving you 4 to 5 wears to decide if it's the right signature for you."
   },
