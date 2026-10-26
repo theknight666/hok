@@ -115,25 +115,25 @@ export function Intro() {
                     animate={{
                       color: [
                         "rgba(251, 248, 243, 0.055)",
-                        "#f59e0b",
-                        "#ff7a00",
-                        "#f59e0b",
+                        "rgba(245, 158, 11, 0.22)",
+                        "rgba(255, 140, 35, 0.38)",
+                        "rgba(245, 158, 11, 0.22)",
                         "rgba(251, 248, 243, 0.055)",
                       ],
                       textShadow: [
-                        "0 0 0px transparent",
-                        "0 0 16px rgba(255, 122, 0, 0.85), 0 0 35px rgba(245, 158, 11, 0.6)",
-                        "0 0 24px rgba(255, 138, 0, 1), 0 0 50px rgba(245, 158, 11, 0.8)",
-                        "0 0 16px rgba(255, 122, 0, 0.85), 0 0 35px rgba(245, 158, 11, 0.6)",
-                        "0 0 0px transparent",
+                        "0 0 0px rgba(255, 130, 30, 0)",
+                        "0 0 12px rgba(245, 150, 20, 0.18), 0 0 25px rgba(225, 110, 15, 0.10)",
+                        "0 0 18px rgba(255, 140, 30, 0.32), 0 0 38px rgba(235, 115, 18, 0.18)",
+                        "0 0 12px rgba(245, 150, 20, 0.18), 0 0 25px rgba(225, 110, 15, 0.10)",
+                        "0 0 0px rgba(255, 130, 30, 0)",
                       ],
                     }}
                     transition={{
-                      duration: 0.75,
-                      delay: 0.35 + i * 0.065,
+                      duration: 1.8,
+                      delay: 0.2 + i * 0.075,
                       repeat: Infinity,
-                      repeatDelay: 1.2,
-                      ease: "easeInOut",
+                      repeatDelay: 0.8,
+                      ease: [0.4, 0, 0.2, 1],
                     }}
                   >
                     {item === " " ? "\u00A0" : item}
