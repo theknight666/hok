@@ -2,7 +2,6 @@ import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion";
 
 const LUXURY_EASE = [0.83, 0, 0.17, 1];
-const WATERMARK_LETTERS = "House of the Knight".split("");
 
 export function Intro() {
   // Always show preloader on every page reload per user instruction (will revert when user texts "revert")
@@ -91,8 +90,20 @@ export function Intro() {
           {/* Analog Luxury Texture Grain */}
           <div className="grain pointer-events-none absolute inset-0 opacity-35" aria-hidden="true" />
 
+          {/* Inline Hardware-Accelerated Smooth Sweep Keyframes */}
+          <style>{`
+            @keyframes watermarkLivingGlow {
+              0% {
+                background-position: 140% 0;
+              }
+              100% {
+                background-position: -40% 0;
+              }
+            }
+          `}</style>
+
           {/* ======================================================== */}
-          {/* WATERMARK: Edge-to-Edge Alphabets with Clean Glow Sweep  */}
+          {/* WATERMARK: Edge-to-Edge Pure Alphabets with Living Glow  */}
           {/* ======================================================== */}
           <motion.div
             style={{
@@ -102,43 +113,26 @@ export function Intro() {
             className="pointer-events-none absolute inset-x-0 bottom-0 pb-1 sm:pb-2 lg:pb-3 flex items-end justify-center select-none will-change-transform w-full overflow-hidden"
             aria-hidden="true"
           >
-            <div className="w-full flex items-center justify-center text-center overflow-visible">
-              <p className="w-full text-center font-display font-black leading-[0.88] tracking-tight whitespace-nowrap text-[13.85vw] select-none">
-                {WATERMARK_LETTERS.map((item, i) => (
-                  <motion.span
-                    key={i}
-                    className="inline-block"
-                    initial={{
-                      color: "rgba(251, 248, 243, 0.055)",
-                      textShadow: "0 0 0px transparent",
-                    }}
-                    animate={{
-                      color: [
-                        "rgba(251, 248, 243, 0.055)",
-                        "rgba(245, 158, 11, 0.22)",
-                        "rgba(255, 140, 35, 0.38)",
-                        "rgba(245, 158, 11, 0.22)",
-                        "rgba(251, 248, 243, 0.055)",
-                      ],
-                      textShadow: [
-                        "0 0 0px rgba(255, 130, 30, 0)",
-                        "0 0 12px rgba(245, 150, 20, 0.18), 0 0 25px rgba(225, 110, 15, 0.10)",
-                        "0 0 18px rgba(255, 140, 30, 0.32), 0 0 38px rgba(235, 115, 18, 0.18)",
-                        "0 0 12px rgba(245, 150, 20, 0.18), 0 0 25px rgba(225, 110, 15, 0.10)",
-                        "0 0 0px rgba(255, 130, 30, 0)",
-                      ],
-                    }}
-                    transition={{
-                      duration: 1.8,
-                      delay: 0.2 + i * 0.075,
-                      repeat: Infinity,
-                      repeatDelay: 0.8,
-                      ease: [0.4, 0, 0.2, 1],
-                    }}
-                  >
-                    {item === " " ? "\u00A0" : item}
-                  </motion.span>
-                ))}
+            <div className="relative w-full flex items-center justify-center text-center overflow-hidden">
+              {/* Base Subtle Edge-to-Edge Watermark */}
+              <p className="w-full text-center font-display font-black leading-[0.88] tracking-tight whitespace-nowrap text-[13.85vw] text-[#FBF8F3]/[0.055] select-none">
+                House of the Knight
+              </p>
+
+              {/* Continuous GPU-Composited Living Amber Glow (Only Alphabets, Zero Pipe) */}
+              <p
+                className="pointer-events-none absolute inset-0 w-full text-center font-display font-black leading-[0.88] tracking-tight whitespace-nowrap text-[13.85vw] select-none"
+                style={{
+                  background:
+                    "linear-gradient(90deg, transparent 0%, transparent 34%, rgba(245, 158, 11, 0.12) 42%, rgba(255, 145, 30, 0.38) 48%, rgba(255, 185, 70, 0.55) 50%, rgba(255, 145, 30, 0.38) 52%, rgba(245, 158, 11, 0.12) 58%, transparent 66%, transparent 100%)",
+                  backgroundSize: "260% 100%",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  animation:
+                    "watermarkLivingGlow 3.4s cubic-bezier(0.35, 0, 0.25, 1) infinite",
+                }}
+              >
+                House of the Knight
               </p>
             </div>
           </motion.div>
