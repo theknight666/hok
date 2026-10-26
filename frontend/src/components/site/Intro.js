@@ -103,7 +103,7 @@ export function Intro() {
           `}</style>
 
           {/* ======================================================== */}
-          {/* WATERMARK: Edge-to-Edge Pure Alphabets with Smudged Hue */}
+          {/* WATERMARK: Subterranean Light Stripe with Upward Rays    */}
           {/* ======================================================== */}
           <motion.div
             style={{
@@ -119,17 +119,21 @@ export function Intro() {
                 House of the Knight
               </p>
 
-              {/* Layer 2: Smudged Atmospheric Warm Amber Hue Glow (Diffused Aura) */}
+              {/* Layer 2: Text Catching Upward Amber Rays (Masked: Base Only, Top Stays Dark) */}
               <p
                 className="pointer-events-none absolute inset-0 w-full text-center font-display font-black leading-[0.88] tracking-tight whitespace-nowrap text-[13.85vw] select-none transform-gpu"
                 style={{
                   background:
-                    "linear-gradient(90deg, transparent 0%, transparent 34%, rgba(245, 150, 15, 0.04) 41%, rgba(255, 140, 25, 0.22) 47%, rgba(255, 180, 60, 0.38) 50%, rgba(255, 140, 25, 0.22) 53%, rgba(245, 150, 15, 0.04) 59%, transparent 66%, transparent 100%)",
+                    "linear-gradient(90deg, transparent 0%, transparent 34%, rgba(245, 150, 15, 0.04) 41%, rgba(255, 140, 25, 0.26) 47%, rgba(255, 185, 65, 0.46) 50%, rgba(255, 140, 25, 0.26) 53%, rgba(245, 150, 15, 0.04) 59%, transparent 66%, transparent 100%)",
                   backgroundSize: "260% 100%",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
-                  filter: "blur(18px) sm:blur(24px)",
-                  opacity: 0.9,
+                  WebkitMaskImage:
+                    "linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 24%, rgba(0,0,0,0.15) 50%, transparent 72%)",
+                  maskImage:
+                    "linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 24%, rgba(0,0,0,0.15) 50%, transparent 72%)",
+                  filter: "blur(14px) sm:blur(18px)",
+                  opacity: 0.95,
                   animation:
                     "watermarkLivingGlow 3.6s cubic-bezier(0.35, 0, 0.25, 1) infinite",
                 }}
@@ -137,28 +141,24 @@ export function Intro() {
                 House of the Knight
               </p>
 
-              {/* Layer 3: Ultra-Soft Secondary Ambient Bloom */}
-              <p
-                className="pointer-events-none absolute inset-0 w-full text-center font-display font-black leading-[0.88] tracking-tight whitespace-nowrap text-[13.85vw] select-none transform-gpu"
+              {/* Layer 3: Subterranean Light Stripe Running Below the Screen Edge */}
+              <div
+                className="pointer-events-none absolute -bottom-6 inset-x-0 h-10 select-none transform-gpu"
                 style={{
                   background:
-                    "linear-gradient(90deg, transparent 0%, transparent 33%, rgba(245, 150, 15, 0.03) 40%, rgba(255, 135, 20, 0.14) 47%, rgba(255, 175, 50, 0.25) 50%, rgba(255, 135, 20, 0.14) 53%, rgba(245, 150, 15, 0.03) 60%, transparent 67%, transparent 100%)",
+                    "linear-gradient(90deg, transparent 0%, transparent 35%, rgba(245, 150, 15, 0.03) 42%, rgba(255, 140, 25, 0.22) 48%, rgba(255, 185, 65, 0.42) 50%, rgba(255, 140, 25, 0.22) 52%, rgba(245, 150, 15, 0.03) 58%, transparent 65%, transparent 100%)",
                   backgroundSize: "260% 100%",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  filter: "blur(36px) sm:blur(48px)",
-                  opacity: 0.85,
+                  filter: "blur(22px) sm:blur(30px)",
+                  opacity: 0.7,
                   animation:
                     "watermarkLivingGlow 3.6s cubic-bezier(0.35, 0, 0.25, 1) infinite",
                 }}
-              >
-                House of the Knight
-              </p>
+              />
             </div>
           </motion.div>
 
           {/* ======================================================== */}
-          {/* CENTERPIECE: Subtle Grey Monogram (Raised Optical Center)*/}
+          {/* CENTERPIECE: 40% Smaller Logo (Raised Above Center)      */}
           {/* ======================================================== */}
           <motion.div
             style={{
@@ -185,10 +185,10 @@ export function Intro() {
                 : { opacity: 1, scale: 1 }
             }
             transition={{ opacity: { duration: 0.18 } }}
-            className="relative z-10 flex items-center justify-center p-6 will-change-transform -translate-y-8 sm:-translate-y-12 lg:-translate-y-14"
+            className="relative z-10 flex items-center justify-center p-6 will-change-transform -translate-y-10 sm:-translate-y-14 lg:-translate-y-16"
           >
-            <div className="relative h-28 w-28 sm:h-36 sm:w-36 lg:h-40 lg:w-40 flex items-center justify-center transform-gpu">
-              {/* Primary Grey Monogram Logo */}
+            <div className="relative h-[4.25rem] w-[4.25rem] sm:h-[5.25rem] sm:w-[5.25rem] lg:h-24 lg:w-24 flex items-center justify-center transform-gpu">
+              {/* Primary Grey Monogram Logo (40% Smaller) */}
               <img
                 src="/images/hok-monogram.png"
                 alt="House of the Knight"
