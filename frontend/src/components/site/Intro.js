@@ -6,7 +6,6 @@ const LUXURY_EASE = [0.83, 0, 0.17, 1];
 export function Intro() {
   // Always show preloader on every page reload per user instruction (will revert when user texts "revert")
   const [show, setShow] = useState(true);
-  const [isExiting, setIsExiting] = useState(false);
   const [isBeating, setIsBeating] = useState(false);
   const containerRef = useRef(null);
 
@@ -51,14 +50,13 @@ export function Intro() {
       setIsBeating(true);
     }, 750);
 
-    // 2. Conclude preloader smoothly after slow contraction and slow after-image settle (at 2.35s)
+    // 2. Conclude preloader smoothly at 2.4s: lift curtain with logo remaining fully visible
     const exitTimer = setTimeout(() => {
-      setIsExiting(true);
+      setShow(false);
       setTimeout(() => {
-        setShow(false);
         document.body.style.overflow = prevOverflow;
-      }, 500);
-    }, 2350);
+      }, 950);
+    }, 2400);
 
     return () => {
       clearTimeout(beatTimer);
@@ -68,11 +66,10 @@ export function Intro() {
   }, [show]);
 
   const handleDismiss = () => {
-    setIsExiting(true);
+    setShow(false);
     setTimeout(() => {
       document.body.style.overflow = "";
-      setShow(false);
-    }, 200);
+    }, 950);
   };
 
   return (
@@ -94,28 +91,61 @@ export function Intro() {
           <div className="grain pointer-events-none absolute inset-0 opacity-35" aria-hidden="true" />
 
           {/* ======================================================== */}
-          {/* WATERMARK: House of the Knight along Bottom Base         */}
+          {/* WATERMARK: Edge-to-Edge with Left-to-Right Orange Glow  */}
           {/* ======================================================== */}
           <motion.div
             style={{
               x: watermarkX,
               y: watermarkY,
             }}
-            className="pointer-events-none absolute inset-x-0 bottom-0 pb-6 sm:pb-8 lg:pb-10 flex items-end justify-center overflow-hidden select-none will-change-transform"
+            className="pointer-events-none absolute inset-x-0 bottom-0 pb-1 sm:pb-2 lg:pb-3 flex items-end justify-center overflow-hidden select-none will-change-transform w-full"
             aria-hidden="true"
           >
-            <motion.p
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.85, ease: "easeOut" }}
-              className="w-full text-center font-display font-bold leading-none tracking-tight whitespace-nowrap text-[9.5vw] sm:text-[8.5vw] lg:text-[7.5vw] text-[#FBF8F3]/[0.055]"
-            >
-              House of the Knight
-            </motion.p>
+            <div className="relative w-full overflow-hidden flex items-center justify-center">
+              {/* Base Subtle Edge-to-Edge Watermark */}
+              <motion.p
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.85, ease: "easeOut" }}
+                className="w-full text-center font-display font-black leading-[0.88] tracking-tight whitespace-nowrap text-[13.85vw] text-[#FBF8F3]/[0.05] select-none"
+              >
+                House of the Knight
+              </motion.p>
+
+              {/* Dynamic Orange Glow Sweeping Left-to-Right */}
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{
+                  opacity: 1,
+                  backgroundPosition: ["140% 0", "-40% 0"],
+                }}
+                transition={{
+                  opacity: { duration: 0.6, delay: 0.2 },
+                  backgroundPosition: {
+                    duration: 2.2,
+                    ease: "easeInOut",
+                    repeat: Infinity,
+                    repeatDelay: 0.3,
+                  },
+                }}
+                style={{
+                  backgroundImage:
+                    "linear-gradient(90deg, transparent 0%, transparent 32%, rgba(255, 106, 0, 0.35) 42%, #ff7a00 48%, #f59e0b 52%, #fbbf24 55%, rgba(255, 106, 0, 0.35) 60%, transparent 70%, transparent 100%)",
+                  backgroundSize: "220% 100%",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  filter:
+                    "drop-shadow(0 0 20px rgba(255, 122, 0, 0.8)) drop-shadow(0 0 50px rgba(245, 158, 11, 0.5))",
+                }}
+                className="pointer-events-none absolute inset-0 w-full text-center font-display font-black leading-[0.88] tracking-tight whitespace-nowrap text-[13.85vw] select-none"
+              >
+                House of the Knight
+              </motion.p>
+            </div>
           </motion.div>
 
           {/* ======================================================== */}
-          {/* CENTERPIECE: Subtle Grey Monogram with Instant 1 Beat    */}
+          {/* CENTERPIECE: Subtle Grey Monogram (Never Disappears)    */}
           {/* ======================================================== */}
           <motion.div
             style={{
@@ -127,9 +157,7 @@ export function Intro() {
             }}
             initial={{ opacity: 0, scale: 0.92 }}
             animate={
-              isExiting
-                ? { opacity: 0, scale: 1.06, transition: { duration: 0.35 } }
-                : isBeating
+              isBeating
                 ? {
                     opacity: 1,
                     scale: [1, 1.32, 1],
