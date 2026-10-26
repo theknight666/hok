@@ -94,28 +94,28 @@ export function Intro() {
           <div className="grain pointer-events-none absolute inset-0 opacity-35" aria-hidden="true" />
 
           {/* ======================================================== */}
-          {/* WATERMARK: House of the Knight in Deep Background        */}
+          {/* WATERMARK: House of the Knight along Bottom Base         */}
           {/* ======================================================== */}
           <motion.div
             style={{
               x: watermarkX,
               y: watermarkY,
             }}
-            className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden select-none will-change-transform"
+            className="pointer-events-none absolute inset-x-0 bottom-0 pb-6 sm:pb-8 lg:pb-10 flex items-end justify-center overflow-hidden select-none will-change-transform"
             aria-hidden="true"
           >
             <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.8 }}
-              className="w-full text-center font-display font-bold leading-[0.92] tracking-tight whitespace-nowrap text-[13.6vw] sm:text-[13.7vw] lg:text-[13.8vw] text-[#FBF8F3]/[0.055]"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.85, ease: "easeOut" }}
+              className="w-full text-center font-display font-bold leading-none tracking-tight whitespace-nowrap text-[9.5vw] sm:text-[8.5vw] lg:text-[7.5vw] text-[#FBF8F3]/[0.055]"
             >
               House of the Knight
             </motion.p>
           </motion.div>
 
           {/* ======================================================== */}
-          {/* CENTERPIECE: Subtle Grey Monogram with Quick 1 Beat     */}
+          {/* CENTERPIECE: Subtle Grey Monogram with Instant 1 Beat    */}
           {/* ======================================================== */}
           <motion.div
             style={{
@@ -132,11 +132,11 @@ export function Intro() {
                 : isBeating
                 ? {
                     opacity: 1,
-                    scale: [1, 1.30, 1],
+                    scale: [1, 1.32, 1],
                     transition: {
                       scale: {
-                        duration: 1.28,
-                        times: [0, 0.05, 1],
+                        duration: 1.32,
+                        times: [0, 0.025, 1],
                         ease: ["easeOut", [0.16, 1, 0.3, 1]],
                       },
                     },
