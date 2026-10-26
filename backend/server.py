@@ -1091,8 +1091,8 @@ async def root():
 
 
 @api.get("/debug")
-async def debug_info():
-    """Diagnose connectivity issues. Remove in production."""
+async def debug_info(_: dict = Depends(require_admin)):
+    """Diagnose connectivity issues. Restricted to administrators."""
     import sys
     mongo_url = os.environ.get("MONGO_URL", "NOT_SET")
     mongo_set = mongo_url != "NOT_SET"
