@@ -46,19 +46,19 @@ export function Intro() {
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
 
-    // 1. Trigger single quick beat + after-image ghost zoom at 0.85s
+    // 1. Trigger single quick beat + after-image ghost zoom at 0.8s
     const beatTimer = setTimeout(() => {
       setIsBeating(true);
-    }, 850);
+    }, 800);
 
-    // 2. Conclude preloader smoothly after after-image dissipates (at 1.65s)
+    // 2. Conclude preloader smoothly after slow contraction and after-image settle (at 1.95s)
     const exitTimer = setTimeout(() => {
       setIsExiting(true);
       setTimeout(() => {
         setShow(false);
         document.body.style.overflow = prevOverflow;
       }, 500);
-    }, 1650);
+    }, 1950);
 
     return () => {
       clearTimeout(beatTimer);
@@ -132,12 +132,12 @@ export function Intro() {
                 : isBeating
                 ? {
                     opacity: 1,
-                    scale: [1, 1.25, 1],
+                    scale: [1, 1.28, 1],
                     transition: {
                       scale: {
-                        duration: 0.50,
-                        times: [0, 0.20, 1],
-                        ease: ["easeOut", [0.25, 1, 0.5, 1]],
+                        duration: 0.88,
+                        times: [0, 0.10, 1],
+                        ease: ["easeOut", [0.16, 1, 0.3, 1]],
                       },
                     },
                   }
@@ -168,10 +168,10 @@ export function Intro() {
                     src="/images/hok-monogram.png"
                     alt=""
                     aria-hidden="true"
-                    initial={{ scale: 1, opacity: 0.82 }}
-                    animate={{ scale: 2.35, opacity: 0 }}
+                    initial={{ scale: 1, opacity: 0.85 }}
+                    animate={{ scale: 2.45, opacity: 0 }}
                     transition={{
-                      duration: 0.65,
+                      duration: 0.82,
                       ease: [0.16, 1, 0.3, 1],
                     }}
                     style={{
@@ -187,11 +187,11 @@ export function Intro() {
                     src="/images/hok-monogram.png"
                     alt=""
                     aria-hidden="true"
-                    initial={{ scale: 1, opacity: 0.42 }}
-                    animate={{ scale: 2.9, opacity: 0 }}
+                    initial={{ scale: 1, opacity: 0.45 }}
+                    animate={{ scale: 3.1, opacity: 0 }}
                     transition={{
-                      duration: 0.78,
-                      delay: 0.03,
+                      duration: 0.95,
+                      delay: 0.04,
                       ease: [0.16, 1, 0.3, 1],
                     }}
                     style={{
