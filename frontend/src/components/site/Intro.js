@@ -115,27 +115,28 @@ export function Intro() {
             isDark ? "border-white/[0.08]" : "border-black/[0.08]"
           } flex items-center justify-center will-change-transform transform-gpu cursor-pointer`}
         >
-          {/* The First Royal Heraldic Damask & Trellis Texture with Lightening Bottom Gradient */}
+          {/* The Royal Heraldic Damask & Trellis Texture Spanning the Full Preloader with Left Corner Text Fade */}
           <svg
             className="pointer-events-none absolute inset-0 h-full w-full"
             style={{
-              maskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 30%, rgba(0,0,0,0.68) 55%, rgba(0,0,0,0.38) 78%, rgba(0,0,0,0.18) 100%)",
-              WebkitMaskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 30%, rgba(0,0,0,0.68) 55%, rgba(0,0,0,0.38) 78%, rgba(0,0,0,0.18) 100%)",
+              maskImage:
+                "radial-gradient(ellipse min(520px, 85vw) min(420px, 50vh) at 0% 100%, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.2) 35%, rgba(0,0,0,0.7) 70%, rgba(0,0,0,1) 100%)",
+              WebkitMaskImage:
+                "radial-gradient(ellipse min(520px, 85vw) min(420px, 50vh) at 0% 100%, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.2) 35%, rgba(0,0,0,0.7) 70%, rgba(0,0,0,1) 100%)",
             }}
             xmlns="http://www.w3.org/2000/svg"
             aria-hidden="true"
           >
             <defs>
-              {/* Native SVG Mask fallback for continuous gradient lightening */}
-              <linearGradient id="royalTextureFadeMaskGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#FFFFFF" stopOpacity="1" />
-                <stop offset="30%" stopColor="#FFFFFF" stopOpacity="1" />
-                <stop offset="55%" stopColor="#FFFFFF" stopOpacity="0.68" />
-                <stop offset="78%" stopColor="#FFFFFF" stopOpacity="0.38" />
-                <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0.18" />
-              </linearGradient>
+              {/* Native SVG Mask fallback fading only around the bottom-left corner */}
+              <radialGradient id="royalTextureCornerMaskGrad" cx="0" cy="1" r="0.5" fx="0" fy="1">
+                <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.05" />
+                <stop offset="35%" stopColor="#FFFFFF" stopOpacity="0.2" />
+                <stop offset="70%" stopColor="#FFFFFF" stopOpacity="0.7" />
+                <stop offset="100%" stopColor="#FFFFFF" stopOpacity="1" />
+              </radialGradient>
               <mask id="royalTextureFadeMask">
-                <rect width="100%" height="100%" fill="url(#royalTextureFadeMaskGrad)" />
+                <rect width="100%" height="100%" fill="url(#royalTextureCornerMaskGrad)" />
               </mask>
 
               <pattern
@@ -184,21 +185,23 @@ export function Intro() {
           />
 
           {/* ======================================================== */}
-          {/* WATERMARK: 3-4 Shades Shifted Stealth Typography         */}
+          {/* WATERMARK: 3-Line Stealth Typography in Left Corner      */}
           {/* ======================================================== */}
           <motion.div
             style={{
               x: watermarkX,
               y: watermarkY,
             }}
-            className="pointer-events-none absolute inset-x-0 bottom-0 pb-3 sm:pb-5 lg:pb-6 flex items-end justify-center select-none will-change-transform w-full overflow-hidden"
+            className="pointer-events-none absolute bottom-6 left-6 sm:bottom-8 sm:left-10 lg:bottom-10 lg:left-12 flex items-end justify-start select-none will-change-transform overflow-hidden"
             aria-hidden="true"
           >
             <p
-              style={{ color: isDark ? "#0A0A0A" : "#F7F7F7" }}
-              className="w-full text-center font-display font-black leading-[0.88] tracking-tight whitespace-nowrap text-[13.85vw] select-none"
+              style={{ color: isDark ? "#222222" : "#D4D4D4" }}
+              className="font-display font-black leading-[0.88] tracking-tight text-4xl sm:text-6xl lg:text-7xl select-none text-left"
             >
-              House of the Knight
+              <span className="block">House</span>
+              <span className="block">of the</span>
+              <span className="block">Knight</span>
             </p>
           </motion.div>
 
