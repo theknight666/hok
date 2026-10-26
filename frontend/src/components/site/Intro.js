@@ -73,15 +73,15 @@ export function Intro() {
           <div className="grain pointer-events-none absolute inset-0 opacity-40" aria-hidden="true" />
 
           {/* ======================================================== */}
-          {/* WATERMARK: HOUSE OF THE KNIGHT across the background     */}
+          {/* WATERMARK: House of the Knight across the background     */}
           {/* ======================================================== */}
           <div
-            className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden opacity-[0.038] select-none"
+            className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden select-none"
             aria-hidden="true"
           >
-            <span className="font-display text-[15vw] font-black uppercase tracking-[-0.04em] whitespace-nowrap text-[#FBF8F3]">
-              HOUSE OF THE KNIGHT
-            </span>
+            <p className="w-full text-center font-display font-bold leading-[0.92] tracking-tight whitespace-nowrap text-[13.6vw] sm:text-[13.7vw] lg:text-[13.8vw] text-[#FBF8F3]/[0.06]">
+              House of the Knight
+            </p>
           </div>
 
           {/* ======================================================== */}
