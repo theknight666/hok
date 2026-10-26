@@ -7,36 +7,29 @@ export function Intro() {
   // Always show preloader on every page reload per user instruction (will revert when user texts "revert")
   const [show, setShow] = useState(true);
   const [isExiting, setIsExiting] = useState(false);
+  const [isBeating, setIsBeating] = useState(false);
   const containerRef = useRef(null);
 
   // -------------------------------------------------------------
-  // DIRECTION 2: Interactive 3D Spatial Parallax
+  // Interactive 3D Spatial Parallax (Direction 2)
   // -------------------------------------------------------------
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
-  // Damped luxury spring physics (weighted, fluid, ultra-smooth)
+  // Damped luxury spring physics
   const springConfig = { damping: 26, stiffness: 110, mass: 0.6 };
   const smoothX = useSpring(mouseX, springConfig);
   const smoothY = useSpring(mouseY, springConfig);
 
-  // Layer 1: Deep Watermark Parallax (counter-shift for depth)
+  // Layer 1: Deep Watermark Parallax
   const watermarkX = useTransform(smoothX, [-0.5, 0.5], [12, -12]);
   const watermarkY = useTransform(smoothY, [-0.5, 0.5], [8, -8]);
 
-  // Layer 2: Volumetric Ambient Caustic Hue (follows light focal point)
-  const hueX = useTransform(smoothX, [-0.5, 0.5], [-38, 38]);
-  const hueY = useTransform(smoothY, [-0.5, 0.5], [-38, 38]);
-
-  // Layer 3: Foreground Logo 3D Tilt & Parallax
+  // Foreground Logo 3D Tilt & Parallax
   const logoX = useTransform(smoothX, [-0.5, 0.5], [-18, 18]);
   const logoY = useTransform(smoothY, [-0.5, 0.5], [-18, 18]);
   const logoRotateX = useTransform(smoothY, [-0.5, 0.5], [7, -7]);
   const logoRotateY = useTransform(smoothX, [-0.5, 0.5], [-7, 7]);
-
-  // Dynamic Shadow Offset counter-reacting to cursor angle
-  const shadowX = useTransform(smoothX, [-0.5, 0.5], [16, -16]);
-  const shadowY = useTransform(smoothY, [-0.5, 0.5], [16, -16]);
 
   const handleMouseMove = (e) => {
     if (!containerRef.current) return;
@@ -53,17 +46,23 @@ export function Intro() {
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
 
-    // Auto-dismiss after stately 2.0s pause
-    const timer = setTimeout(() => {
+    // 1. Trigger Heartbeat pulse at 1.0s (lub-dub)
+    const beatTimer = setTimeout(() => {
+      setIsBeating(true);
+    }, 1000);
+
+    // 2. Conclude preloader right after heartbeat finishes (at 1.7s)
+    const exitTimer = setTimeout(() => {
       setIsExiting(true);
       setTimeout(() => {
         setShow(false);
         document.body.style.overflow = prevOverflow;
       }, 500);
-    }, 2000);
+    }, 1700);
 
     return () => {
-      clearTimeout(timer);
+      clearTimeout(beatTimer);
+      clearTimeout(exitTimer);
       document.body.style.overflow = prevOverflow;
     };
   }, [show]);
@@ -81,7 +80,7 @@ export function Intro() {
       {show && (
         <motion.div
           ref={containerRef}
-          key="minimalist-luxury-preloader-v2"
+          key="minimalist-luxury-preloader-v3"
           data-testid="intro-curtain"
           initial={{ y: 0 }}
           exit={{ y: "-100%" }}
@@ -91,34 +90,11 @@ export function Intro() {
           style={{ perspective: 1200 }}
           className="fixed inset-0 z-[9999] pointer-events-auto select-none overflow-hidden bg-[#0A080D] flex items-center justify-center will-change-transform transform-gpu shadow-[0_30px_90px_rgba(0,0,0,0.95)] cursor-pointer"
         >
-          {/* ======================================================== */}
-          {/* LAYER 2: MID-GROUND VOLUMETRIC CAUSTIC AMBER HUE         */}
-          {/* ======================================================== */}
-          <motion.div
-            style={{
-              x: hueX,
-              y: hueY,
-              background:
-                "radial-gradient(circle at center, rgba(242, 169, 0, 0.34) 0%, rgba(201, 71, 27, 0.16) 45%, rgba(10,8,13,0) 74%)",
-            }}
-            initial={{ opacity: 0, scale: 0.85 }}
-            animate={{
-              opacity: isExiting ? 0 : 1,
-              scale: [0.96, 1.05, 0.96],
-            }}
-            transition={{
-              opacity: { duration: 0.7 },
-              scale: { duration: 4.2, repeat: Infinity, ease: "easeInOut" },
-            }}
-            className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[520px] w-[520px] sm:h-[760px] sm:w-[760px] rounded-full blur-[140px] will-change-transform"
-            aria-hidden="true"
-          />
-
           {/* Analog Luxury Texture Grain */}
-          <div className="grain pointer-events-none absolute inset-0 opacity-40" aria-hidden="true" />
+          <div className="grain pointer-events-none absolute inset-0 opacity-35" aria-hidden="true" />
 
           {/* ======================================================== */}
-          {/* LAYER 1: DEEP WATERMARK (House of the Knight)            */}
+          {/* WATERMARK: House of the Knight in Deep Background        */}
           {/* ======================================================== */}
           <motion.div
             style={{
@@ -131,7 +107,7 @@ export function Intro() {
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 1 }}
+              transition={{ duration: 0.8 }}
               className="w-full text-center font-display font-bold leading-[0.92] tracking-tight whitespace-nowrap text-[13.6vw] sm:text-[13.7vw] lg:text-[13.8vw] text-[#FBF8F3]/[0.055]"
             >
               House of the Knight
@@ -139,7 +115,7 @@ export function Intro() {
           </motion.div>
 
           {/* ======================================================== */}
-          {/* LAYER 3: FOREGROUND 3D TACTILE GREY MONOGRAM LOGO        */}
+          {/* CENTERPIECE: Subtle Grey Monogram with Heartbeat Beat    */}
           {/* ======================================================== */}
           <motion.div
             style={{
@@ -149,33 +125,35 @@ export function Intro() {
               rotateY: logoRotateY,
               transformStyle: "preserve-3d",
             }}
-            initial={{ opacity: 0, scale: 0.86 }}
-            animate={{
-              opacity: isExiting ? 0 : 1,
-              scale: isExiting ? 1.08 : [0.98, 1.02, 0.98],
-            }}
-            transition={{
-              opacity: { duration: 0.6 },
-              scale: { duration: 3.6, repeat: Infinity, ease: "easeInOut" },
-            }}
+            initial={{ opacity: 0, scale: 0.92 }}
+            animate={
+              isExiting
+                ? { opacity: 0, scale: 1.08 }
+                : isBeating
+                ? {
+                    opacity: 1,
+                    scale: [1, 1.14, 0.96, 1.22, 1],
+                    transition: {
+                      scale: {
+                        duration: 0.55,
+                        times: [0, 0.22, 0.45, 0.72, 1],
+                        ease: "easeInOut",
+                      },
+                    },
+                  }
+                : { opacity: 1, scale: 1 }
+            }
+            transition={{ opacity: { duration: 0.5 } }}
             className="relative z-10 flex items-center justify-center p-6 will-change-transform"
           >
-            {/* Subtle Ethereal Halo to Ensure the Grey Logo Stands Out */}
-            <motion.div
-              style={{
-                x: shadowX,
-                y: shadowY,
-              }}
-              className="pointer-events-none absolute inset-0 rounded-full bg-white/[0.08] blur-2xl -z-10"
-            />
-
             <div className="relative h-28 w-28 sm:h-36 sm:w-36 lg:h-40 lg:w-40 flex items-center justify-center transform-gpu">
               <img
                 src="/images/hok-monogram.png"
                 alt="House of the Knight"
                 style={{
                   filter:
-                    "grayscale(100%) brightness(1.22) contrast(1.08) drop-shadow(0 0 20px rgba(225, 228, 232, 0.35)) drop-shadow(0 8px 24px rgba(0, 0, 0, 0.8))",
+                    "grayscale(100%) brightness(0.68) contrast(1.05) drop-shadow(0 6px 20px rgba(0, 0, 0, 0.9))",
+                  opacity: 0.86,
                 }}
                 className="h-full w-full object-contain select-none pointer-events-none"
                 draggable={false}
