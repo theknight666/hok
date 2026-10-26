@@ -122,9 +122,6 @@ export function NotesPyramid({ notes, color, product }) {
                 <p className="mt-1 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                   {tier.sub}
                 </p>
-                <span className="inline-block mt-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80">
-                  Arranged by dominance
-                </span>
                 <p className="mt-2 text-xs text-muted-foreground/80 hidden sm:block max-w-[240px]">
                   {tier.desc}
                 </p>
@@ -236,7 +233,7 @@ export function NotesPyramid({ notes, color, product }) {
           <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
             <div>
               <p className="font-display text-lg sm:text-xl">Main Accords & Structure</p>
-              <p className="text-xs text-muted-foreground">Signature olfactory fingerprint · Arranged by dominance</p>
+              <p className="text-xs text-muted-foreground">Signature olfactory fingerprint</p>
             </div>
             <button
               onClick={() => setActiveTab("architecture")}

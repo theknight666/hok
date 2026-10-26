@@ -9,7 +9,7 @@ export const FALLBACK_PRODUCTS = [
     color: "#D4A24C",
     badge: "The Signature",
     tagline: "Liquid gold, warm resins and a whisper of smoke.",
-    story: "A radiant amber that glows like candlelight on gilded walls — warm, golden and unmistakably regal.",
+    story: "A radiant amber that glows like candlelight on gilded walls — warm, golden and unmistakably regal. Conceived as a celebration of sovereign decadence, it weaves precious golden resins, smoky blonde tobacco and vintage rum into a captivating trail of timeless grandeur.",
     concentration: "Eau de Parfum",
     volume: "50 ml",
     price: 1599,
@@ -48,7 +48,7 @@ export const FALLBACK_PRODUCTS = [
     color: "#1E2F5C",
     badge: "The Noble",
     tagline: "Crisp bergamot, lavender and warm woods.",
-    story: "Composed with the poise of a knight in court — fresh at first, then deep, warm and assured.",
+    story: "Composed with the poise of a knight in royal court — fresh and invigorating at first, then deep, warm and commanding. An aristocratic harmony of wild French lavender, tart green apple and precious woods designed for those who lead with quiet authority.",
     concentration: "Eau de Parfum",
     volume: "50 ml",
     price: 1499,
@@ -86,7 +86,7 @@ export const FALLBACK_PRODUCTS = [
     color: "#8A4B1F",
     badge: "The Reserve",
     tagline: "Cognac, cinnamon and oak — served over ice.",
-    story: "An ode to the spirit lost to the heavens as cognac ages in oak, poured cold over crystal ice.",
+    story: "An ode to the sacred spirit lost to the heavens as cognac ages in French oak, poured cold over crystal ice. Rich with spicy cinnamon, roasted praline and aged eau-de-vie, it captures the hedonistic warmth of late-night indulgence in an opulent salon.",
     concentration: "Eau de Parfum",
     volume: "50 ml",
     price: 1549,
@@ -124,7 +124,7 @@ export const FALLBACK_PRODUCTS = [
     color: "#5A1420",
     badge: "The Enigma",
     tagline: "Tobacco, rum and dark leather after midnight.",
-    story: "A dark, addictive trail of tobacco and rum that lingers long after you have left the room.",
+    story: "A dark, intoxicating trail of cured tobacco and vintage Jamaican rum that lingers long after you have left the room. Ignited by crimson saffron and wrapped in dark saddle leather, it is an enigmatic elixir of unrestrained passion and midnight temptation.",
     concentration: "Eau de Parfum",
     volume: "50 ml",
     price: 1499,
@@ -157,7 +157,7 @@ export const FALLBACK_PRODUCTS = [
   },
 ];
 
-const CACHE_KEY = "hotk_catalog_cache_v5";
+const CACHE_KEY = "hotk_catalog_cache_v6";
 
 export function getCachedCatalog() {
   if (typeof window === "undefined") return FALLBACK_PRODUCTS;
