@@ -119,17 +119,17 @@ export function Intro() {
                 House of the Knight
               </p>
 
-              {/* Continuous GPU-Composited Living Amber Glow (Only Alphabets, Zero Pipe) */}
+              {/* Continuous GPU-Composited Living Amber Glow (Even More Subtle, Zero Pipe) */}
               <p
                 className="pointer-events-none absolute inset-0 w-full text-center font-display font-black leading-[0.88] tracking-tight whitespace-nowrap text-[13.85vw] select-none"
                 style={{
                   background:
-                    "linear-gradient(90deg, transparent 0%, transparent 34%, rgba(245, 158, 11, 0.12) 42%, rgba(255, 145, 30, 0.38) 48%, rgba(255, 185, 70, 0.55) 50%, rgba(255, 145, 30, 0.38) 52%, rgba(245, 158, 11, 0.12) 58%, transparent 66%, transparent 100%)",
+                    "linear-gradient(90deg, transparent 0%, transparent 34%, rgba(245, 158, 11, 0.05) 42%, rgba(255, 150, 40, 0.16) 48%, rgba(255, 190, 85, 0.26) 50%, rgba(255, 150, 40, 0.16) 52%, rgba(245, 158, 11, 0.05) 58%, transparent 66%, transparent 100%)",
                   backgroundSize: "260% 100%",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                   animation:
-                    "watermarkLivingGlow 3.4s cubic-bezier(0.35, 0, 0.25, 1) infinite",
+                    "watermarkLivingGlow 3.6s cubic-bezier(0.35, 0, 0.25, 1) infinite",
                 }}
               >
                 House of the Knight
@@ -138,7 +138,7 @@ export function Intro() {
           </motion.div>
 
           {/* ======================================================== */}
-          {/* CENTERPIECE: Subtle Grey Monogram (Never Disappears)    */}
+          {/* CENTERPIECE: Subtle Grey Monogram (Raised Optical Center)*/}
           {/* ======================================================== */}
           <motion.div
             style={{
@@ -165,7 +165,7 @@ export function Intro() {
                 : { opacity: 1, scale: 1 }
             }
             transition={{ opacity: { duration: 0.5 } }}
-            className="relative z-10 flex items-center justify-center p-6 will-change-transform"
+            className="relative z-10 flex items-center justify-center p-6 will-change-transform -translate-y-8 sm:-translate-y-12 lg:-translate-y-14"
           >
             <div className="relative h-28 w-28 sm:h-36 sm:w-36 lg:h-40 lg:w-40 flex items-center justify-center transform-gpu">
               {/* Primary Grey Monogram Logo */}
