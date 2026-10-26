@@ -2,20 +2,56 @@ import { useEffect, useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const CREATIONS = [
-  { roman: "I", name: "Blonde Amber", note: "Molten Amber · Blonde Tobacco · Aged Rum" },
-  { roman: "II", name: "Layton", note: "Aristocratic Lavender · Crisp Apple · Noble Woods" },
-  { roman: "III", name: "Angels Share", note: "Cognac Over Ice · Roasted Praline · French Oak" },
-  { roman: "IV", name: "Side Effect", note: "Cured Tobacco · Crimson Saffron · Dark Leather" },
+  {
+    num: "01",
+    roman: "I",
+    name: "Blonde Amber",
+    tagline: "The Sovereign Amber",
+    notes: "Molten Amber · Blonde Tobacco · Aged Rum",
+    image: "/images/cut-blonde-amber.png",
+    glow: "rgba(242, 169, 0, 0.32)",
+    accent: "#F2A900",
+  },
+  {
+    num: "02",
+    roman: "II",
+    name: "Layton",
+    tagline: "The Aristocratic Wood",
+    notes: "Crisp Green Apple · French Lavender · Noble Woods",
+    image: "/images/cut-layton.png",
+    glow: "rgba(35, 56, 219, 0.32)",
+    accent: "#768BFF",
+  },
+  {
+    num: "03",
+    roman: "III",
+    name: "Angels Share",
+    tagline: "The Heavenly Reserve",
+    notes: "French Oak-Aged Cognac · Roasted Praline · Cinnamon Ice",
+    image: "/images/cut-angels-share.png",
+    glow: "rgba(201, 71, 27, 0.36)",
+    accent: "#FFA06A",
+  },
+  {
+    num: "04",
+    roman: "IV",
+    name: "Side Effect",
+    tagline: "The Midnight Enigma",
+    notes: "Cured Tobacco Leaf · Crimson Saffron · Dark Leather",
+    image: "/images/cut-side-effect.png",
+    glow: "rgba(180, 20, 80, 0.36)",
+    accent: "#E24F88",
+  },
 ];
 
-const CURTAIN_EASE = [0.77, 0, 0.175, 1];
+const LUXURY_EASE = [0.83, 0, 0.17, 1];
 
 export function Intro() {
   const [show, setShow] = useState(() => {
     if (typeof window === "undefined") return false;
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has("intro") || urlParams.has("preloader")) return true;
-    return !sessionStorage.getItem("hotk_intro_v4");
+    return !sessionStorage.getItem("hotk_intro_v5");
   });
 
   const [progress, setProgress] = useState(0);
@@ -26,10 +62,10 @@ export function Intro() {
 
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    sessionStorage.setItem("hotk_intro_v4", "1");
+    sessionStorage.setItem("hotk_intro_v5", "1");
 
     const startTime = performance.now();
-    const duration = 2000; // 2.0s elegant progression
+    const duration = 2100; // 2.1s stately cinematic reveal
 
     let frameId;
     const updateProgress = (currentTime) => {
@@ -37,7 +73,7 @@ export function Intro() {
       const t = Math.min(1, elapsed / duration);
 
       // Smooth luxury deceleration curve
-      const easedT = t < 0.6 ? 1.35 * Math.pow(t, 1.15) : 1 - Math.pow(1 - t, 2.8);
+      const easedT = t < 0.6 ? 1.32 * Math.pow(t, 1.15) : 1 - Math.pow(1 - t, 2.7);
       const currentVal = Math.min(100, Math.round(easedT * 100));
 
       setProgress(currentVal);
@@ -50,7 +86,7 @@ export function Intro() {
         setTimeout(() => {
           setShow(false);
           document.body.style.overflow = prevOverflow;
-        }, 500);
+        }, 550);
       }
     };
 
@@ -62,7 +98,7 @@ export function Intro() {
     };
   }, [show]);
 
-  // Determine active creation stage based on progress
+  // Active fragrance creation based on progress
   const currentCreation = useMemo(() => {
     if (progress < 25) return CREATIONS[0];
     if (progress < 50) return CREATIONS[1];
@@ -75,148 +111,251 @@ export function Intro() {
     setTimeout(() => {
       document.body.style.overflow = "";
       setShow(false);
-    }, 200);
+    }, 220);
   };
 
   return (
     <AnimatePresence mode="wait">
       {show && (
         <motion.div
-          key="preloader-curtain"
+          key="ultra-premium-preloader"
           data-testid="intro-curtain"
           initial={{ y: 0 }}
           exit={{ y: "-100%" }}
-          transition={{ duration: 0.9, ease: CURTAIN_EASE }}
-          className="fixed inset-0 z-[9999] pointer-events-auto select-none overflow-hidden bg-[#110E13] text-[#FBF8F3] will-change-transform transform-gpu shadow-[0_25px_60px_rgba(0,0,0,0.8)]"
+          transition={{ duration: 0.95, ease: LUXURY_EASE }}
+          className="fixed inset-0 z-[9999] pointer-events-auto select-none overflow-hidden bg-[#0A080D] text-[#FBF8F3] will-change-transform transform-gpu shadow-[0_30px_90px_rgba(0,0,0,0.95)]"
         >
-          {/* Subtle Warm Amber Paper Atmosphere */}
-          <div
-            className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(212,162,76,0.14)_0%,rgba(17,14,19,0.98)_72%)]"
+          {/* ======================================================== */}
+          {/* ARCHITECTURAL BACKGROUND: Caustic Aura, Watermark & Grain */}
+          {/* ======================================================== */}
+          {/* Dynamic Volumetric Caustic Bloom */}
+          <motion.div
+            key={currentCreation.name}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.7 }}
+            className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[550px] w-[550px] sm:h-[750px] sm:w-[750px] rounded-full blur-[140px]"
+            style={{
+              background: `radial-gradient(circle, ${currentCreation.glow} 0%, rgba(10,8,13,0) 70%)`,
+            }}
             aria-hidden="true"
           />
 
-          {/* Golden Ambient Vignette Glow */}
+          {/* Monumental Watermark Typography across Stage */}
           <div
-            className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[380px] w-[380px] sm:h-[540px] sm:w-[540px] rounded-full bg-gradient-to-b from-[#D4A24C]/18 via-[#F2A900]/08 to-transparent blur-[120px]"
+            className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden opacity-[0.032] select-none"
             aria-hidden="true"
-          />
+          >
+            <span className="font-display text-[15vw] font-black uppercase tracking-[-0.04em] whitespace-nowrap text-[#FBF8F3]">
+              HOUSE OF THE KNIGHT
+            </span>
+          </div>
 
-          {/* Micro-grain texture */}
-          <div className="grain pointer-events-none absolute inset-0 opacity-40" aria-hidden="true" />
+          {/* Analog Texture Grain */}
+          <div className="grain pointer-events-none absolute inset-0 opacity-45" aria-hidden="true" />
 
-          {/* Bottom Golden Hairline Seam */}
-          <div className="absolute inset-x-0 bottom-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#D4A24C]/60 to-transparent shadow-[0_0_12px_rgba(212,162,76,0.5)]" />
+          {/* Gilded Top & Bottom Frame Hairlines */}
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-[#D4A24C]/40 to-transparent" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#D4A24C]/70 to-transparent shadow-[0_0_16px_rgba(212,162,76,0.5)]" />
 
-          {/* Main Layout Container */}
+          {/* ======================================================== */}
+          {/* MAIN CHOREOGRAPHED STAGE CONTENT                         */}
+          {/* ======================================================== */}
           <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: isExiting ? 0 : 1, y: isExiting ? -20 : 0 }}
-            transition={{ duration: 0.5, ease: CURTAIN_EASE }}
-            className="relative z-20 flex h-full w-full flex-col items-center justify-between px-6 py-10 sm:px-12 sm:py-14"
+            animate={{ opacity: isExiting ? 0 : 1, y: isExiting ? -24 : 0 }}
+            transition={{ duration: 0.5, ease: LUXURY_EASE }}
+            className="relative z-20 flex h-full w-full flex-col items-center justify-between px-5 py-8 sm:px-12 sm:py-12"
           >
             {/* TOP BAR: Heritage & Provenance */}
-            <header className="flex w-full items-center justify-between text-[0.62rem] sm:text-[0.68rem] uppercase tracking-[0.32em] text-[#D4A24C]/80 font-mono">
+            <header className="flex w-full items-center justify-between text-[0.6rem] sm:text-[0.66rem] uppercase tracking-[0.34em] text-[#D4A24C]/85 font-mono">
               <span className="flex items-center gap-2">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#D4A24C] shadow-[0_0_8px_#D4A24C]" />
+                <span className="h-1.5 w-1.5 rotate-45 bg-[#D4A24C] shadow-[0_0_8px_#D4A24C]" />
                 Maison de Haute Parfumerie
               </span>
-              <span className="hidden sm:inline-block text-[#EFE8DC]/50">
-                New Delhi · Grasse · Paris
+
+              <span className="hidden md:inline-flex items-center gap-2 text-[#EFE8DC]/60 tracking-[0.3em]">
+                <span>Paris</span>
+                <span className="opacity-40">·</span>
+                <span>Grasse</span>
+                <span className="opacity-40">·</span>
+                <span>New Delhi</span>
               </span>
-              <span>MMXXVI</span>
+
+              <span className="flex items-center gap-1.5 font-mono">
+                <span className="text-[#EFE8DC]/50">EST.</span> MMXXVI
+              </span>
             </header>
 
-            {/* CENTER STAGE: Emblem & House Crest */}
-            <main className="flex flex-col items-center text-center my-auto max-w-xl">
-              {/* Crest Medallion with Subtle Halo */}
-              <div className="relative mb-7 flex items-center justify-center">
-                {/* Delicate Gold Border Medallion */}
-                <div className="relative h-24 w-24 sm:h-28 sm:w-28 rounded-full border border-[#D4A24C]/35 bg-gradient-to-b from-[#1C1821] to-[#110E13] p-5 shadow-[0_8px_32px_rgba(0,0,0,0.6)] flex items-center justify-center">
-                  <motion.img
-                    src="/images/hok-monogram.png"
-                    alt="House of the Knight Monogram"
-                    initial={{ scale: 0.88, opacity: 0 }}
-                    animate={{ scale: [0.96, 1.02, 0.98], opacity: 1 }}
-                    transition={{
-                      scale: { duration: 3.2, repeat: Infinity, ease: "easeInOut" },
-                      opacity: { duration: 0.7 },
-                    }}
-                    className="h-full w-full object-contain filter drop-shadow-[0_0_16px_rgba(212,162,76,0.45)]"
-                  />
-                  {/* Outer Hairline Halo */}
-                  <div className="pointer-events-none absolute -inset-2.5 rounded-full border border-[#D4A24C]/15" />
-                </div>
-              </div>
-
-              {/* Sculpted Editorial Typography */}
+            {/* ======================================================== */}
+            {/* CENTERPIECE: Grand Flacon, Crest & Monumental Typography */}
+            {/* ======================================================== */}
+            <main className="flex flex-col items-center text-center my-auto w-full max-w-2xl">
+              {/* Heraldic Gold Monogram Seal */}
               <motion.div
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2, duration: 0.8, ease: CURTAIN_EASE }}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.8, ease: LUXURY_EASE }}
+                className="relative mb-3 flex items-center justify-center"
               >
-                <p className="text-[0.58rem] sm:text-[0.66rem] font-mono uppercase tracking-[0.42em] text-[#D4A24C] mb-2.5">
+                <div className="relative h-14 w-14 sm:h-16 sm:w-16 rounded-full border border-[#D4A24C]/40 bg-gradient-to-b from-[#1C1724] to-[#0D0A11] p-3 shadow-[0_4px_24px_rgba(0,0,0,0.8)] flex items-center justify-center">
+                  <img
+                    src="/images/hok-monogram.png"
+                    alt="House of the Knight Crest"
+                    className="h-full w-full object-contain filter drop-shadow-[0_0_12px_rgba(212,162,76,0.5)]"
+                  />
+                  {/* Subtle Concentric Halo */}
+                  <div className="pointer-events-none absolute -inset-2 rounded-full border border-[#D4A24C]/15" />
+                </div>
+              </motion.div>
+
+              {/* Monumental Editorial Brand Name */}
+              <motion.div
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.15, duration: 0.85, ease: LUXURY_EASE }}
+                className="mb-1"
+              >
+                <p className="text-[0.58rem] sm:text-[0.66rem] font-mono uppercase tracking-[0.42em] text-[#D4A24C] mb-1.5">
                   The Private Collection
                 </p>
-                <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl tracking-tight uppercase text-[#FBF8F3]">
+                <h1 className="font-display text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-[-0.02em] uppercase leading-none text-[#FBF8F3]">
                   House of the{" "}
-                  <span className="font-display-italic text-transparent bg-clip-text bg-gradient-to-r from-[#D4A24C] via-[#FFE4A0] to-[#C59B3F] drop-shadow-[0_2px_14px_rgba(212,162,76,0.35)]">
+                  <span className="font-display-italic font-normal text-transparent bg-clip-text bg-gradient-to-r from-[#F7D58C] via-[#FFF3D2] to-[#C99638] drop-shadow-[0_2px_18px_rgba(212,162,76,0.45)]">
                     Knight
                   </span>
                 </h1>
               </motion.div>
 
-              {/* Dynamic Creation Reveal */}
-              <div className="h-14 mt-5 flex flex-col items-center justify-center overflow-hidden">
+              {/* CENTER STAGE HERO: Floating Crystal Flacon */}
+              <div className="relative my-2 sm:my-4 flex items-center justify-center h-44 sm:h-56 lg:h-64 w-full">
+                {/* Backlight halo behind flacon */}
+                <div
+                  className="pointer-events-none absolute h-36 w-36 sm:h-48 sm:w-48 rounded-full blur-[60px]"
+                  style={{ background: currentCreation.glow }}
+                />
+
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={currentCreation.name}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.4 }}
-                    className="flex flex-col items-center"
+                    initial={{ opacity: 0, scale: 0.88, y: 16 }}
+                    animate={{
+                      opacity: 1,
+                      scale: 1,
+                      y: [0, -7, 0],
+                    }}
+                    exit={{ opacity: 0, scale: 0.94, y: -16 }}
+                    transition={{
+                      opacity: { duration: 0.45 },
+                      scale: { duration: 0.45 },
+                      y: {
+                        duration: 3.2,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                      },
+                    }}
+                    className="relative z-10 flex flex-col items-center justify-center h-full"
                   >
-                    <span className="text-xs sm:text-sm font-medium tracking-[0.18em] text-[#F6EFE4] uppercase">
-                      Extract {currentCreation.roman} — {currentCreation.name}
-                    </span>
-                    <span className="text-[0.62rem] sm:text-[0.7rem] tracking-[0.24em] text-[#D4A24C]/80 uppercase mt-1">
-                      {currentCreation.note}
-                    </span>
+                    <img
+                      src={currentCreation.image}
+                      alt={currentCreation.name}
+                      className="h-full w-auto max-h-[180px] sm:max-h-[225px] lg:max-h-[260px] object-contain drop-shadow-[0_18px_35px_rgba(0,0,0,0.85)] filter contrast-[1.04]"
+                      draggable={false}
+                    />
+                    {/* Floor Reflection / Shadow */}
+                    <div className="mt-1 h-3 w-28 sm:w-36 rounded-full bg-black/60 blur-md" />
                   </motion.div>
                 </AnimatePresence>
               </div>
+
+              {/* Dynamic Extract Details */}
+              <div className="h-14 flex flex-col items-center justify-center overflow-hidden">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={currentCreation.name}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.35 }}
+                    className="flex flex-col items-center"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="h-1.5 w-1.5 rotate-45 bg-[#D4A24C]" />
+                      <span className="font-display text-sm sm:text-base font-semibold tracking-[0.16em] uppercase text-[#FBF8F3]">
+                        Extract {currentCreation.roman} — {currentCreation.name}
+                      </span>
+                      <span className="h-1.5 w-1.5 rotate-45 bg-[#D4A24C]" />
+                    </div>
+                    <p className="mt-1 font-mono text-[0.62rem] sm:text-[0.7rem] uppercase tracking-[0.24em] text-[#D4A24C]/90">
+                      {currentCreation.notes}
+                    </p>
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+
+              {/* 4 Sovereign Extracts Horizontal Indicator Ribbon */}
+              <div className="mt-3 hidden sm:flex items-center justify-center gap-1.5 p-1 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-md">
+                {CREATIONS.map((c) => {
+                  const isActive = c.name === currentCreation.name;
+                  return (
+                    <div
+                      key={c.num}
+                      className={`px-3 py-1 rounded-full text-[0.58rem] font-mono uppercase tracking-[0.18em] transition-all duration-300 flex items-center gap-1.5 ${
+                        isActive
+                          ? "bg-gradient-to-r from-[#D4A24C]/30 to-[#F2A900]/20 text-[#FFE5A3] border border-[#D4A24C]/50 shadow-[0_0_12px_rgba(212,162,76,0.3)]"
+                          : "text-[#EFE8DC]/40"
+                      }`}
+                    >
+                      <span className="opacity-60">{c.num}</span>
+                      <span>{c.name}</span>
+                    </div>
+                  );
+                })}
+              </div>
             </main>
 
-            {/* BOTTOM STAGE: Precision Progress & Skip */}
-            <footer className="w-full max-w-lg flex flex-col items-center">
-              {/* Ultra-Fine Gold Progress Line */}
-              <div className="relative w-full h-[2px] rounded-full bg-white/10 overflow-hidden">
+            {/* ======================================================== */}
+            {/* BOTTOM STAGE: Precision Chronometer & Velvet Bar         */}
+            {/* ======================================================== */}
+            <footer className="w-full max-w-xl flex flex-col items-center">
+              {/* Precision Dual-Track Progress Bar with Jewel Glider */}
+              <div className="relative w-full h-[3px] rounded-full bg-white/10 overflow-hidden shadow-inner">
                 <motion.div
-                  className="h-full bg-gradient-to-r from-[#D4A24C] via-[#FFE5A3] to-[#F2A900] rounded-full shadow-[0_0_10px_rgba(242,169,0,0.6)]"
+                  className="h-full bg-gradient-to-r from-[#D4A24C] via-[#FFE299] to-[#F2A900] rounded-full shadow-[0_0_14px_rgba(242,169,0,0.8)]"
                   style={{ width: `${progress}%` }}
                   transition={{ ease: "linear" }}
                 />
               </div>
 
-              {/* Sub-bar Details: Concentration, Progress Counter, Skip Action */}
-              <div className="mt-4 w-full flex items-center justify-between text-xs text-[#EFE8DC]/70 font-mono">
-                <span className="text-[0.6rem] sm:text-[0.64rem] tracking-[0.24em] uppercase opacity-75">
-                  EDP · 50 ML
-                </span>
-
-                <div className="flex items-baseline gap-1 text-[#D4A24C]">
-                  <span className="text-base sm:text-lg font-light tracking-widest font-mono">
-                    {progress < 10 ? `0${progress}` : progress}
+              {/* Sub-bar Details: Specification, Oversized Percentage, Skip */}
+              <div className="mt-4 w-full flex items-center justify-between text-[#EFE8DC]/70 font-mono text-xs">
+                <div className="flex flex-col items-start text-left">
+                  <span className="text-[0.62rem] sm:text-[0.66rem] uppercase tracking-[0.22em] text-[#D4A24C]">
+                    Eau de Parfum
                   </span>
-                  <span className="text-[0.65rem] opacity-70">%</span>
+                  <span className="text-[0.56rem] tracking-[0.18em] uppercase text-[#EFE8DC]/50">
+                    50 ml · Hand-Decanted
+                  </span>
                 </div>
 
+                {/* Haute-Horlogerie Numerical Counter */}
+                <div className="flex items-baseline gap-1 text-[#F7D58C] drop-shadow-[0_0_12px_rgba(212,162,76,0.4)]">
+                  <span className="font-display text-2xl sm:text-3xl font-light tracking-widest font-mono">
+                    {progress < 10 ? `0${progress}` : progress}
+                  </span>
+                  <span className="text-[0.7rem] font-mono text-[#D4A24C]">%</span>
+                </div>
+
+                {/* Ultra-Luxury Skip Button */}
                 <button
                   type="button"
                   onClick={handleSkip}
-                  className="text-[0.62rem] sm:text-[0.66rem] uppercase tracking-[0.22em] text-[#D4A24C] hover:text-[#FFE5A3] transition-colors hover:underline cursor-pointer flex items-center gap-1"
+                  className="group relative px-4 py-1.5 rounded-full border border-[#D4A24C]/40 bg-[#16121B]/80 hover:bg-[#D4A24C] text-[#D4A24C] hover:text-[#0A080D] transition-all duration-300 font-mono text-[0.62rem] uppercase tracking-[0.22em] cursor-pointer flex items-center gap-1.5 shadow-[0_2px_12px_rgba(0,0,0,0.5)]"
                 >
-                  Enter House <span aria-hidden="true">→</span>
+                  <span>Enter House</span>
+                  <span className="transition-transform duration-300 group-hover:translate-x-0.5" aria-hidden="true">
+                    →
+                  </span>
                 </button>
               </div>
             </footer>
