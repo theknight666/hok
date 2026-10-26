@@ -46,19 +46,19 @@ export function Intro() {
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
 
-    // 1. Trigger single quick beat + ghost image zoom at 0.85s
+    // 1. Trigger single quick beat + after-image ghost zoom at 0.85s
     const beatTimer = setTimeout(() => {
       setIsBeating(true);
     }, 850);
 
-    // 2. Conclude preloader smoothly right after ghost zoom dissipates (at 1.55s)
+    // 2. Conclude preloader smoothly after after-image dissipates (at 1.65s)
     const exitTimer = setTimeout(() => {
       setIsExiting(true);
       setTimeout(() => {
         setShow(false);
         document.body.style.overflow = prevOverflow;
       }, 500);
-    }, 1550);
+    }, 1650);
 
     return () => {
       clearTimeout(beatTimer);
@@ -132,12 +132,12 @@ export function Intro() {
                 : isBeating
                 ? {
                     opacity: 1,
-                    scale: [1, 1.22, 1],
+                    scale: [1, 1.25, 1],
                     transition: {
                       scale: {
-                        duration: 0.32,
-                        times: [0, 0.4, 1],
-                        ease: [0.22, 1, 0.36, 1],
+                        duration: 0.50,
+                        times: [0, 0.20, 1],
+                        ease: ["easeOut", [0.25, 1, 0.5, 1]],
                       },
                     },
                   }
@@ -160,18 +160,18 @@ export function Intro() {
                 draggable={false}
               />
 
-              {/* Ghost Image Zooming Outward at the Quick 1 Beat */}
+              {/* Ghost After-Image Zooming Outward at the Fast Beat Expansion */}
               {isBeating && (
                 <>
-                  {/* Primary Ghost Zoom Echo */}
+                  {/* Primary Ghost After-Image Zoom Echo */}
                   <motion.img
                     src="/images/hok-monogram.png"
                     alt=""
                     aria-hidden="true"
-                    initial={{ scale: 1, opacity: 0.75 }}
-                    animate={{ scale: 2.1, opacity: 0 }}
+                    initial={{ scale: 1, opacity: 0.82 }}
+                    animate={{ scale: 2.35, opacity: 0 }}
                     transition={{
-                      duration: 0.55,
+                      duration: 0.65,
                       ease: [0.16, 1, 0.3, 1],
                     }}
                     style={{
@@ -182,16 +182,16 @@ export function Intro() {
                     draggable={false}
                   />
 
-                  {/* Secondary Subtle Ghost Ripple */}
+                  {/* Secondary Subtle After-Image Ripple */}
                   <motion.img
                     src="/images/hok-monogram.png"
                     alt=""
                     aria-hidden="true"
-                    initial={{ scale: 1, opacity: 0.38 }}
-                    animate={{ scale: 2.6, opacity: 0 }}
+                    initial={{ scale: 1, opacity: 0.42 }}
+                    animate={{ scale: 2.9, opacity: 0 }}
                     transition={{
-                      duration: 0.68,
-                      delay: 0.04,
+                      duration: 0.78,
+                      delay: 0.03,
                       ease: [0.16, 1, 0.3, 1],
                     }}
                     style={{
