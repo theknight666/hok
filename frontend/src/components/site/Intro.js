@@ -46,19 +46,19 @@ export function Intro() {
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
 
-    // 1. Trigger Heartbeat pulse at 1.0s (lub-dub)
+    // 1. Trigger single quick beat + ghost image zoom at 0.85s
     const beatTimer = setTimeout(() => {
       setIsBeating(true);
-    }, 1000);
+    }, 850);
 
-    // 2. Conclude preloader right after heartbeat finishes (at 1.7s)
+    // 2. Conclude preloader smoothly right after ghost zoom dissipates (at 1.55s)
     const exitTimer = setTimeout(() => {
       setIsExiting(true);
       setTimeout(() => {
         setShow(false);
         document.body.style.overflow = prevOverflow;
       }, 500);
-    }, 1700);
+    }, 1550);
 
     return () => {
       clearTimeout(beatTimer);
@@ -115,7 +115,7 @@ export function Intro() {
           </motion.div>
 
           {/* ======================================================== */}
-          {/* CENTERPIECE: Subtle Grey Monogram with Heartbeat Beat    */}
+          {/* CENTERPIECE: Subtle Grey Monogram with Quick 1 Beat     */}
           {/* ======================================================== */}
           <motion.div
             style={{
@@ -128,16 +128,16 @@ export function Intro() {
             initial={{ opacity: 0, scale: 0.92 }}
             animate={
               isExiting
-                ? { opacity: 0, scale: 1.08 }
+                ? { opacity: 0, scale: 1.06, transition: { duration: 0.35 } }
                 : isBeating
                 ? {
                     opacity: 1,
-                    scale: [1, 1.14, 0.96, 1.22, 1],
+                    scale: [1, 1.22, 1],
                     transition: {
                       scale: {
-                        duration: 0.55,
-                        times: [0, 0.22, 0.45, 0.72, 1],
-                        ease: "easeInOut",
+                        duration: 0.32,
+                        times: [0, 0.4, 1],
+                        ease: [0.22, 1, 0.36, 1],
                       },
                     },
                   }
@@ -147,6 +147,7 @@ export function Intro() {
             className="relative z-10 flex items-center justify-center p-6 will-change-transform"
           >
             <div className="relative h-28 w-28 sm:h-36 sm:w-36 lg:h-40 lg:w-40 flex items-center justify-center transform-gpu">
+              {/* Primary Grey Monogram Logo */}
               <img
                 src="/images/hok-monogram.png"
                 alt="House of the Knight"
@@ -155,9 +156,53 @@ export function Intro() {
                     "grayscale(100%) brightness(0.68) contrast(1.05) drop-shadow(0 6px 20px rgba(0, 0, 0, 0.9))",
                   opacity: 0.86,
                 }}
-                className="h-full w-full object-contain select-none pointer-events-none"
+                className="relative z-10 h-full w-full object-contain select-none pointer-events-none"
                 draggable={false}
               />
+
+              {/* Ghost Image Zooming Outward at the Quick 1 Beat */}
+              {isBeating && (
+                <>
+                  {/* Primary Ghost Zoom Echo */}
+                  <motion.img
+                    src="/images/hok-monogram.png"
+                    alt=""
+                    aria-hidden="true"
+                    initial={{ scale: 1, opacity: 0.75 }}
+                    animate={{ scale: 2.1, opacity: 0 }}
+                    transition={{
+                      duration: 0.55,
+                      ease: [0.16, 1, 0.3, 1],
+                    }}
+                    style={{
+                      filter: "grayscale(100%) brightness(0.72) contrast(1.05)",
+                      pointerEvents: "none",
+                    }}
+                    className="absolute inset-0 z-0 h-full w-full object-contain select-none pointer-events-none transform-gpu origin-center"
+                    draggable={false}
+                  />
+
+                  {/* Secondary Subtle Ghost Ripple */}
+                  <motion.img
+                    src="/images/hok-monogram.png"
+                    alt=""
+                    aria-hidden="true"
+                    initial={{ scale: 1, opacity: 0.38 }}
+                    animate={{ scale: 2.6, opacity: 0 }}
+                    transition={{
+                      duration: 0.68,
+                      delay: 0.04,
+                      ease: [0.16, 1, 0.3, 1],
+                    }}
+                    style={{
+                      filter: "grayscale(100%) brightness(0.65) contrast(1.05)",
+                      pointerEvents: "none",
+                    }}
+                    className="absolute inset-0 z-0 h-full w-full object-contain select-none pointer-events-none transform-gpu origin-center"
+                    draggable={false}
+                  />
+                </>
+              )}
             </div>
           </motion.div>
         </motion.div>
