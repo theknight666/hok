@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { toast } from "sonner";
+import { ChevronLeft, ChevronRight, X, Plus, Search, Sparkles } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { api, formatErr } from "@/lib/api";
 import { BottleUpload } from "./BottleUpload";
 import { getCachedCatalog, setCachedCatalog } from "@/hooks/useProducts";
+import { getNoteImage, KNOWN_NOTES } from "@/lib/visual";
 
 const TEXT = [
   ["name", "Name"],
@@ -40,53 +42,321 @@ const parseAccords = (str) => {
   }).filter((x) => Boolean(x.name));
 };
 
+const TIERS_CONFIG = [
+  { key: "top", title: "Top Notes", subtitle: "The opening · first 15 minutes · volatile aromatics & effervescence" },
+  { key: "heart", title: "Heart Notes", subtitle: "The character · 15 mins to 4 hours · soul of the fragrance" },
+  { key: "base", title: "Base Notes", subtitle: "The legacy & drydown · 4 to 12+ hours · deep woods, resins & absolutes" },
+];
+
+function NoteTierBuilder({ tierKey, title, subtitle, notesList, onNotesChange, rawString, onRawChange }) {
+  const [isPickerOpen, setIsPickerOpen] = useState(false);
+  const [showRaw, setShowRaw] = useState(false);
+  const [search, setSearch] = useState("");
+  const [customNote, setCustomNote] = useState("");
+
+  const move = (idx, delta) => {
+    const target = idx + delta;
+    if (target < 0 || target >= notesList.length) return;
+    const next = [...notesList];
+    const [moved] = next.splice(idx, 1);
+    next.splice(target, 0, moved);
+    onNotesChange(next);
+  };
+
+  const remove = (idx) => {
+    onNotesChange(notesList.filter((_, i) => i !== idx));
+  };
+
+  const add = (noteName) => {
+    const trimmed = (noteName || "").trim();
+    if (!trimmed) return;
+    if (notesList.some((n) => n.toLowerCase() === trimmed.toLowerCase())) {
+      toast.info(`"${trimmed}" is already added to ${title}`);
+      return;
+    }
+    onNotesChange([...notesList, trimmed]);
+  };
+
+  const handleCustomAdd = (e) => {
+    e.preventDefault();
+    if (!customNote.trim()) return;
+    add(customNote);
+    setCustomNote("");
+  };
+
+  const availableNotes = KNOWN_NOTES.filter(
+    (n) =>
+      !notesList.some((existing) => existing.toLowerCase() === n.name.toLowerCase()) &&
+      n.name.toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <div className="sm:col-span-2 rounded-2xl border border-border/80 bg-card/60 p-4 space-y-3.5 transition-all shadow-sm">
+      {/* Tier Header with Note Counter and Actions */}
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/50 pb-2.5">
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full bg-gold" />
+            <h5 className="font-display text-sm font-bold uppercase tracking-wider text-foreground">
+              {title}
+            </h5>
+            <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-mono text-muted-foreground">
+              {notesList.length} {notesList.length === 1 ? "note" : "notes"} · In order of dominance
+            </span>
+          </div>
+          <p className="text-[11px] text-muted-foreground mt-0.5">{subtitle}</p>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setShowRaw(!showRaw)}
+            className="text-[11px] text-muted-foreground hover:text-foreground underline cursor-pointer"
+          >
+            {showRaw ? "Hide Text" : "Bulk Edit"}
+          </button>
+          <button
+            type="button"
+            onClick={() => setIsPickerOpen(!isPickerOpen)}
+            className="inline-flex items-center gap-1.5 rounded-full border border-gold/50 bg-gold/15 px-3 py-1 text-xs font-semibold text-gold transition-colors hover:bg-gold hover:text-black cursor-pointer shadow-sm"
+          >
+            <Plus className="h-3.5 w-3.5" />
+            <span>{isPickerOpen ? "Done Picking" : "+ Select Notes"}</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Selected Notes (Dominance Flow) */}
+      {notesList.length === 0 ? (
+        <div className="rounded-xl border border-dashed border-border/60 py-4 text-center text-xs text-muted-foreground">
+          No notes selected for {title}. Click <strong className="text-gold">+ Select Notes</strong> above to choose ingredients.
+        </div>
+      ) : (
+        <div className="flex flex-wrap items-center gap-2 pt-1">
+          {notesList.map((note, idx) => {
+            const img = getNoteImage(note);
+            return (
+              <div
+                key={`${note}-${idx}`}
+                className="group relative inline-flex items-center gap-2 rounded-full border border-border bg-background py-1 pl-1.5 pr-2.5 text-xs font-medium shadow-sm transition-all hover:border-gold/70 hover:shadow-md"
+              >
+                {/* Dominance Rank Badge */}
+                <span className="flex h-4 w-4 items-center justify-center rounded-full bg-muted font-mono text-[9px] font-bold text-muted-foreground">
+                  {idx + 1}
+                </span>
+
+                {/* Note Thumbnail Icon */}
+                <div className="relative flex h-6 w-6 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border/60 bg-muted shadow-inner">
+                  {img ? (
+                    <img src={img} alt={note} className="h-full w-full object-cover" />
+                  ) : (
+                    <span className="text-[9px] font-bold uppercase text-muted-foreground">
+                      {note.slice(0, 2)}
+                    </span>
+                  )}
+                </div>
+
+                {/* Note Title */}
+                <span className="font-medium text-foreground">{note}</span>
+
+                {/* Reorder and Delete Controls */}
+                <div className="flex items-center gap-0.5 ml-1 pl-1 border-l border-border/50">
+                  <button
+                    type="button"
+                    disabled={idx === 0}
+                    onClick={() => move(idx, -1)}
+                    title="Increase dominance (move earlier in list)"
+                    className="rounded p-0.5 text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-20 cursor-pointer"
+                  >
+                    <ChevronLeft className="h-3 w-3" />
+                  </button>
+                  <button
+                    type="button"
+                    disabled={idx === notesList.length - 1}
+                    onClick={() => move(idx, 1)}
+                    title="Decrease dominance (move later in list)"
+                    className="rounded p-0.5 text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-20 cursor-pointer"
+                  >
+                    <ChevronRight className="h-3 w-3" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => remove(idx)}
+                    title="Remove note"
+                    className="rounded p-0.5 text-destructive/70 hover:bg-destructive/15 hover:text-destructive cursor-pointer ml-0.5"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Optional Raw Comma-Separated Text Input for Bulk Operations */}
+      {showRaw && (
+        <div className="pt-1">
+          <label className="text-[11px] text-muted-foreground uppercase tracking-wider block mb-1">
+            Bulk Edit (comma separated in order of dominance):
+          </label>
+          <input
+            value={rawString}
+            onChange={(e) => onRawChange(e.target.value)}
+            className={`${cls} text-xs font-mono`}
+            placeholder="e.g. Vanilla, Sandalwood, Amber, Patchouli"
+          />
+        </div>
+      )}
+
+      {/* Expandable Visual Note Library & Quick-Add Palette */}
+      {isPickerOpen && (
+        <div className="rounded-xl border border-border/80 bg-background/95 p-3.5 space-y-3 shadow-lg">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
+            {/* Search Filter */}
+            <div className="relative flex-1">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search note catalog (e.g. Amber, Bergamot, Rum, Saffron)..."
+                className="w-full rounded-lg border border-input bg-muted/30 py-1.5 pl-8 pr-3 text-xs outline-none focus:border-gold"
+              />
+            </div>
+
+            {/* Custom note form */}
+            <form onSubmit={handleCustomAdd} className="flex items-center gap-1.5">
+              <input
+                type="text"
+                value={customNote}
+                onChange={(e) => setCustomNote(e.target.value)}
+                placeholder="Type custom note..."
+                className="w-36 sm:w-44 rounded-lg border border-input bg-muted/30 py-1.5 px-2.5 text-xs outline-none focus:border-gold"
+              />
+              <button
+                type="submit"
+                className="rounded-lg bg-foreground px-2.5 py-1.5 text-xs font-semibold text-background hover:bg-gold hover:text-black transition-colors cursor-pointer"
+              >
+                Add
+              </button>
+            </form>
+          </div>
+
+          {/* Quick-Click Visual Note Chips */}
+          <div className="max-h-52 overflow-y-auto space-y-2 pr-1" data-lenis-prevent>
+            <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+              Click any note to add to {title}:
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {availableNotes.map((item) => {
+                const img = getNoteImage(item.name);
+                return (
+                  <button
+                    key={item.name}
+                    type="button"
+                    onClick={() => add(item.name)}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-muted/40 py-1 pl-1 pr-2.5 text-xs text-foreground transition-all hover:scale-105 hover:border-gold hover:bg-gold/15 cursor-pointer"
+                  >
+                    <div className="h-5 w-5 shrink-0 overflow-hidden rounded-full border border-border/50 bg-background">
+                      {img ? (
+                        <img src={img} alt={item.name} className="h-full w-full object-cover" />
+                      ) : (
+                        <span className="flex h-full w-full items-center justify-center text-[8px] font-bold">
+                          {item.name.slice(0, 2)}
+                        </span>
+                      )}
+                    </div>
+                    <span>{item.name}</span>
+                    <Plus className="h-3 w-3 opacity-50" />
+                  </button>
+                );
+              })}
+              {availableNotes.length === 0 && (
+                <p className="text-xs text-muted-foreground italic py-2">
+                  No matching catalog notes. Use the input on the right to add a custom note!
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function ProductDialog({ product, onClose, onSaved }) {
   const isNew = !product.slug;
-  const [f, setF] = useState({
-    name: "",
-    slug: "",
-    tagline: "",
-    story: "",
-    badge: "",
-    concentration: "EDP",
-    volume: "50 ml",
-    image: "",
-    color: "#C5A059",
-    price: 0,
-    sample_price: 99,
-    stock: 0,
-    low_stock_threshold: 10,
-    active: true,
-    featured: false,
-    olfactory_family: product.olfactory_family || "",
-    accords_str: (product.accords || []).map((a) => `${a.name}: ${a.pct}`).join(", "),
-    arch_longevity: product.architecture?.longevity || "12+ Hours · Enduring Aura",
-    arch_sillage: product.architecture?.sillage || "Intense · Regal Radiance",
-    arch_season: product.architecture?.season || "Autumn / Winter / Sovereign Evenings",
-    arch_profile: product.architecture?.profile || "",
-    top: (product.notes?.top || []).join(", "),
-    heart: (product.notes?.heart || []).join(", "),
-    base: (product.notes?.base || []).join(", "),
-    ...product,
-    // ensure strings are formatted properly even if product overrides
-    ...(product.notes ? {
-      top: (product.notes.top || []).join(", "),
-      heart: (product.notes.heart || []).join(", "),
-      base: (product.notes.base || []).join(", "),
-    } : {}),
-    ...(product.accords ? {
+  const [f, setF] = useState(() => {
+    const topNotes = product.notes?.top || (product.top ? toList(product.top) : []);
+    const heartNotes = product.notes?.heart || (product.heart ? toList(product.heart) : []);
+    const baseNotes = product.notes?.base || (product.base ? toList(product.base) : []);
+
+    return {
+      name: "",
+      slug: "",
+      tagline: "",
+      story: "",
+      badge: "",
+      concentration: "EDP",
+      volume: "50 ml",
+      image: "",
+      color: "#C5A059",
+      price: 0,
+      sample_price: 99,
+      stock: 0,
+      low_stock_threshold: 10,
+      active: true,
+      featured: false,
+      olfactory_family: product.olfactory_family || "",
       accords_str: (product.accords || []).map((a) => `${a.name}: ${a.pct}`).join(", "),
-    } : {}),
-    ...(product.architecture ? {
-      arch_longevity: product.architecture.longevity || "12+ Hours · Enduring Aura",
-      arch_sillage: product.architecture.sillage || "Intense · Regal Radiance",
-      arch_season: product.architecture.season || "Autumn / Winter / Sovereign Evenings",
-      arch_profile: product.architecture.profile || "",
-    } : {}),
+      arch_longevity: product.architecture?.longevity || "12+ Hours · Enduring Aura",
+      arch_sillage: product.architecture?.sillage || "Intense · Regal Radiance",
+      arch_season: product.architecture?.season || "Autumn / Winter / Sovereign Evenings",
+      arch_profile: product.architecture?.profile || "",
+      top: topNotes.join(", "),
+      heart: heartNotes.join(", "),
+      base: baseNotes.join(", "),
+      top_list: topNotes,
+      heart_list: heartNotes,
+      base_list: baseNotes,
+      ...product,
+      top_list: topNotes,
+      heart_list: heartNotes,
+      base_list: baseNotes,
+      top: topNotes.join(", "),
+      heart: heartNotes.join(", "),
+      base: baseNotes.join(", "),
+      ...(product.accords ? {
+        accords_str: (product.accords || []).map((a) => `${a.name}: ${a.pct}`).join(", "),
+      } : {}),
+      ...(product.architecture ? {
+        arch_longevity: product.architecture.longevity || "12+ Hours · Enduring Aura",
+        arch_sillage: product.architecture.sillage || "Intense · Regal Radiance",
+        arch_season: product.architecture.season || "Autumn / Winter / Sovereign Evenings",
+        arch_profile: product.architecture.profile || "",
+      } : {}),
+    };
   });
 
   const [busy, setBusy] = useState(false);
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
+
+  const updateTierNotes = (tierKey, nextList) => {
+    setF((prev) => ({
+      ...prev,
+      [`${tierKey}_list`]: nextList,
+      [tierKey]: nextList.join(", "),
+    }));
+  };
+
+  const handleRawNotesChange = (tierKey, rawValue) => {
+    setF((prev) => ({
+      ...prev,
+      [tierKey]: rawValue,
+      [`${tierKey}_list`]: toList(rawValue),
+    }));
+  };
 
   const save = async (e) => {
     e.preventDefault();
@@ -110,9 +380,9 @@ export function ProductDialog({ product, onClose, onSaved }) {
       active: f.active,
       featured: f.featured,
       notes: {
-        top: toList(f.top),
-        heart: toList(f.heart),
-        base: toList(f.base),
+        top: f.top_list && f.top_list.length ? f.top_list : toList(f.top),
+        heart: f.heart_list && f.heart_list.length ? f.heart_list : toList(f.heart),
+        base: f.base_list && f.base_list.length ? f.base_list : toList(f.base),
       },
       olfactory_family: f.olfactory_family || "",
       accords: parsedAccordsList,
@@ -199,8 +469,13 @@ export function ProductDialog({ product, onClose, onSaved }) {
           </label>
 
           <div className="sm:col-span-2 border-b pt-4 pb-2">
-            <h4 className="font-display text-lg">Full Note Structure & Pyramid</h4>
-            <p className="text-xs text-muted-foreground">Enter notes comma-separated in order of dominance (most prominent first). Each will automatically pair with ingredient images.</p>
+            <h4 className="font-display text-lg flex items-center gap-2">
+              <span>Full Note Structure & Pyramid</span>
+              <Sparkles className="h-4 w-4 text-gold" />
+            </h4>
+            <p className="text-xs text-muted-foreground">
+              Visually select, add, remove, and reorder notes by dominance using the controls below. Each note renders with its authentic ingredient photograph.
+            </p>
           </div>
 
           <label className="text-xs uppercase tracking-[0.18em] text-muted-foreground sm:col-span-2">
@@ -208,11 +483,18 @@ export function ProductDialog({ product, onClose, onSaved }) {
             <input value={f.olfactory_family} onChange={set("olfactory_family")} className={cls} placeholder="e.g. Warm Amber Spicy · Oriental Gourmand" data-testid="pd-olfactory-family" />
           </label>
 
-          {["top", "heart", "base"].map((k) => (
-            <label key={k} className="text-xs uppercase tracking-[0.18em] text-muted-foreground sm:col-span-2">
-              {k} notes (in order of dominance, comma separated)
-              <input value={f[k]} onChange={set(k)} className={cls} placeholder={`e.g. ${k === "top" ? "Bitter Orange, Rum, Pink Pepper" : k === "heart" ? "Blonde Tobacco, Orris, Dried Fruits" : "Amber, Vanilla, Tonka Bean"}`} data-testid={`pd-notes-${k}`} />
-            </label>
+          {/* Interactive Visual Note Tier Builders */}
+          {TIERS_CONFIG.map(({ key, title, subtitle }) => (
+            <NoteTierBuilder
+              key={key}
+              tierKey={key}
+              title={title}
+              subtitle={subtitle}
+              notesList={f[`${key}_list`] || []}
+              onNotesChange={(nextList) => updateTierNotes(key, nextList)}
+              rawString={f[key]}
+              onRawChange={(val) => handleRawNotesChange(key, val)}
+            />
           ))}
 
           <div className="sm:col-span-2 border-b pt-4 pb-2">
