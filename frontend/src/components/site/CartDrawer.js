@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Minus, Plus, X } from "lucide-react";
+import { Minus, Plus, X, Trash2 } from "lucide-react";
 import { Sheet, SheetContent, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { useCart } from "@/context/CartContext";
 import { Bottle } from "./Bottle";
@@ -7,7 +7,7 @@ import { worldOf } from "@/lib/visual";
 import { inr, FREE_SHIPPING } from "@/lib/api";
 
 export function CartDrawer() {
-  const { items, open, setOpen, update, remove, subtotal } = useCart();
+  const { items, open, setOpen, update, remove, clear, subtotal } = useCart();
   const left = Math.max(0, FREE_SHIPPING - subtotal);
   const pct = Math.min(100, (subtotal / FREE_SHIPPING) * 100);
 
@@ -38,27 +38,80 @@ export function CartDrawer() {
                   <Bottle p={i} className="h-24 w-auto" />
                 </div>
                 <div className="flex flex-1 flex-col">
-                  <div className="flex justify-between gap-3">
+                  <div className="flex justify-between items-start gap-3">
                     <div>
                       <p className="font-display text-xl leading-tight">{i.name}</p>
                       <span className="mt-1 inline-block text-[11px] font-medium uppercase tracking-wider text-muted-foreground bg-muted/60 px-2 py-0.5 rounded-full">
                         {i.size || "50 ml"}
                       </span>
                     </div>
-                    <button onClick={() => remove(itemKey)} data-testid={`cart-remove-${itemKey}`} className="text-muted-foreground hover:text-foreground" aria-label="Remove">
-                      <X className="h-4 w-4" strokeWidth={1.3} />
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        remove(itemKey);
+                      }}
+                      data-testid={`cart-remove-${itemKey}`}
+                      className="-mr-2 -mt-2 flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground active:scale-95 transition-all touch-manipulation cursor-pointer"
+                      aria-label={`Remove ${i.name} from bag`}
+                    >
+                      <X className="h-4 w-4" strokeWidth={1.8} />
                     </button>
                   </div>
                   <p className="mt-2 text-sm font-semibold">{inr(i.price)}</p>
-                  <div className="mt-auto flex items-center gap-4">
-                    <button onClick={() => update(itemKey, i.qty - 1)} data-testid={`cart-dec-${itemKey}`} className="hover:text-gold" aria-label="Decrease"><Minus className="h-3.5 w-3.5" /></button>
-                    <span className="w-5 text-center text-sm" data-testid={`cart-qty-${itemKey}`}>{i.qty}</span>
-                    <button onClick={() => update(itemKey, i.qty + 1)} data-testid={`cart-inc-${itemKey}`} className="hover:text-gold" aria-label="Increase"><Plus className="h-3.5 w-3.5" /></button>
+                  <div className="mt-auto flex items-center justify-between pt-2">
+                    <div className="inline-flex items-center rounded-full border border-border/80 bg-muted/40 p-0.5">
+                      <button
+                        type="button"
+                        onClick={() => update(itemKey, i.qty - 1)}
+                        data-testid={`cart-dec-${itemKey}`}
+                        className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-background hover:text-gold active:scale-90 transition-all touch-manipulation text-muted-foreground hover:text-foreground"
+                        aria-label={i.qty === 1 ? "Remove item" : "Decrease quantity"}
+                      >
+                        {i.qty === 1 ? (
+                          <Trash2 className="h-3.5 w-3.5 text-red-500/80 hover:text-red-500" />
+                        ) : (
+                          <Minus className="h-3.5 w-3.5" />
+                        )}
+                      </button>
+                      <span className="min-w-[28px] text-center text-xs font-semibold" data-testid={`cart-qty-${itemKey}`}>
+                        {i.qty}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => update(itemKey, i.qty + 1)}
+                        data-testid={`cart-inc-${itemKey}`}
+                        className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-background hover:text-gold active:scale-90 transition-all touch-manipulation text-muted-foreground hover:text-foreground"
+                        aria-label="Increase quantity"
+                      >
+                        <Plus className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => remove(itemKey)}
+                      className="text-[11px] font-medium text-muted-foreground hover:text-red-500 active:text-red-600 transition-colors underline-offset-4 hover:underline p-1 touch-manipulation"
+                      aria-label="Remove"
+                    >
+                      Remove
+                    </button>
                   </div>
                 </div>
               </div>
             );
           })}
+          {items.length > 1 && (
+            <div className="py-3 text-right">
+              <button
+                type="button"
+                onClick={clear}
+                className="text-xs text-muted-foreground hover:text-red-500 active:text-red-600 transition-colors"
+                data-testid="cart-clear-btn"
+              >
+                Clear entire bag
+              </button>
+            </div>
+          )}
           {!items.length && (
             <div className="py-16">
               <p className="text-muted-foreground">Discover the four signatures of the House.</p>
