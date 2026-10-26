@@ -8,8 +8,13 @@ export function Intro() {
   const themeContext = useTheme();
   const isDark = themeContext ? themeContext.theme === "dark" : false;
 
-  // Always show preloader on every page reload per user instruction (will revert when user texts "revert")
-  const [show, setShow] = useState(true);
+  // Single session preloader: shows once per session (override with ?intro or ?preloader query param)
+  const [show, setShow] = useState(() => {
+    if (typeof window === "undefined") return false;
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has("intro") || urlParams.has("preloader")) return true;
+    return !sessionStorage.getItem("hotk_intro_v5");
+  });
   const [isBeating, setIsBeating] = useState(false);
   const containerRef = useRef(null);
 
@@ -46,6 +51,8 @@ export function Intro() {
   useEffect(() => {
     if (!show) return undefined;
 
+    sessionStorage.setItem("hotk_intro_v5", "1");
+
     // Lock scroll smoothly without toggling overflow on body (eliminates scrollbar layout shift)
     if (window.__lenis) {
       window.__lenis.stop();
@@ -72,6 +79,7 @@ export function Intro() {
 
   const handleDismiss = () => {
     setShow(false);
+    sessionStorage.setItem("hotk_intro_v5", "1");
     if (window.__lenis) {
       window.__lenis.start();
     }
