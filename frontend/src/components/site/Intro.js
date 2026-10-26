@@ -1,46 +1,43 @@
 import { useEffect, useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const STAGES = [
-  { threshold: 0, label: "Sourcing Rare Absolutes & Resins" },
-  { threshold: 30, label: "Six-Week Cold Maceration" },
-  { threshold: 68, label: "Hand-Decanting Crystal Flacons" },
-  { threshold: 94, label: "The Keep Is Open" },
+const CREATIONS = [
+  { roman: "I", name: "Blonde Amber", note: "Molten Amber · Blonde Tobacco · Aged Rum" },
+  { roman: "II", name: "Layton", note: "Aristocratic Lavender · Crisp Apple · Noble Woods" },
+  { roman: "III", name: "Angels Share", note: "Cognac Over Ice · Roasted Praline · French Oak" },
+  { roman: "IV", name: "Side Effect", note: "Cured Tobacco · Crimson Saffron · Dark Leather" },
 ];
 
-const LUXURY_EASE = [0.85, 0, 0.15, 1];
+const CURTAIN_EASE = [0.77, 0, 0.175, 1];
 
 export function Intro() {
   const [show, setShow] = useState(() => {
     if (typeof window === "undefined") return false;
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has("intro") || urlParams.has("preloader")) return true;
-    return !sessionStorage.getItem("hotk_intro_v3");
+    return !sessionStorage.getItem("hotk_intro_v4");
   });
 
   const [progress, setProgress] = useState(0);
-  const [isFinishing, setIsFinishing] = useState(false);
+  const [isExiting, setIsExiting] = useState(false);
 
-  // Smooth counter animation
   useEffect(() => {
     if (!show) return undefined;
 
-    // Lock background scroll during preloader
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-
-    sessionStorage.setItem("hotk_intro_v3", "1");
+    sessionStorage.setItem("hotk_intro_v4", "1");
 
     const startTime = performance.now();
-    const duration = 1800; // 1.8s progress duration
+    const duration = 2000; // 2.0s elegant progression
 
     let frameId;
     const updateProgress = (currentTime) => {
       const elapsed = currentTime - startTime;
       const t = Math.min(1, elapsed / duration);
 
-      // Smooth custom acceleration/deceleration
-      const easedT = t < 0.7 ? 1.4 * Math.pow(t, 1.2) : 1 - Math.pow(1 - t, 2.5);
+      // Smooth luxury deceleration curve
+      const easedT = t < 0.6 ? 1.35 * Math.pow(t, 1.15) : 1 - Math.pow(1 - t, 2.8);
       const currentVal = Math.min(100, Math.round(easedT * 100));
 
       setProgress(currentVal);
@@ -49,12 +46,11 @@ export function Intro() {
         frameId = requestAnimationFrame(updateProgress);
       } else {
         setProgress(100);
-        setIsFinishing(true);
-        // Linger briefly at 100% for the grand gate split
+        setIsExiting(true);
         setTimeout(() => {
           setShow(false);
           document.body.style.overflow = prevOverflow;
-        }, 550);
+        }, 500);
       }
     };
 
@@ -66,246 +62,166 @@ export function Intro() {
     };
   }, [show]);
 
-  // Current stage copy based on progress
-  const currentStage = useMemo(() => {
-    for (let i = STAGES.length - 1; i >= 0; i--) {
-      if (progress >= STAGES[i].threshold) {
-        return STAGES[i].label;
-      }
-    }
-    return STAGES[0].label;
+  // Determine active creation stage based on progress
+  const currentCreation = useMemo(() => {
+    if (progress < 25) return CREATIONS[0];
+    if (progress < 50) return CREATIONS[1];
+    if (progress < 75) return CREATIONS[2];
+    return CREATIONS[3];
   }, [progress]);
 
-  // Floating ambient motes
-  const motes = useMemo(
-    () =>
-      Array.from({ length: 18 }, (_, i) => ({
-        id: i,
-        x: (i * 23) % 96 + 2,
-        y: (i * 37) % 80 + 10,
-        size: (i % 3) + 1.5,
-        duration: 3 + (i % 4) * 0.8,
-        delay: (i % 5) * 0.3,
-      })),
-    []
-  );
-
   const handleSkip = () => {
-    document.body.style.overflow = "";
-    setShow(false);
+    setIsExiting(true);
+    setTimeout(() => {
+      document.body.style.overflow = "";
+      setShow(false);
+    }, 200);
   };
 
   return (
     <AnimatePresence mode="wait">
       {show && (
-        <div
+        <motion.div
+          key="preloader-curtain"
           data-testid="intro-curtain"
-          className="fixed inset-0 z-[9999] pointer-events-auto select-none overflow-hidden"
+          initial={{ y: 0 }}
+          exit={{ y: "-100%" }}
+          transition={{ duration: 0.9, ease: CURTAIN_EASE }}
+          className="fixed inset-0 z-[9999] pointer-events-auto select-none overflow-hidden bg-[#110E13] text-[#FBF8F3] will-change-transform transform-gpu shadow-[0_25px_60px_rgba(0,0,0,0.8)]"
         >
-          {/* ======================================================== */}
-          {/* DUAL SHUTTER GATE PANELS                                 */}
-          {/* ======================================================== */}
-          {/* Top Panel (Glides Upwards) */}
-          <motion.div
-            initial={{ y: 0 }}
-            exit={{ y: "-100%" }}
-            transition={{ duration: 0.95, ease: LUXURY_EASE }}
-            className="absolute inset-x-0 top-0 h-1/2 bg-[#09080B] will-change-transform transform-gpu shadow-2xl"
-          >
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,rgba(212,162,76,0.12)_0%,rgba(9,8,11,1)_70%)]" />
-          </motion.div>
-
-          {/* Bottom Panel (Glides Downwards) */}
-          <motion.div
-            initial={{ y: 0 }}
-            exit={{ y: "100%" }}
-            transition={{ duration: 0.95, ease: LUXURY_EASE }}
-            className="absolute inset-x-0 bottom-0 h-1/2 bg-[#09080B] will-change-transform transform-gpu shadow-2xl"
-          >
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(212,162,76,0.12)_0%,rgba(9,8,11,1)_70%)]" />
-          </motion.div>
-
-          {/* Glowing Horizon Seam Filament */}
-          <motion.div
-            initial={{ scaleX: 0, opacity: 0 }}
-            animate={{ scaleX: isFinishing ? 1.15 : 1, opacity: isFinishing ? 1 : 0.4 }}
-            exit={{ scaleX: 1.4, opacity: 0 }}
-            transition={{ duration: 0.6, ease: LUXURY_EASE }}
-            className="pointer-events-none absolute left-0 right-0 top-1/2 -translate-y-1/2 h-[1px] bg-gradient-to-r from-transparent via-[#F2A900] to-transparent z-10 will-change-transform"
+          {/* Subtle Warm Amber Paper Atmosphere */}
+          <div
+            className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(212,162,76,0.14)_0%,rgba(17,14,19,0.98)_72%)]"
+            aria-hidden="true"
           />
 
-          {/* ======================================================== */}
-          {/* CENTER LUXURY CONTENT                                    */}
-          {/* ======================================================== */}
+          {/* Golden Ambient Vignette Glow */}
+          <div
+            className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[380px] w-[380px] sm:h-[540px] sm:w-[540px] rounded-full bg-gradient-to-b from-[#D4A24C]/18 via-[#F2A900]/08 to-transparent blur-[120px]"
+            aria-hidden="true"
+          />
+
+          {/* Micro-grain texture */}
+          <div className="grain pointer-events-none absolute inset-0 opacity-40" aria-hidden="true" />
+
+          {/* Bottom Golden Hairline Seam */}
+          <div className="absolute inset-x-0 bottom-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#D4A24C]/60 to-transparent shadow-[0_0_12px_rgba(212,162,76,0.5)]" />
+
+          {/* Main Layout Container */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.96 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 1.05, y: -16 }}
-            transition={{ duration: 0.65, ease: LUXURY_EASE }}
-            className="relative z-20 flex h-full w-full flex-col items-center justify-between px-6 py-10 sm:py-14 text-[#FBF8F3]"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: isExiting ? 0 : 1, y: isExiting ? -20 : 0 }}
+            transition={{ duration: 0.5, ease: CURTAIN_EASE }}
+            className="relative z-20 flex h-full w-full flex-col items-center justify-between px-6 py-10 sm:px-12 sm:py-14"
           >
-            {/* Ambient Celestial Aura */}
-            <div
-              className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[340px] w-[340px] sm:h-[480px] sm:w-[480px] rounded-full bg-gradient-to-b from-[#D4A24C]/25 via-[#F2A900]/15 to-transparent blur-[110px]"
-              aria-hidden="true"
-            />
+            {/* TOP BAR: Heritage & Provenance */}
+            <header className="flex w-full items-center justify-between text-[0.62rem] sm:text-[0.68rem] uppercase tracking-[0.32em] text-[#D4A24C]/80 font-mono">
+              <span className="flex items-center gap-2">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#D4A24C] shadow-[0_0_8px_#D4A24C]" />
+                Maison de Haute Parfumerie
+              </span>
+              <span className="hidden sm:inline-block text-[#EFE8DC]/50">
+                New Delhi · Grasse · Paris
+              </span>
+              <span>MMXXVI</span>
+            </header>
 
-            {/* Drifting Golden Motes */}
-            <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-              {motes.map((m) => (
-                <motion.div
-                  key={m.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{
-                    opacity: [0, 0.65, 0],
-                    y: [-10, -70],
-                  }}
-                  transition={{
-                    duration: m.duration,
-                    repeat: Infinity,
-                    delay: m.delay,
-                    ease: "easeInOut",
-                  }}
-                  style={{
-                    left: `${m.x}%`,
-                    top: `${m.y}%`,
-                    width: `${m.size}px`,
-                    height: `${m.size}px`,
-                  }}
-                  className="absolute rounded-full bg-[#F2A900] shadow-[0_0_6px_#F2A900]"
-                />
-              ))}
-            </div>
-
-            {/* TOP HEADER: Heritage Watermark */}
-            <motion.div
-              initial={{ opacity: 0, y: -12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.15, duration: 0.8, ease: LUXURY_EASE }}
-              className="flex items-center gap-3 text-center"
-            >
-              <span className="h-px w-6 bg-gradient-to-r from-transparent to-[#D4A24C]/60" />
-              <p className="text-[0.58rem] sm:text-[0.64rem] font-mono uppercase tracking-[0.38em] text-[#D4A24C]">
-                Maison de Haute Parfumerie · MMXXVI
-              </p>
-              <span className="h-px w-6 bg-gradient-to-l from-transparent to-[#D4A24C]/60" />
-            </motion.div>
-
-            {/* CENTER STAGE: Heraldic Crest & Wordmark */}
-            <div className="flex flex-col items-center text-center -mt-4">
-              {/* Heraldic Emblem with Orbital Ring */}
-              <div className="relative mb-6 flex items-center justify-center">
-                {/* Rotating Dashed Orbital Halo */}
-                <svg
-                  className="absolute h-28 w-28 sm:h-36 sm:w-36 animate-[spin_24s_linear_infinite]"
-                  viewBox="0 0 100 100"
-                >
-                  <circle
-                    cx="50"
-                    cy="50"
-                    r="46"
-                    fill="none"
-                    stroke="rgba(212, 162, 76, 0.3)"
-                    strokeWidth="0.75"
-                    strokeDasharray="4 8"
-                  />
-                </svg>
-
-                {/* Inner Solid Halo Ring */}
-                <div className="h-24 w-24 sm:h-32 sm:w-32 rounded-full border border-[#D4A24C]/40 bg-[#0C0B0E]/60 p-5 backdrop-blur-md shadow-2xl flex items-center justify-center">
+            {/* CENTER STAGE: Emblem & House Crest */}
+            <main className="flex flex-col items-center text-center my-auto max-w-xl">
+              {/* Crest Medallion with Subtle Halo */}
+              <div className="relative mb-7 flex items-center justify-center">
+                {/* Delicate Gold Border Medallion */}
+                <div className="relative h-24 w-24 sm:h-28 sm:w-28 rounded-full border border-[#D4A24C]/35 bg-gradient-to-b from-[#1C1821] to-[#110E13] p-5 shadow-[0_8px_32px_rgba(0,0,0,0.6)] flex items-center justify-center">
                   <motion.img
                     src="/images/hok-monogram.png"
-                    alt="House of the Knight Crest"
-                    initial={{ scale: 0.82, opacity: 0 }}
-                    animate={{
-                      scale: [0.94, 1.03, 0.98],
-                      opacity: 1,
-                    }}
+                    alt="House of the Knight Monogram"
+                    initial={{ scale: 0.88, opacity: 0 }}
+                    animate={{ scale: [0.96, 1.02, 0.98], opacity: 1 }}
                     transition={{
-                      scale: { duration: 2.8, repeat: Infinity, ease: "easeInOut" },
-                      opacity: { duration: 0.8 },
+                      scale: { duration: 3.2, repeat: Infinity, ease: "easeInOut" },
+                      opacity: { duration: 0.7 },
                     }}
-                    className="h-full w-full object-contain filter drop-shadow-[0_0_16px_rgba(242,169,0,0.5)]"
+                    className="h-full w-full object-contain filter drop-shadow-[0_0_16px_rgba(212,162,76,0.45)]"
                   />
+                  {/* Outer Hairline Halo */}
+                  <div className="pointer-events-none absolute -inset-2.5 rounded-full border border-[#D4A24C]/15" />
                 </div>
-
-                {/* Cardinal Diamond Markers */}
-                <span className="absolute -top-1 h-1.5 w-1.5 rotate-45 bg-[#F2A900] shadow-[0_0_6px_#F2A900]" />
-                <span className="absolute -bottom-1 h-1.5 w-1.5 rotate-45 bg-[#F2A900] shadow-[0_0_6px_#F2A900]" />
               </div>
 
-              {/* Sculpted House Title */}
+              {/* Sculpted Editorial Typography */}
               <motion.div
-                initial={{ opacity: 0, y: 14 }}
+                initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.25, duration: 0.9, ease: LUXURY_EASE }}
+                transition={{ delay: 0.2, duration: 0.8, ease: CURTAIN_EASE }}
               >
-                <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl tracking-[0.16em] uppercase text-[#FBF8F3]">
+                <p className="text-[0.58rem] sm:text-[0.66rem] font-mono uppercase tracking-[0.42em] text-[#D4A24C] mb-2.5">
+                  The Private Collection
+                </p>
+                <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl tracking-tight uppercase text-[#FBF8F3]">
                   House of the{" "}
-                  <span className="font-display-italic text-transparent bg-clip-text bg-gradient-to-r from-[#D4A24C] via-[#FFE5A3] to-[#C59B3F] drop-shadow-[0_2px_12px_rgba(242,169,0,0.35)]">
+                  <span className="font-display-italic text-transparent bg-clip-text bg-gradient-to-r from-[#D4A24C] via-[#FFE4A0] to-[#C59B3F] drop-shadow-[0_2px_14px_rgba(212,162,76,0.35)]">
                     Knight
                   </span>
                 </h1>
               </motion.div>
 
-              {/* Sub-creed */}
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 0.7 }}
-                transition={{ delay: 0.45, duration: 0.8 }}
-                className="mt-3 text-[0.62rem] sm:text-[0.7rem] uppercase tracking-[0.32em] text-[#D8D2C6]"
-              >
-                Extracted in Secret · Composed with Obsession
-              </motion.p>
-            </div>
-
-            {/* BOTTOM STAGE: High-Precision Progress & Dynamic Stage */}
-            <div className="w-full max-w-md flex flex-col items-center">
-              {/* Dynamic Status Text */}
-              <div className="h-6 flex items-center justify-center overflow-hidden mb-2">
-                <motion.p
-                  key={currentStage}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  transition={{ duration: 0.35 }}
-                  className="font-mono text-[0.65rem] sm:text-xs tracking-[0.22em] text-[#D4A24C] uppercase text-center"
-                >
-                  {currentStage}
-                </motion.p>
+              {/* Dynamic Creation Reveal */}
+              <div className="h-14 mt-5 flex flex-col items-center justify-center overflow-hidden">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={currentCreation.name}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.4 }}
+                    className="flex flex-col items-center"
+                  >
+                    <span className="text-xs sm:text-sm font-medium tracking-[0.18em] text-[#F6EFE4] uppercase">
+                      Extract {currentCreation.roman} — {currentCreation.name}
+                    </span>
+                    <span className="text-[0.62rem] sm:text-[0.7rem] tracking-[0.24em] text-[#D4A24C]/80 uppercase mt-1">
+                      {currentCreation.note}
+                    </span>
+                  </motion.div>
+                </AnimatePresence>
               </div>
+            </main>
 
-              {/* Razor-Thin Precision Progress Bar */}
-              <div className="relative w-full h-[2px] rounded-full bg-white/10 overflow-hidden shadow-inner">
+            {/* BOTTOM STAGE: Precision Progress & Skip */}
+            <footer className="w-full max-w-lg flex flex-col items-center">
+              {/* Ultra-Fine Gold Progress Line */}
+              <div className="relative w-full h-[2px] rounded-full bg-white/10 overflow-hidden">
                 <motion.div
-                  className="h-full bg-gradient-to-r from-[#D4A24C] via-[#FFE08A] to-[#F2A900] rounded-full shadow-[0_0_12px_#F2A900]"
+                  className="h-full bg-gradient-to-r from-[#D4A24C] via-[#FFE5A3] to-[#F2A900] rounded-full shadow-[0_0_10px_rgba(242,169,0,0.6)]"
                   style={{ width: `${progress}%` }}
                   transition={{ ease: "linear" }}
                 />
               </div>
 
-              {/* Progress Numeral & Skip Button */}
-              <div className="mt-3 w-full flex items-center justify-between text-xs text-muted-foreground">
-                <span className="text-[0.6rem] font-mono tracking-widest uppercase opacity-60">
-                  New Delhi · Reserve
+              {/* Sub-bar Details: Concentration, Progress Counter, Skip Action */}
+              <div className="mt-4 w-full flex items-center justify-between text-xs text-[#EFE8DC]/70 font-mono">
+                <span className="text-[0.6rem] sm:text-[0.64rem] tracking-[0.24em] uppercase opacity-75">
+                  EDP · 50 ML
                 </span>
 
-                <span className="font-mono text-sm sm:text-base font-light tracking-widest text-[#F2A900]">
-                  {progress < 10 ? `0${progress}` : progress}
-                  <span className="text-[0.65rem] opacity-70 ml-0.5">%</span>
-                </span>
+                <div className="flex items-baseline gap-1 text-[#D4A24C]">
+                  <span className="text-base sm:text-lg font-light tracking-widest font-mono">
+                    {progress < 10 ? `0${progress}` : progress}
+                  </span>
+                  <span className="text-[0.65rem] opacity-70">%</span>
+                </div>
 
                 <button
                   type="button"
                   onClick={handleSkip}
-                  className="text-[0.62rem] font-mono uppercase tracking-[0.2em] text-[#D4A24C]/80 hover:text-[#FFE5A3] transition-colors hover:underline"
+                  className="text-[0.62rem] sm:text-[0.66rem] uppercase tracking-[0.22em] text-[#D4A24C] hover:text-[#FFE5A3] transition-colors hover:underline cursor-pointer flex items-center gap-1"
                 >
-                  Enter House →
+                  Enter House <span aria-hidden="true">→</span>
                 </button>
               </div>
-            </div>
+            </footer>
           </motion.div>
-        </div>
+        </motion.div>
       )}
     </AnimatePresence>
   );
