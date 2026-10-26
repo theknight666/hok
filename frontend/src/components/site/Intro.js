@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion";
 
 const LUXURY_EASE = [0.83, 0, 0.17, 1];
+const WATERMARK_LETTERS = "House of the Knight".split("");
 
 export function Intro() {
   // Always show preloader on every page reload per user instruction (will revert when user texts "revert")
@@ -91,56 +92,54 @@ export function Intro() {
           <div className="grain pointer-events-none absolute inset-0 opacity-35" aria-hidden="true" />
 
           {/* ======================================================== */}
-          {/* WATERMARK: Edge-to-Edge with Left-to-Right Orange Glow  */}
+          {/* WATERMARK: Edge-to-Edge Alphabets with Clean Glow Sweep  */}
           {/* ======================================================== */}
           <motion.div
             style={{
               x: watermarkX,
               y: watermarkY,
             }}
-            className="pointer-events-none absolute inset-x-0 bottom-0 pb-1 sm:pb-2 lg:pb-3 flex items-end justify-center overflow-hidden select-none will-change-transform w-full"
+            className="pointer-events-none absolute inset-x-0 bottom-0 pb-1 sm:pb-2 lg:pb-3 flex items-end justify-center select-none will-change-transform w-full overflow-hidden"
             aria-hidden="true"
           >
-            <div className="relative w-full overflow-hidden flex items-center justify-center">
-              {/* Base Subtle Edge-to-Edge Watermark */}
-              <motion.p
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.85, ease: "easeOut" }}
-                className="w-full text-center font-display font-black leading-[0.88] tracking-tight whitespace-nowrap text-[13.85vw] text-[#FBF8F3]/[0.05] select-none"
-              >
-                House of the Knight
-              </motion.p>
-
-              {/* Dynamic Orange Glow Sweeping Left-to-Right */}
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{
-                  opacity: 1,
-                  backgroundPosition: ["140% 0", "-40% 0"],
-                }}
-                transition={{
-                  opacity: { duration: 0.6, delay: 0.2 },
-                  backgroundPosition: {
-                    duration: 2.2,
-                    ease: "easeInOut",
-                    repeat: Infinity,
-                    repeatDelay: 0.3,
-                  },
-                }}
-                style={{
-                  backgroundImage:
-                    "linear-gradient(90deg, transparent 0%, transparent 32%, rgba(255, 106, 0, 0.35) 42%, #ff7a00 48%, #f59e0b 52%, #fbbf24 55%, rgba(255, 106, 0, 0.35) 60%, transparent 70%, transparent 100%)",
-                  backgroundSize: "220% 100%",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  filter:
-                    "drop-shadow(0 0 20px rgba(255, 122, 0, 0.8)) drop-shadow(0 0 50px rgba(245, 158, 11, 0.5))",
-                }}
-                className="pointer-events-none absolute inset-0 w-full text-center font-display font-black leading-[0.88] tracking-tight whitespace-nowrap text-[13.85vw] select-none"
-              >
-                House of the Knight
-              </motion.p>
+            <div className="w-full flex items-center justify-center text-center overflow-visible">
+              <p className="w-full text-center font-display font-black leading-[0.88] tracking-tight whitespace-nowrap text-[13.85vw] select-none">
+                {WATERMARK_LETTERS.map((item, i) => (
+                  <motion.span
+                    key={i}
+                    className="inline-block"
+                    initial={{
+                      color: "rgba(251, 248, 243, 0.055)",
+                      textShadow: "0 0 0px transparent",
+                    }}
+                    animate={{
+                      color: [
+                        "rgba(251, 248, 243, 0.055)",
+                        "#f59e0b",
+                        "#ff7a00",
+                        "#f59e0b",
+                        "rgba(251, 248, 243, 0.055)",
+                      ],
+                      textShadow: [
+                        "0 0 0px transparent",
+                        "0 0 16px rgba(255, 122, 0, 0.85), 0 0 35px rgba(245, 158, 11, 0.6)",
+                        "0 0 24px rgba(255, 138, 0, 1), 0 0 50px rgba(245, 158, 11, 0.8)",
+                        "0 0 16px rgba(255, 122, 0, 0.85), 0 0 35px rgba(245, 158, 11, 0.6)",
+                        "0 0 0px transparent",
+                      ],
+                    }}
+                    transition={{
+                      duration: 0.75,
+                      delay: 0.35 + i * 0.065,
+                      repeat: Infinity,
+                      repeatDelay: 1.2,
+                      ease: "easeInOut",
+                    }}
+                  >
+                    {item === " " ? "\u00A0" : item}
+                  </motion.span>
+                ))}
+              </p>
             </div>
           </motion.div>
 
