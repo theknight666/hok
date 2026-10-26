@@ -139,7 +139,7 @@ export function Intro() {
           </motion.div>
 
           {/* ======================================================== */}
-          {/* LAYER 3: FOREGROUND 3D TACTILE GOLD MONOGRAM LOGO        */}
+          {/* LAYER 3: FOREGROUND 3D TACTILE GREY MONOGRAM LOGO        */}
           {/* ======================================================== */}
           <motion.div
             style={{
@@ -160,20 +160,24 @@ export function Intro() {
             }}
             className="relative z-10 flex items-center justify-center p-6 will-change-transform"
           >
-            {/* Dynamic Physical Floor Shadow Offset */}
+            {/* Subtle Ethereal Halo to Ensure the Grey Logo Stands Out */}
             <motion.div
               style={{
                 x: shadowX,
                 y: shadowY,
               }}
-              className="pointer-events-none absolute inset-0 rounded-full bg-[#F2A900]/15 blur-2xl filter -z-10"
+              className="pointer-events-none absolute inset-0 rounded-full bg-white/[0.08] blur-2xl -z-10"
             />
 
             <div className="relative h-28 w-28 sm:h-36 sm:w-36 lg:h-40 lg:w-40 flex items-center justify-center transform-gpu">
               <img
                 src="/images/hok-monogram.png"
                 alt="House of the Knight"
-                className="h-full w-full object-contain filter drop-shadow-[0_0_28px_rgba(212,162,76,0.65)] select-none pointer-events-none"
+                style={{
+                  filter:
+                    "grayscale(100%) brightness(1.22) contrast(1.08) drop-shadow(0 0 20px rgba(225, 228, 232, 0.35)) drop-shadow(0 8px 24px rgba(0, 0, 0, 0.8))",
+                }}
+                className="h-full w-full object-contain select-none pointer-events-none"
                 draggable={false}
               />
             </div>
