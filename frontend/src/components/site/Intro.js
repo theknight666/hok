@@ -103,7 +103,7 @@ export function Intro() {
           `}</style>
 
           {/* ======================================================== */}
-          {/* WATERMARK: Subterranean Light Stripe with Upward Rays    */}
+          {/* WATERMARK: Pure Letter Bases Catching Upward Amber Rays */}
           {/* ======================================================== */}
           <motion.div
             style={{
@@ -119,20 +119,16 @@ export function Intro() {
                 House of the Knight
               </p>
 
-              {/* Layer 2: Text Catching Upward Amber Rays (Masked: Base Only, Top Stays Dark) */}
+              {/* Layer 2: Bottom-Anchored Radial Amber Hue (Only Lower Rays on Glyphs, Zero Pipe) */}
               <p
                 className="pointer-events-none absolute inset-0 w-full text-center font-display font-black leading-[0.88] tracking-tight whitespace-nowrap text-[13.85vw] select-none transform-gpu"
                 style={{
                   background:
-                    "linear-gradient(90deg, transparent 0%, transparent 34%, rgba(245, 150, 15, 0.04) 41%, rgba(255, 140, 25, 0.26) 47%, rgba(255, 185, 65, 0.46) 50%, rgba(255, 140, 25, 0.26) 53%, rgba(245, 150, 15, 0.04) 59%, transparent 66%, transparent 100%)",
+                    "radial-gradient(ellipse 48% 85% at 50% 100%, rgba(255, 185, 65, 0.48) 0%, rgba(255, 140, 25, 0.24) 30%, rgba(245, 150, 15, 0.05) 55%, transparent 75%)",
                   backgroundSize: "260% 100%",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
-                  WebkitMaskImage:
-                    "linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 24%, rgba(0,0,0,0.15) 50%, transparent 72%)",
-                  maskImage:
-                    "linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 24%, rgba(0,0,0,0.15) 50%, transparent 72%)",
-                  filter: "blur(14px) sm:blur(18px)",
+                  filter: "blur(12px) sm:blur(16px)",
                   opacity: 0.95,
                   animation:
                     "watermarkLivingGlow 3.6s cubic-bezier(0.35, 0, 0.25, 1) infinite",
@@ -140,20 +136,6 @@ export function Intro() {
               >
                 House of the Knight
               </p>
-
-              {/* Layer 3: Subterranean Light Stripe Running Below the Screen Edge */}
-              <div
-                className="pointer-events-none absolute -bottom-6 inset-x-0 h-10 select-none transform-gpu"
-                style={{
-                  background:
-                    "linear-gradient(90deg, transparent 0%, transparent 35%, rgba(245, 150, 15, 0.03) 42%, rgba(255, 140, 25, 0.22) 48%, rgba(255, 185, 65, 0.42) 50%, rgba(255, 140, 25, 0.22) 52%, rgba(245, 150, 15, 0.03) 58%, transparent 65%, transparent 100%)",
-                  backgroundSize: "260% 100%",
-                  filter: "blur(22px) sm:blur(30px)",
-                  opacity: 0.7,
-                  animation:
-                    "watermarkLivingGlow 3.6s cubic-bezier(0.35, 0, 0.25, 1) infinite",
-                }}
-              />
             </div>
           </motion.div>
 
@@ -173,11 +155,11 @@ export function Intro() {
               isBeating
                 ? {
                     opacity: 1,
-                    scale: [1, 1.32, 1],
+                    scale: [1, 1.35, 1],
                     transition: {
                       scale: {
-                        duration: 1.32,
-                        times: [0, 0.025, 1],
+                        duration: 1.35,
+                        times: [0, 0.015, 1],
                         ease: ["easeOut", [0.16, 1, 0.3, 1]],
                       },
                     },
@@ -204,16 +186,16 @@ export function Intro() {
               {/* Ghost After-Image Zooming Outward at the Fast Beat Expansion */}
               {isBeating && (
                 <>
-                  {/* Primary Ghost After-Image Zoom Echo (Slow Ethereal Dissolve) */}
+                  {/* Primary Ghost After-Image Zoom Echo (Greater Distance Travel) */}
                   <motion.img
                     src="/images/hok-monogram.png"
                     alt=""
                     aria-hidden="true"
                     initial={{ scale: 1, opacity: 0.88 }}
-                    animate={{ scale: 2.65, opacity: 0 }}
+                    animate={{ scale: 3.4, opacity: 0 }}
                     transition={{
-                      duration: 1.25,
-                      ease: [0.14, 1, 0.28, 1],
+                      duration: 1.4,
+                      ease: [0.12, 1, 0.25, 1],
                     }}
                     style={{
                       filter: "grayscale(100%) brightness(0.72) contrast(1.05)",
@@ -223,17 +205,17 @@ export function Intro() {
                     draggable={false}
                   />
 
-                  {/* Secondary Subtle After-Image Ripple (Slow Extended Echo) */}
+                  {/* Secondary Subtle After-Image Ripple (Extended Cosmic Travel) */}
                   <motion.img
                     src="/images/hok-monogram.png"
                     alt=""
                     aria-hidden="true"
                     initial={{ scale: 1, opacity: 0.50 }}
-                    animate={{ scale: 3.35, opacity: 0 }}
+                    animate={{ scale: 4.4, opacity: 0 }}
                     transition={{
-                      duration: 1.50,
+                      duration: 1.65,
                       delay: 0.04,
-                      ease: [0.14, 1, 0.28, 1],
+                      ease: [0.12, 1, 0.25, 1],
                     }}
                     style={{
                       filter: "grayscale(100%) brightness(0.65) contrast(1.05)",
