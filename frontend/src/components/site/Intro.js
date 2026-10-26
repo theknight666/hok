@@ -45,18 +45,18 @@ export function Intro() {
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
 
-    // 1. Trigger single ultra-fast beat + slow after-image ghost zoom at 0.75s
+    // 1. Trigger single ultra-fast beat + after-image ghost zoom quickly at 0.25s (no awkward delay)
     const beatTimer = setTimeout(() => {
       setIsBeating(true);
-    }, 750);
+    }, 250);
 
-    // 2. Conclude preloader smoothly at 2.4s: lift curtain with logo remaining fully visible
+    // 2. Conclude preloader smoothly at 1.85s: lift curtain with logo remaining fully visible
     const exitTimer = setTimeout(() => {
       setShow(false);
       setTimeout(() => {
         document.body.style.overflow = prevOverflow;
       }, 950);
-    }, 2400);
+    }, 1850);
 
     return () => {
       clearTimeout(beatTimer);
@@ -103,31 +103,51 @@ export function Intro() {
           `}</style>
 
           {/* ======================================================== */}
-          {/* WATERMARK: Edge-to-Edge Pure Alphabets with Living Glow  */}
+          {/* WATERMARK: Edge-to-Edge Pure Alphabets with Smudged Hue */}
           {/* ======================================================== */}
           <motion.div
             style={{
               x: watermarkX,
               y: watermarkY,
             }}
-            className="pointer-events-none absolute inset-x-0 bottom-0 pb-1 sm:pb-2 lg:pb-3 flex items-end justify-center select-none will-change-transform w-full overflow-hidden"
+            className="pointer-events-none absolute inset-x-0 bottom-0 pb-1 sm:pb-2 lg:pb-3 flex items-end justify-center select-none will-change-transform w-full overflow-visible"
             aria-hidden="true"
           >
-            <div className="relative w-full flex items-center justify-center text-center overflow-hidden">
-              {/* Base Subtle Edge-to-Edge Watermark */}
-              <p className="w-full text-center font-display font-black leading-[0.88] tracking-tight whitespace-nowrap text-[13.85vw] text-[#FBF8F3]/[0.055] select-none">
+            <div className="relative w-full flex items-center justify-center text-center overflow-visible">
+              {/* Layer 1: Base Subtle Edge-to-Edge Watermark Typography */}
+              <p className="w-full text-center font-display font-black leading-[0.88] tracking-tight whitespace-nowrap text-[13.85vw] text-[#FBF8F3]/[0.05] select-none">
                 House of the Knight
               </p>
 
-              {/* Continuous GPU-Composited Living Amber Glow (Even More Subtle, Zero Pipe) */}
+              {/* Layer 2: Smudged Atmospheric Warm Amber Hue Glow (Diffused Aura) */}
               <p
-                className="pointer-events-none absolute inset-0 w-full text-center font-display font-black leading-[0.88] tracking-tight whitespace-nowrap text-[13.85vw] select-none"
+                className="pointer-events-none absolute inset-0 w-full text-center font-display font-black leading-[0.88] tracking-tight whitespace-nowrap text-[13.85vw] select-none transform-gpu"
                 style={{
                   background:
-                    "linear-gradient(90deg, transparent 0%, transparent 34%, rgba(245, 158, 11, 0.05) 42%, rgba(255, 150, 40, 0.16) 48%, rgba(255, 190, 85, 0.26) 50%, rgba(255, 150, 40, 0.16) 52%, rgba(245, 158, 11, 0.05) 58%, transparent 66%, transparent 100%)",
+                    "linear-gradient(90deg, transparent 0%, transparent 34%, rgba(245, 150, 15, 0.04) 41%, rgba(255, 140, 25, 0.22) 47%, rgba(255, 180, 60, 0.38) 50%, rgba(255, 140, 25, 0.22) 53%, rgba(245, 150, 15, 0.04) 59%, transparent 66%, transparent 100%)",
                   backgroundSize: "260% 100%",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
+                  filter: "blur(18px) sm:blur(24px)",
+                  opacity: 0.9,
+                  animation:
+                    "watermarkLivingGlow 3.6s cubic-bezier(0.35, 0, 0.25, 1) infinite",
+                }}
+              >
+                House of the Knight
+              </p>
+
+              {/* Layer 3: Ultra-Soft Secondary Ambient Bloom */}
+              <p
+                className="pointer-events-none absolute inset-0 w-full text-center font-display font-black leading-[0.88] tracking-tight whitespace-nowrap text-[13.85vw] select-none transform-gpu"
+                style={{
+                  background:
+                    "linear-gradient(90deg, transparent 0%, transparent 33%, rgba(245, 150, 15, 0.03) 40%, rgba(255, 135, 20, 0.14) 47%, rgba(255, 175, 50, 0.25) 50%, rgba(255, 135, 20, 0.14) 53%, rgba(245, 150, 15, 0.03) 60%, transparent 67%, transparent 100%)",
+                  backgroundSize: "260% 100%",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  filter: "blur(36px) sm:blur(48px)",
+                  opacity: 0.85,
                   animation:
                     "watermarkLivingGlow 3.6s cubic-bezier(0.35, 0, 0.25, 1) infinite",
                 }}
@@ -164,7 +184,7 @@ export function Intro() {
                   }
                 : { opacity: 1, scale: 1 }
             }
-            transition={{ opacity: { duration: 0.5 } }}
+            transition={{ opacity: { duration: 0.18 } }}
             className="relative z-10 flex items-center justify-center p-6 will-change-transform -translate-y-8 sm:-translate-y-12 lg:-translate-y-14"
           >
             <div className="relative h-28 w-28 sm:h-36 sm:w-36 lg:h-40 lg:w-40 flex items-center justify-center transform-gpu">
