@@ -33,6 +33,7 @@ export function ProductDialog({ product, onClose, onSaved }) {
       image: f.image, color: f.color, price: Number(f.price), sample_price: Number(f.sample_price || 99),
       stock: Number(f.stock), low_stock_threshold: Number(f.low_stock_threshold),
       active: f.active, featured: f.featured, notes: { top: toList(f.top), heart: toList(f.heart), base: toList(f.base) },
+      olfactory_family: product.olfactory_family, accords: product.accords, architecture: product.architecture,
     };
     try {
       const savedSlug = isNew ? f.slug.trim().toLowerCase().replace(/\s+/g, "-") : product.slug;

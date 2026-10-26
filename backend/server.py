@@ -946,26 +946,111 @@ async def admin_review_delete(rid: str, _: dict = Depends(require_admin)):
 
 # ---------- Seed ----------
 SEED = [
-    {"slug": "blonde-amber", "name": "Blonde Amber", "order": 1, "color": "#D4A24C", "badge": "The Signature",
-     "tagline": "Liquid gold, warm resins and a whisper of smoke.",
-     "story": "A radiant amber that glows like candlelight on gilded walls — warm, golden and unmistakably regal.",
-     "concentration": "Eau de Parfum", "volume": "50 ml", "price": 1599, "sample_price": 99, "stock": 50,
-     "notes": {"top": ["Bitter Orange", "Pink Pepper"], "heart": ["Blonde Tobacco", "Orris"], "base": ["Amber", "Tonka", "Vanilla"]}},
-    {"slug": "layton", "name": "Layton", "order": 2, "color": "#1E2F5C", "badge": "The Noble",
-     "tagline": "Crisp bergamot, lavender and warm woods.",
-     "story": "Composed with the poise of a knight in court — fresh at first, then deep, warm and assured.",
-     "concentration": "Eau de Parfum", "volume": "50 ml", "price": 1499, "sample_price": 99, "stock": 50,
-     "notes": {"top": ["Apple", "Bergamot", "Lavender"], "heart": ["Jasmine", "Violet"], "base": ["Vanilla", "Sandalwood", "Guaiac Wood"]}},
-    {"slug": "angels-share-on-the-rocks", "name": "Angels Share On The Rocks", "order": 3, "color": "#8A4B1F",
-     "badge": "The Reserve", "tagline": "Cognac, cinnamon and oak — served over ice.",
-     "story": "An ode to the spirit lost to the heavens as cognac ages in oak, poured cold over crystal ice.",
-     "concentration": "Eau de Parfum", "volume": "50 ml", "price": 1549, "sample_price": 99, "stock": 50,
-     "notes": {"top": ["Cognac", "Frozen Bergamot"], "heart": ["Cinnamon", "Oak"], "base": ["Praline", "Sandalwood", "Vanilla"]}},
-    {"slug": "side-effect", "name": "Side Effect", "order": 4, "color": "#5A1420", "badge": "The Enigma",
-     "tagline": "Tobacco, rum and dark leather after midnight.",
-     "story": "A dark, addictive trail of tobacco and rum that lingers long after you have left the room.",
-     "concentration": "Eau de Parfum", "volume": "50 ml", "price": 1499, "sample_price": 99, "stock": 50,
-     "notes": {"top": ["Rum", "Tobacco"], "heart": ["Cinnamon", "Saffron"], "base": ["Leather", "Vanilla", "Woody Amber"]}},
+    {
+        "slug": "blonde-amber", "name": "Blonde Amber", "order": 1, "color": "#D4A24C", "badge": "The Signature",
+        "tagline": "Liquid gold, warm resins and a whisper of smoke.",
+        "story": "A radiant amber that glows like candlelight on gilded walls — warm, golden and unmistakably regal.",
+        "concentration": "Eau de Parfum", "volume": "50 ml", "price": 1599, "sample_price": 99, "stock": 50,
+        "olfactory_family": "Warm Amber Spicy · Oriental Gourmand",
+        "accords": [
+            {"name": "Amber Resin", "pct": 95},
+            {"name": "Warm Spice", "pct": 90},
+            {"name": "Sweet Blonde Tobacco", "pct": 86},
+            {"name": "Bourbon Vanilla", "pct": 82},
+            {"name": "Sunlit Citrus", "pct": 68},
+            {"name": "Precious Woods", "pct": 60},
+        ],
+        "architecture": {
+            "longevity": "12+ Hours · Enduring Aura",
+            "sillage": "Intense · Regal Radiance",
+            "season": "Autumn / Winter / Sovereign Evenings",
+            "concentration": "EDP",
+            "profile": "An imperial opening of sun-drenched bitter orange and fizzing pink pepper steeped in aged rum, revealing a heart of velvety blonde tobacco and powdery Tuscan orris, grounded on molten amber resin, tonka and bourbon vanilla.",
+        },
+        "notes": {
+            "top": ["Bitter Orange", "Rum", "Pink Pepper", "Cardamom", "Bergamot", "Ginger"],
+            "heart": ["Blonde Tobacco", "Orris", "Dried Fruits", "Sandalwood", "Saffron", "White Pepper", "Jasmine"],
+            "base": ["Amber", "Vanilla", "Tonka Bean", "Cedarwood", "Labdanum", "Myrrh", "Patchouli", "Musk"],
+        },
+    },
+    {
+        "slug": "layton", "name": "Layton", "order": 2, "color": "#1E2F5C", "badge": "The Noble",
+        "tagline": "Crisp bergamot, lavender and warm woods.",
+        "story": "Composed with the poise of a knight in court — fresh at first, then deep, warm and assured.",
+        "concentration": "Eau de Parfum", "volume": "50 ml", "price": 1499, "sample_price": 99, "stock": 50,
+        "olfactory_family": "Amber Floral · Aristocratic Fresh Woody",
+        "accords": [
+            {"name": "Warm Spicy", "pct": 94},
+            {"name": "Aromatic Lavender", "pct": 88},
+            {"name": "Crisp Apple & Citrus", "pct": 85},
+            {"name": "Bourbon Vanilla", "pct": 80},
+            {"name": "Noble Woods", "pct": 74},
+        ],
+        "architecture": {
+            "longevity": "10–12 Hours · All-Day Sillage",
+            "sillage": "Heavy · Commanding Aura",
+            "season": "All-Season Signature · Court & Evening",
+            "concentration": "EDP",
+            "profile": "Tart crisp apple and Italian bergamot infused with wild French lavender, drifting into an aristocratic heart of night-blooming jasmine and violet, resting on a grand bed of vanilla, creamy sandalwood and guaiac wood.",
+        },
+        "notes": {
+            "top": ["Apple", "Lavender", "Bergamot", "Mandarin Orange"],
+            "heart": ["Jasmine", "Violet", "Cardamom", "Pink Pepper"],
+            "base": ["Vanilla", "Sandalwood", "Guaiac Wood", "Amber", "Patchouli"],
+        },
+    },
+    {
+        "slug": "angels-share-on-the-rocks", "name": "Angels Share On The Rocks", "order": 3, "color": "#8A4B1F",
+        "badge": "The Reserve", "tagline": "Cognac, cinnamon and oak — served over ice.",
+        "story": "An ode to the spirit lost to the heavens as cognac ages in oak, poured cold over crystal ice.",
+        "concentration": "Eau de Parfum", "volume": "50 ml", "price": 1549, "sample_price": 99, "stock": 50,
+        "olfactory_family": "Warm Gourmand · Boozy Amber Wood",
+        "accords": [
+            {"name": "Cinnamon Spice", "pct": 96},
+            {"name": "Oak-Aged Cognac", "pct": 92},
+            {"name": "Praline & Vanilla", "pct": 88},
+            {"name": "French Oak", "pct": 82},
+            {"name": "Golden Amber", "pct": 76},
+        ],
+        "architecture": {
+            "longevity": "10–14 Hours · Enveloping Warmth",
+            "sillage": "Strong · Intoxicating Trail",
+            "season": "Fall / Winter / Midnight Revelry",
+            "concentration": "EDP",
+            "profile": "An intoxicating splash of aged oak-barrel cognac chilled over frosted bergamot, leading to an opulent core of warm cinnamon bark and roasted hazelnut praline, grounded by sandalwood and golden amber.",
+        },
+        "notes": {
+            "top": ["Cognac", "Cinnamon", "Frozen Bergamot", "Nutmeg"],
+            "heart": ["Oak", "Praline", "Tonka Bean", "Cardamom"],
+            "base": ["Vanilla", "Sandalwood", "Amber", "Cedarwood"],
+        },
+    },
+    {
+        "slug": "side-effect", "name": "Side Effect", "order": 4, "color": "#5A1420", "badge": "The Enigma",
+        "tagline": "Tobacco, rum and dark leather after midnight.",
+        "story": "A dark, addictive trail of tobacco and rum that lingers long after you have left the room.",
+        "concentration": "Eau de Parfum", "volume": "50 ml", "price": 1499, "sample_price": 99, "stock": 50,
+        "olfactory_family": "Amber Tobacco · Dark Narcotic Leather",
+        "accords": [
+            {"name": "Rich Tobacco", "pct": 96},
+            {"name": "Dark Rum", "pct": 92},
+            {"name": "Warm Cinnamon", "pct": 88},
+            {"name": "Vanilla Absolute", "pct": 82},
+            {"name": "Leather & Saffron", "pct": 78},
+        ],
+        "architecture": {
+            "longevity": "12+ Hours · Addictive Longevity",
+            "sillage": "Enormous · Room-Commanding",
+            "season": "Autumn / Winter / Intimate After-Hours",
+            "concentration": "EDP",
+            "profile": "A dangerously seductive duet of dark vintage rum and cured tobacco leaf ignited by cinnamon and crimson saffron threads, draped over an opulent base of dark saddle leather, woody amber and vanilla.",
+        },
+        "notes": {
+            "top": ["Tobacco", "Rum", "Cinnamon", "Pink Pepper"],
+            "heart": ["Saffron", "Dried Fruits", "Cardamom"],
+            "base": ["Leather", "Vanilla", "Woody Amber", "Sandalwood", "Patchouli"],
+        },
+    },
 ]
 SEED_PRICES = {"blonde-amber": 1599, "layton": 1499, "angels-share-on-the-rocks": 1549, "side-effect": 1499}
 SEED_SAMPLE_PRICES = {"blonde-amber": 99, "layton": 99, "angels-share-on-the-rocks": 99, "side-effect": 99}
@@ -989,10 +1074,18 @@ async def startup():
                        "low_stock_threshold": 10, "active": True, "featured": True, "updated_at": now().isoformat()}
                 await db.products.insert_one(doc)
             else:
-                # Ensure seed products are always active and featured
+                # Ensure seed products are always active, featured, and sync updated notes & architecture
                 await db.products.update_one(
                     {"slug": p["slug"]},
-                    {"$set": {"active": True, "featured": True, "concentration": "Eau de Parfum"}}
+                    {"$set": {
+                        "active": True,
+                        "featured": True,
+                        "concentration": "Eau de Parfum",
+                        "notes": p["notes"],
+                        "olfactory_family": p.get("olfactory_family"),
+                        "accords": p.get("accords"),
+                        "architecture": p.get("architecture"),
+                    }}
                 )
         await db.products.update_many({"featured": {"$exists": False}}, {"$set": {"featured": True}})
         await db.products.update_many({"concentration": "Extrait de Parfum"}, {"$set": {"concentration": "Eau de Parfum"}})

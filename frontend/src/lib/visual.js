@@ -17,14 +17,71 @@ export const cutout = (p) =>
 export const flatNotes = (notes, n = 5) =>
   [...(notes?.top || []), ...(notes?.heart || []), ...(notes?.base || [])].slice(0, n);
 
-/** Raw-ingredient renders available under /public/images/notes. */
-const NOTE_IMAGES = new Set(["bitter-orange", "blonde-tobacco", "vanilla", "apple", "lavender", "sandalwood", "cognac", "cinnamon", "oak", "saffron"]);
-export const noteSlug = (n) => n.toLowerCase().trim().replace(/\s+/g, "-");
+export const noteSlug = (n) =>
+  String(n || "")
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/\s+/g, "-");
+
+const NOTE_IMAGE_MAP = {
+  "apple": "/images/notes/apple.png",
+  "bitter-orange": "/images/notes/bitter-orange.png",
+  "blonde-tobacco": "/images/notes/blonde-tobacco.png",
+  "tobacco": "/images/notes/tobacco.png",
+  "cinnamon": "/images/notes/cinnamon.png",
+  "cognac": "/images/notes/cognac.png",
+  "lavender": "/images/notes/lavender.png",
+  "oak": "/images/notes/oak.png",
+  "saffron": "/images/notes/saffron.png",
+  "sandalwood": "/images/notes/sandalwood.png",
+  "vanilla": "/images/notes/vanilla.png",
+  "mandarin-orange": "/images/notes/mandarin-orange.png",
+  "mandarin": "/images/notes/mandarin-orange.png",
+  "nutmeg": "/images/notes/nutmeg.png",
+  "amber": "/images/notes/amber.jpg",
+  "woody-amber": "/images/notes/woody-amber.jpg",
+  "bergamot": "/images/notes/bergamot.jpg",
+  "frozen-bergamot": "/images/notes/frozen-bergamot.jpg",
+  "cardamom": "/images/notes/cardamom.jpg",
+  "cedarwood": "/images/notes/cedarwood.jpg",
+  "cedar": "/images/notes/cedarwood.jpg",
+  "guaiac-wood": "/images/notes/guaiac-wood.jpg",
+  "jasmine": "/images/notes/jasmine.jpg",
+  "leather": "/images/notes/leather.jpg",
+  "orris": "/images/notes/orris.jpg",
+  "orris-root": "/images/notes/orris.jpg",
+  "patchouli": "/images/notes/patchouli.jpg",
+  "pink-pepper": "/images/notes/pink-pepper.jpg",
+  "white-pepper": "/images/notes/white-pepper.jpg",
+  "praline": "/images/notes/praline.jpg",
+  "rum": "/images/notes/rum.jpg",
+  "tonka": "/images/notes/tonka.jpg",
+  "tonka-bean": "/images/notes/tonka-bean.jpg",
+  "violet": "/images/notes/violet.jpg",
+  "ginger": "/images/notes/ginger.jpg",
+  "dried-fruits": "/images/notes/dried-fruits.jpg",
+  "olibanum": "/images/notes/olibanum.jpg",
+  "myrrh": "/images/notes/myrrh.jpg",
+  "labdanum": "/images/notes/labdanum.jpg",
+  "musk": "/images/notes/musk.jpg",
+};
+
+export const getNoteImage = (n) => {
+  if (!n) return null;
+  const slug = noteSlug(n);
+  if (NOTE_IMAGE_MAP[slug]) return NOTE_IMAGE_MAP[slug];
+  for (const [key, path] of Object.entries(NOTE_IMAGE_MAP)) {
+    if (slug.includes(key) || key.includes(slug)) return path;
+  }
+  return null;
+};
+
 export const noteImages = (notes, n = 3) =>
   [...(notes?.top || []), ...(notes?.heart || []), ...(notes?.base || [])]
-    .filter((x) => NOTE_IMAGES.has(noteSlug(x)))
+    .filter((x) => Boolean(getNoteImage(x)))
     .filter((x, i, a) => a.indexOf(x) === i)
     .slice(0, n)
-    .map((x) => ({ name: x, src: `/images/notes/${noteSlug(x)}.png` }));
+    .map((x) => ({ name: x, src: getNoteImage(x) }));
 
 export const featuredFirst = (products) => [...products].sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));

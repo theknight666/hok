@@ -138,7 +138,7 @@ export default function Product() {
             </FadeUp>
             <FadeUp className="mt-14">
               <p className="eyebrow mb-6">The Composition</p>
-              <NotesPyramid notes={p.notes} color={world.bg} />
+              <NotesPyramid notes={p.notes} color={world.bg} product={p} />
             </FadeUp>
             <ReviewsBlock slug={p.slug} name={p.name} />
           </motion.div>
