@@ -60,6 +60,8 @@
   html {
     -webkit-tap-highlight-color: transparent;
     text-rendering: optimizeLegibility;
+    overflow-y: scroll !important;
+    scrollbar-gutter: stable;
   }
   html.lenis, html.lenis body {
     height: auto;
@@ -70,8 +72,9 @@
   .lenis.lenis-smooth [data-lenis-prevent] {
     overscroll-behavior: contain;
   }
+  /* Prevent Lenis from removing scrollbar on stop, eliminating horizontal viewport shift */
   .lenis.lenis-stopped {
-    overflow: hidden;
+    overflow-y: scroll !important;
   }
   body {
     @apply bg-background text-foreground;
@@ -79,6 +82,25 @@
     font-weight: 400;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+  /* Sleek Luxury Royal Scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--background));
+  }
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+    border-radius: 9999px;
+    border: 2px solid hsl(var(--background));
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--gold));
+  }
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--border)) hsl(var(--background));
   }
   ::selection { background: hsl(var(--gold)); color: var(--ink); }
   h1, h2, h3, .font-display {

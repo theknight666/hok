@@ -1,9 +1,13 @@
 import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { useTheme } from "@/context/ThemeContext";
 
 const LUXURY_EASE = [0.83, 0, 0.17, 1];
 
 export function Intro() {
+  const themeContext = useTheme();
+  const isDark = themeContext ? themeContext.theme === "dark" : false;
+
   // Always show preloader on every page reload per user instruction (will revert when user texts "revert")
   const [show, setShow] = useState(true);
   const [isBeating, setIsBeating] = useState(false);
@@ -42,8 +46,10 @@ export function Intro() {
   useEffect(() => {
     if (!show) return undefined;
 
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    // Lock scroll smoothly without toggling overflow on body (eliminates scrollbar layout shift)
+    if (window.__lenis) {
+      window.__lenis.stop();
+    }
 
     // 1. Trigger single ultra-fast beat + after-image ghost zoom quickly at 0.25s (no awkward delay)
     const beatTimer = setTimeout(() => {
@@ -53,23 +59,22 @@ export function Intro() {
     // 2. Conclude preloader smoothly at 1.85s: lift curtain with logo remaining fully visible
     const exitTimer = setTimeout(() => {
       setShow(false);
-      setTimeout(() => {
-        document.body.style.overflow = prevOverflow;
-      }, 950);
     }, 1850);
 
     return () => {
       clearTimeout(beatTimer);
       clearTimeout(exitTimer);
-      document.body.style.overflow = prevOverflow;
+      if (window.__lenis) {
+        window.__lenis.start();
+      }
     };
   }, [show]);
 
   const handleDismiss = () => {
     setShow(false);
-    setTimeout(() => {
-      document.body.style.overflow = "";
-    }, 950);
+    if (window.__lenis) {
+      window.__lenis.start();
+    }
   };
 
   return (
@@ -77,102 +82,116 @@ export function Intro() {
       {show && (
         <motion.div
           ref={containerRef}
-          key="minimalist-luxury-preloader-v3"
+          key={`minimalist-luxury-${isDark ? "dark" : "light"}-preloader-slab`}
           data-testid="intro-curtain"
           initial={{ y: 0 }}
           exit={{ y: "-100%" }}
           transition={{ duration: 0.95, ease: LUXURY_EASE }}
           onMouseMove={handleMouseMove}
           onClick={handleDismiss}
-          style={{ perspective: 1200 }}
-          className="fixed inset-0 z-[9999] pointer-events-auto select-none overflow-hidden bg-[#0A080D] flex items-center justify-center will-change-transform transform-gpu shadow-[0_30px_90px_rgba(0,0,0,0.95)] cursor-pointer"
-        >
-          {/* Analog Luxury Texture Grain */}
-          <div className="grain pointer-events-none absolute inset-0 opacity-35" aria-hidden="true" />
-
-          {/* Google Assistant Android Bottom Wave Keyframes */}
-          <style>{`
-            @keyframes assistantBottomWave {
-              0% {
-                background-position: 140% 100%;
-              }
-              100% {
-                background-position: -40% 100%;
+          onAnimationComplete={(definition) => {
+            if (definition === "exit" || !show) {
+              if (window.__lenis) {
+                window.__lenis.start();
               }
             }
-          `}</style>
-
-          {/* ======================================================== */}
-          {/* GOOGLE ASSISTANT BOTTOM GLOW & WATERMARK TYPOGRAPHY     */}
-          {/* Glow emanates upward from bottom bezel like Android     */}
-          {/* ======================================================== */}
-          {/* Layer 1: Ambient Bottom Chin Horizon (Google Assistant light bar / aura) */}
-          <div
-            className="pointer-events-none absolute inset-x-0 bottom-0 h-24 sm:h-32 lg:h-36 overflow-visible flex items-end justify-center select-none"
+          }}
+          style={{
+            perspective: 1200,
+            backgroundColor: isDark ? "#000000" : "#FFFFFF",
+            boxShadow: isDark
+              ? "0 14px 28px -4px rgba(0, 0, 0, 0.95), 0 35px 70px -8px rgba(0, 0, 0, 0.98), 0 85px 170px -16px rgba(0, 0, 0, 1), inset 0 2px 2px rgba(255, 255, 255, 0.14), inset 0 -4px 10px rgba(255, 255, 255, 0.05), inset 0 0 90px rgba(0, 0, 0, 0.6)"
+              : "0 14px 28px -4px rgba(0, 0, 0, 0.16), 0 35px 70px -8px rgba(0, 0, 0, 0.24), 0 85px 170px -16px rgba(0, 0, 0, 0.32), inset 0 2px 2px rgba(255, 255, 255, 1), inset 0 -5px 12px rgba(0, 0, 0, 0.10), inset 0 0 90px rgba(0, 0, 0, 0.025)",
+          }}
+          className={`fixed inset-0 z-[9999] pointer-events-auto select-none overflow-hidden rounded-b-[34px] sm:rounded-b-[42px] lg:rounded-b-[50px] border-b-2 border-x ${
+            isDark ? "border-white/[0.08]" : "border-black/[0.08]"
+          } flex items-center justify-center will-change-transform transform-gpu cursor-pointer`}
+        >
+          {/* The First Royal Heraldic Damask & Trellis Texture with Lightening Bottom Gradient */}
+          <svg
+            className="pointer-events-none absolute inset-0 h-full w-full"
+            style={{
+              maskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 30%, rgba(0,0,0,0.68) 55%, rgba(0,0,0,0.38) 78%, rgba(0,0,0,0.18) 100%)",
+              WebkitMaskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 30%, rgba(0,0,0,0.68) 55%, rgba(0,0,0,0.38) 78%, rgba(0,0,0,0.18) 100%)",
+            }}
+            xmlns="http://www.w3.org/2000/svg"
             aria-hidden="true"
           >
-            <div
-              className="w-full h-full transform-gpu opacity-70"
-              style={{
-                background:
-                  "radial-gradient(ellipse 65% 100% at 50% 100%, rgba(255, 185, 70, 0.22) 0%, rgba(255, 140, 25, 0.09) 35%, rgba(240, 120, 15, 0.015) 65%, transparent 85%)",
-                backgroundSize: "240% 100%",
-                filter: "blur(20px) sm:blur(28px)",
-                animation:
-                  "assistantBottomWave 3.8s cubic-bezier(0.35, 0, 0.25, 1) infinite",
-              }}
-            />
-          </div>
+            <defs>
+              {/* Native SVG Mask fallback for continuous gradient lightening */}
+              <linearGradient id="royalTextureFadeMaskGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#FFFFFF" stopOpacity="1" />
+                <stop offset="30%" stopColor="#FFFFFF" stopOpacity="1" />
+                <stop offset="55%" stopColor="#FFFFFF" stopOpacity="0.68" />
+                <stop offset="78%" stopColor="#FFFFFF" stopOpacity="0.38" />
+                <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0.18" />
+              </linearGradient>
+              <mask id="royalTextureFadeMask">
+                <rect width="100%" height="100%" fill="url(#royalTextureFadeMaskGrad)" />
+              </mask>
 
-          {/* Layer 2: Parallax Watermark Text Lit from the Bottom Up */}
+              <pattern
+                id="royalHeraldicPattern"
+                width="72"
+                height="72"
+                patternUnits="userSpaceOnUse"
+              >
+                {/* Royal Trellis Diamond Lattice */}
+                <path
+                  d="M36 0 L72 36 L36 72 L0 36 Z"
+                  fill="none"
+                  stroke={isDark ? "#141414" : "#F5F5F5"}
+                  strokeWidth="0.85"
+                />
+
+                {/* Alternating Diamond Center Florets */}
+                <circle cx="0" cy="0" r="2.2" fill={isDark ? "#141414" : "#F5F5F5"} />
+                <circle cx="72" cy="0" r="2.2" fill={isDark ? "#141414" : "#F5F5F5"} />
+                <circle cx="0" cy="72" r="2.2" fill={isDark ? "#141414" : "#F5F5F5"} />
+                <circle cx="72" cy="72" r="2.2" fill={isDark ? "#141414" : "#F5F5F5"} />
+
+                {/* Authentic Royal Spade (♠) Perfectly Centered at (36, 36) */}
+                <path
+                  d="M 36 25 C 38 28, 44.5 32, 44.5 36.5 C 44.5 40.5, 41 42, 37.5 40.5 C 36.8 40, 36.2 39.5, 36.2 39 C 36.5 41.5, 38 44.5, 39.5 46 L 32.5 46 C 34 44.5, 35.5 41.5, 35.8 39 C 35.8 39.5, 35.2 40, 34.5 40.5 C 31 42, 27.5 40.5, 27.5 36.5 C 27.5 32, 34 28, 36 25 Z"
+                  fill={isDark ? "#141414" : "#F5F5F5"}
+                />
+              </pattern>
+            </defs>
+            <rect
+              width="100%"
+              height="100%"
+              fill="url(#royalHeraldicPattern)"
+              mask="url(#royalTextureFadeMask)"
+            />
+          </svg>
+
+          {/* Physical 3D Architectural Slab Bottom Thickness Bevel */}
+          <div
+            className={`pointer-events-none absolute inset-x-0 bottom-0 h-2.5 rounded-b-[34px] sm:rounded-b-[42px] lg:rounded-b-[50px] ${
+              isDark
+                ? "bg-gradient-to-t from-white/[0.08] to-transparent"
+                : "bg-gradient-to-t from-black/[0.04] to-transparent"
+            }`}
+            aria-hidden="true"
+          />
+
+          {/* ======================================================== */}
+          {/* WATERMARK: 3-4 Shades Shifted Stealth Typography         */}
+          {/* ======================================================== */}
           <motion.div
             style={{
               x: watermarkX,
               y: watermarkY,
             }}
-            className="pointer-events-none absolute inset-x-0 bottom-0 pb-1 sm:pb-2 lg:pb-3 flex items-end justify-center select-none will-change-transform w-full overflow-visible"
+            className="pointer-events-none absolute inset-x-0 bottom-0 pb-3 sm:pb-5 lg:pb-6 flex items-end justify-center select-none will-change-transform w-full overflow-hidden"
             aria-hidden="true"
           >
-            <div className="relative w-full flex items-center justify-center text-center overflow-visible">
-              {/* Layer 2a: Base Subtle Edge-to-Edge Watermark Typography */}
-              <p className="w-full text-center font-display font-black leading-[0.88] tracking-tight whitespace-nowrap text-[13.85vw] text-[#FBF8F3]/[0.05] select-none">
-                House of the Knight
-              </p>
-
-              {/* Layer 2b: Upward Rays Catching Letter Bases (Google Assistant illumination) */}
-              <p
-                className="pointer-events-none absolute inset-0 w-full text-center font-display font-black leading-[0.88] tracking-tight whitespace-nowrap text-[13.85vw] select-none transform-gpu"
-                style={{
-                  background:
-                    "radial-gradient(ellipse 55% 100% at 50% 100%, rgba(255, 195, 75, 0.40) 0%, rgba(255, 150, 30, 0.18) 28%, rgba(240, 120, 15, 0.03) 58%, transparent 78%)",
-                  backgroundSize: "240% 100%",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  animation:
-                    "assistantBottomWave 3.8s cubic-bezier(0.35, 0, 0.25, 1) infinite",
-                }}
-              >
-                House of the Knight
-              </p>
-
-              {/* Layer 2c: Atmospheric Smudged Glow Rising from Letter Bases */}
-              <p
-                className="pointer-events-none absolute inset-0 w-full text-center font-display font-black leading-[0.88] tracking-tight whitespace-nowrap text-[13.85vw] select-none transform-gpu"
-                style={{
-                  background:
-                    "radial-gradient(ellipse 55% 100% at 50% 100%, rgba(255, 185, 70, 0.26) 0%, rgba(255, 140, 25, 0.10) 30%, rgba(240, 120, 15, 0.015) 55%, transparent 75%)",
-                  backgroundSize: "240% 100%",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  filter: "blur(14px) sm:blur(20px)",
-                  opacity: 0.85,
-                  animation:
-                    "assistantBottomWave 3.8s cubic-bezier(0.35, 0, 0.25, 1) infinite",
-                }}
-              >
-                House of the Knight
-              </p>
-            </div>
+            <p
+              style={{ color: isDark ? "#0A0A0A" : "#F7F7F7" }}
+              className="w-full text-center font-display font-black leading-[0.88] tracking-tight whitespace-nowrap text-[13.85vw] select-none"
+            >
+              House of the Knight
+            </p>
           </motion.div>
 
           {/* ======================================================== */}
@@ -214,15 +233,16 @@ export function Intro() {
               transition={{ opacity: { duration: 0.18 } }}
               className="relative flex items-center justify-center p-6 will-change-transform"
             >
-              <div className="relative h-[4.25rem] w-[4.25rem] sm:h-[5.25rem] sm:w-[5.25rem] lg:h-24 lg:w-24 flex items-center justify-center transform-gpu">
-                {/* Primary Grey Monogram Logo (40% Smaller) */}
+              <div className="relative h-[6.8rem] w-[6.8rem] sm:h-[8.4rem] sm:w-[8.4rem] lg:h-[9.6rem] lg:w-[9.6rem] flex items-center justify-center transform-gpu">
+                {/* Primary Monogram Logo: Grey on Dark mode, Dark Obsidian on White mode */}
                 <img
-                  src="/images/hok-monogram.png"
+                  src={isDark ? "/images/hok-monogram.png" : "/images/hok-monogram-dark.png"}
                   alt="House of the Knight"
                   style={{
-                    filter:
-                      "grayscale(100%) brightness(0.68) contrast(1.05) drop-shadow(0 6px 20px rgba(0, 0, 0, 0.9))",
-                    opacity: 0.86,
+                    filter: isDark
+                      ? "grayscale(100%) brightness(0.72) contrast(1.05) drop-shadow(0 14px 28px rgba(0, 0, 0, 0.95)) drop-shadow(0 4px 10px rgba(0, 0, 0, 0.8))"
+                      : "drop-shadow(0 14px 28px rgba(0, 0, 0, 0.18)) drop-shadow(0 3px 8px rgba(0, 0, 0, 0.10))",
+                    opacity: 0.92,
                   }}
                   className="relative z-10 h-full w-full object-contain select-none pointer-events-none"
                   draggable={false}
@@ -231,31 +251,31 @@ export function Intro() {
                 {/* Ghost After-Image Zooming Outward at the Fast Beat Expansion */}
                 {isBeating && (
                   <>
-                    {/* Primary Ghost After-Image Zoom Echo (Greater Distance Travel) */}
+                    {/* Primary Ghost After-Image Zoom Echo */}
                     <motion.img
-                      src="/images/hok-monogram.png"
+                      src={isDark ? "/images/hok-monogram.png" : "/images/hok-monogram-dark.png"}
                       alt=""
                       aria-hidden="true"
-                      initial={{ scale: 1, opacity: 0.88 }}
+                      initial={{ scale: 1, opacity: isDark ? 0.85 : 0.42 }}
                       animate={{ scale: 3.4, opacity: 0 }}
                       transition={{
                         duration: 1.4,
                         ease: [0.12, 1, 0.25, 1],
                       }}
                       style={{
-                        filter: "grayscale(100%) brightness(0.72) contrast(1.05)",
+                        filter: isDark ? "grayscale(100%) brightness(0.75) contrast(1.05)" : "none",
                         pointerEvents: "none",
                       }}
                       className="absolute inset-0 z-0 h-full w-full object-contain select-none pointer-events-none transform-gpu origin-center"
                       draggable={false}
                     />
 
-                    {/* Secondary Subtle After-Image Ripple (Extended Cosmic Travel) */}
+                    {/* Secondary Subtle After-Image Ripple */}
                     <motion.img
-                      src="/images/hok-monogram.png"
+                      src={isDark ? "/images/hok-monogram.png" : "/images/hok-monogram-dark.png"}
                       alt=""
                       aria-hidden="true"
-                      initial={{ scale: 1, opacity: 0.50 }}
+                      initial={{ scale: 1, opacity: isDark ? 0.48 : 0.22 }}
                       animate={{ scale: 4.4, opacity: 0 }}
                       transition={{
                         duration: 1.65,
@@ -263,7 +283,7 @@ export function Intro() {
                         ease: [0.12, 1, 0.25, 1],
                       }}
                       style={{
-                        filter: "grayscale(100%) brightness(0.65) contrast(1.05)",
+                        filter: isDark ? "grayscale(100%) brightness(0.68) contrast(1.05)" : "none",
                         pointerEvents: "none",
                       }}
                       className="absolute inset-0 z-0 h-full w-full object-contain select-none pointer-events-none transform-gpu origin-center"
