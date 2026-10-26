@@ -441,28 +441,25 @@ async def ensure_seeded():
             else:
                 seen_slugs.add(slug)
 
-        # 2. Ensure each seed fragrance exists and is active/featured with 50ml and 2ml pricing
+        # 2. Ensure each seed fragrance exists initially if missing
         for p in SEED:
             existing = await db.products.find_one({"slug": p["slug"]})
             if not existing:
-                doc = {**p, "price": SEED_PRICES[p["slug"]], "sample_price": SEED_SAMPLE_PRICES[p["slug"]],
+                doc = {**p, "price": SEED_PRICES.get(p["slug"], 1499), "sample_price": SEED_SAMPLE_PRICES.get(p["slug"], 99),
                        "volume": "50 ml", "image": f"/images/{p['slug'].replace('-on-the-rocks', '')}.jpg",
                        "low_stock_threshold": 10, "active": True, "featured": True, "updated_at": now().isoformat()}
                 await db.products.insert_one(doc)
                 logger.info("Seeded missing fragrance: %s", p["slug"])
             else:
-                await db.products.update_one(
-                    {"slug": p["slug"]},
-                    {"$set": {
-                        "volume": "50 ml",
-                        "concentration": "Eau de Parfum",
-                        "price": SEED_PRICES[p["slug"]],
-                        "sample_price": SEED_SAMPLE_PRICES[p["slug"]],
-                        "active": True,
-                        "featured": True
-                    }}
-                )
-        await db.products.update_many({"concentration": "Extrait de Parfum"}, {"$set": {"concentration": "Eau de Parfum"}})
+                # Existing product: ONLY backfill missing fields if not present.
+                # NEVER overwrite user-modified fields like price, stock, active status, story, or notes!
+                missing = {}
+                if "sample_price" not in existing or existing.get("sample_price") is None:
+                    missing["sample_price"] = SEED_SAMPLE_PRICES.get(p["slug"], 99)
+                if "volume" not in existing:
+                    missing["volume"] = "50 ml"
+                if missing:
+                    await db.products.update_one({"slug": p["slug"]}, {"$set": missing})
 
         # One-time cleanup of initial development dummy/test orders and customers
         dummy_cleaned = await db.meta.find_one({"_id": "initial_dummy_cleaned_v1"})
@@ -576,7 +573,7 @@ async def create_order(body: OrderIn, user: Optional[dict] = Depends(optional_us
             if size == "2 ml":
                 unit_price = p.get("sample_price", 99)
             else:
-                unit_price = p.get("price", SEED_PRICES.get(it.slug, 1599))
+                unit_price = p.get("price", 0)
                 p_upd = await db.products.find_one_and_update(
                     {"slug": it.slug, "active": True, "stock": {"$gte": it.qty}},
                     {"$inc": {"stock": -it.qty}}, projection={"_id": 0})
@@ -737,7 +734,7 @@ async def admin_create_product(body: ProductIn, _: dict = Depends(require_admin)
     doc = body.model_dump()
     doc["updated_at"] = now().isoformat()
     await db.products.insert_one(dict(doc))
-    _products_cache = [p for p in _products_cache if p.get("slug") != doc["slug"]] + [dict(doc)]
+    _products_cache = []
     return doc
 
 
@@ -749,7 +746,7 @@ async def admin_update_product(slug: str, body: ProductPatch, _: dict = Depends(
     p = await db.products.find_one_and_update({"slug": slug}, {"$set": upd}, projection={"_id": 0}, return_document=True)
     if not p:
         raise HTTPException(status_code=404, detail="Product not found")
-    _products_cache = [x for x in _products_cache if x.get("slug") != slug] + [p]
+    _products_cache = []
     return p
 
 
@@ -1074,28 +1071,7 @@ async def startup():
         await db.reviews.create_index([("product_slug", 1), ("user_id", 1)], unique=True)
         await db.reviews.create_index("id", unique=True)
         await db.files.create_index("storage_path", unique=True)
-        for p in SEED:
-            if not await db.products.find_one({"slug": p["slug"]}):
-                doc = {**p, "price": SEED_PRICES[p["slug"]], "image": f"/images/{p['slug'].replace('-on-the-rocks', '')}.jpg",
-                       "low_stock_threshold": 10, "active": True, "featured": True, "updated_at": now().isoformat()}
-                await db.products.insert_one(doc)
-            else:
-                # Ensure seed products are always active, featured, and sync updated notes & architecture
-                await db.products.update_one(
-                    {"slug": p["slug"]},
-                    {"$set": {
-                        "active": True,
-                        "featured": True,
-                        "story": p["story"],
-                        "concentration": "Eau de Parfum",
-                        "notes": p["notes"],
-                        "olfactory_family": p.get("olfactory_family"),
-                        "accords": p.get("accords"),
-                        "architecture": p.get("architecture"),
-                    }}
-                )
-        await db.products.update_many({"featured": {"$exists": False}}, {"$set": {"featured": True}})
-        await db.products.update_many({"concentration": "Extrait de Parfum"}, {"$set": {"concentration": "Eau de Parfum"}})
+        await ensure_seeded()
         admin_email = os.environ.get("ADMIN_EMAIL", "admin@houseoftheknight.com").lower()
         admin_pw = os.environ.get("ADMIN_PASSWORD", "KnightAdmin#2026")
         existing = await db.users.find_one({"email": admin_email})

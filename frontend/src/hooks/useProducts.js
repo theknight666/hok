@@ -201,8 +201,9 @@ export function useProducts() {
         return getCachedCatalog();
       }
     },
-    initialData: () => getCachedCatalog(),
-    staleTime: 1000 * 60 * 2,
+    placeholderData: () => getCachedCatalog(),
+    staleTime: 1000 * 5,
+    refetchOnWindowFocus: true,
   });
 
   const products = Array.isArray(q.data) && q.data.length ? q.data : getCachedCatalog();
@@ -234,7 +235,9 @@ export function useProduct(slug) {
         return fallback;
       }
     },
-    initialData: fallback,
+    placeholderData: fallback,
+    staleTime: 1000 * 5,
+    refetchOnWindowFocus: true,
     retry: 1,
   });
   return { ...q, data: q.data || fallback };

@@ -7,13 +7,9 @@ import { EASE } from "@/components/site/Reveal";
 import { worldOf } from "@/lib/visual";
 import { useCart } from "@/context/CartContext";
 import { inr } from "@/lib/api";
+import { FALLBACK_PRODUCTS } from "@/hooks/useProducts";
 
-const FALLBACK = [
-  { slug: "blonde-amber", name: "Blonde Amber", price: 18500, image: "/images/blonde-amber.jpg", tagline: "Liquid gold, warm resins and a whisper of smoke." },
-  { slug: "layton", name: "Layton", price: 16500, image: "/images/layton.jpg", tagline: "Crisp bergamot, lavender and warm woods." },
-  { slug: "angels-share-on-the-rocks", name: "Angels Share On The Rocks", price: 17500, image: "/images/angels-share.jpg", tagline: "Cognac, cinnamon and oak — served over ice." },
-  { slug: "side-effect", name: "Side Effect", price: 16000, image: "/images/side-effect.jpg", tagline: "Tobacco, rum and dark leather after midnight." },
-];
+const FALLBACK = FALLBACK_PRODUCTS;
 
 /** Signed distance from the active index around the ring, e.g. -2,-1,0,1 for n=4. */
 const ringOffset = (i, active, n) => ((i - active + n + Math.floor(n / 2)) % n) - Math.floor(n / 2);

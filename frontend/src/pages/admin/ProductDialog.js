@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ChevronLeft, ChevronRight, X, Plus, Search, Sparkles } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -339,6 +340,7 @@ export function ProductDialog({ product, onClose, onSaved }) {
     };
   });
 
+  const qc = useQueryClient();
   const [busy, setBusy] = useState(false);
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
 
@@ -410,6 +412,10 @@ export function ProductDialog({ product, onClose, onSaved }) {
       } catch (err) {
         // Non-blocking cache sync
       }
+
+      qc.invalidateQueries({ queryKey: ["products"] });
+      qc.invalidateQueries({ queryKey: ["product", savedSlug] });
+      qc.invalidateQueries({ queryKey: ["admin-products"] });
 
       toast.success("Fragrance saved successfully");
       onSaved();
