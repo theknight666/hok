@@ -47,12 +47,8 @@ const CREATIONS = [
 const LUXURY_EASE = [0.83, 0, 0.17, 1];
 
 export function Intro() {
-  const [show, setShow] = useState(() => {
-    if (typeof window === "undefined") return false;
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.has("intro") || urlParams.has("preloader")) return true;
-    return !sessionStorage.getItem("hotk_intro_v5");
-  });
+  // Always show preloader on every page reload per user instruction (will revert when user texts "revert")
+  const [show, setShow] = useState(true);
 
   const [progress, setProgress] = useState(0);
   const [isExiting, setIsExiting] = useState(false);
@@ -62,7 +58,6 @@ export function Intro() {
 
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    sessionStorage.setItem("hotk_intro_v5", "1");
 
     const startTime = performance.now();
     const duration = 2100; // 2.1s stately cinematic reveal
