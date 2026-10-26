@@ -119,17 +119,17 @@ export function Intro() {
                 House of the Knight
               </p>
 
-              {/* Layer 2: Bottom-Anchored Radial Amber Hue (Only Lower Rays on Glyphs, Zero Pipe) */}
+              {/* Layer 2: Bottom-Anchored Radial Amber Hue (Whisper-Quiet Subtle Glow) */}
               <p
                 className="pointer-events-none absolute inset-0 w-full text-center font-display font-black leading-[0.88] tracking-tight whitespace-nowrap text-[13.85vw] select-none transform-gpu"
                 style={{
                   background:
-                    "radial-gradient(ellipse 48% 85% at 50% 100%, rgba(255, 185, 65, 0.48) 0%, rgba(255, 140, 25, 0.24) 30%, rgba(245, 150, 15, 0.05) 55%, transparent 75%)",
+                    "radial-gradient(ellipse 48% 85% at 50% 100%, rgba(255, 180, 60, 0.16) 0%, rgba(255, 140, 20, 0.07) 30%, rgba(245, 145, 15, 0.015) 55%, transparent 75%)",
                   backgroundSize: "260% 100%",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
-                  filter: "blur(12px) sm:blur(16px)",
-                  opacity: 0.95,
+                  filter: "blur(16px) sm:blur(22px)",
+                  opacity: 0.75,
                   animation:
                     "watermarkLivingGlow 3.6s cubic-bezier(0.35, 0, 0.25, 1) infinite",
                 }}
@@ -140,7 +140,7 @@ export function Intro() {
           </motion.div>
 
           {/* ======================================================== */}
-          {/* CENTERPIECE: 40% Smaller Logo (Raised Above Center)      */}
+          {/* CENTERPIECE: 40% Smaller Logo (Decisively Raised Up)     */}
           {/* ======================================================== */}
           <motion.div
             style={{
@@ -167,7 +167,7 @@ export function Intro() {
                 : { opacity: 1, scale: 1 }
             }
             transition={{ opacity: { duration: 0.18 } }}
-            className="relative z-10 flex items-center justify-center p-6 will-change-transform -translate-y-10 sm:-translate-y-14 lg:-translate-y-16"
+            className="relative z-10 flex items-center justify-center p-6 will-change-transform -translate-y-[15vh] sm:-translate-y-[18vh] lg:-translate-y-[20vh]"
           >
             <div className="relative h-[4.25rem] w-[4.25rem] sm:h-[5.25rem] sm:w-[5.25rem] lg:h-24 lg:w-24 flex items-center justify-center transform-gpu">
               {/* Primary Grey Monogram Logo (40% Smaller) */}
