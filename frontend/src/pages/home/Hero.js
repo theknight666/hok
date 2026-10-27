@@ -60,6 +60,7 @@ export function Hero({ products }) {
 
   return (
     <motion.section
+      id="hero"
       animate={{ backgroundColor: world.bg, color: world.ink }}
       transition={{ duration: 0.9, ease: EASE }}
       style={{ "--w-bg": world.bg, "--w-ink": world.ink, "--w-soft": world.soft }}

@@ -53,9 +53,8 @@ export function Header() {
       };
 
       if (pathname !== "/") {
-        navigate(to);
+        navigate("/", { state: { scrollTo: targetId } });
       } else {
-        navigate(to, { replace: true });
         scroll();
         setTimeout(scroll, 80);
         setTimeout(scroll, 350);

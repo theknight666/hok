@@ -53,8 +53,14 @@ export function Intro() {
 
     sessionStorage.setItem("hotk_intro_v5", "1");
 
+    // Force scroll to top (0, 0) so the page behind curtain is strictly at the Hero section
+    window.scrollTo(0, 0);
+    if (document.documentElement) document.documentElement.scrollTop = 0;
+    if (document.body) document.body.scrollTop = 0;
+
     // Lock scroll smoothly without toggling overflow on body (eliminates scrollbar layout shift)
     if (window.__lenis) {
+      window.__lenis.scrollTo(0, { immediate: true });
       window.__lenis.stop();
     }
 
@@ -65,6 +71,11 @@ export function Intro() {
 
     // 2. Conclude preloader smoothly at 1.85s: lift curtain with logo remaining fully visible
     const exitTimer = setTimeout(() => {
+      window.scrollTo(0, 0);
+      if (window.__lenis) {
+        window.__lenis.scrollTo(0, { immediate: true });
+        window.__lenis.start();
+      }
       setShow(false);
     }, 1850);
 
@@ -72,17 +83,20 @@ export function Intro() {
       clearTimeout(beatTimer);
       clearTimeout(exitTimer);
       if (window.__lenis) {
+        window.__lenis.scrollTo(0, { immediate: true });
         window.__lenis.start();
       }
     };
   }, [show]);
 
   const handleDismiss = () => {
-    setShow(false);
-    sessionStorage.setItem("hotk_intro_v5", "1");
+    window.scrollTo(0, 0);
     if (window.__lenis) {
+      window.__lenis.scrollTo(0, { immediate: true });
       window.__lenis.start();
     }
+    setShow(false);
+    sessionStorage.setItem("hotk_intro_v5", "1");
   };
 
   return (
@@ -99,7 +113,9 @@ export function Intro() {
           onClick={handleDismiss}
           onAnimationComplete={(definition) => {
             if (definition === "exit" || !show) {
+              window.scrollTo(0, 0);
               if (window.__lenis) {
+                window.__lenis.scrollTo(0, { immediate: true });
                 window.__lenis.start();
               }
             }

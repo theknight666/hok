@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { KnightMark } from "./Logo";
@@ -44,6 +44,36 @@ export function Footer() {
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
   const footerRef = useRef(null);
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+
+  const handleNavClick = (e, to) => {
+    if (to.startsWith("/#")) {
+      e.preventDefault();
+      const targetHash = to.replace("/", "");
+      const targetId = targetHash.replace("#", "");
+
+      const performScroll = () => {
+        const el = document.getElementById(targetId) || document.querySelector(targetHash);
+        if (el) {
+          if (window.__lenis) {
+            window.__lenis.resize();
+            window.__lenis.scrollTo(el, { offset: -85, duration: 0.85, force: true });
+          } else {
+            const top = el.getBoundingClientRect().top + window.scrollY - 85;
+            window.scrollTo({ top, behavior: "smooth" });
+          }
+        }
+      };
+
+      if (pathname !== "/") {
+        navigate("/", { state: { scrollTo: targetId } });
+      } else {
+        performScroll();
+        setTimeout(performScroll, 80);
+      }
+    }
+  };
 
   const { scrollYProgress } = useScroll({
     target: footerRef,
@@ -94,7 +124,7 @@ export function Footer() {
               <p className="text-[0.66rem] font-medium uppercase tracking-[0.3em] text-gold">{c.t}</p>
               <ul className="mt-5 space-y-3 text-base font-semibold">
                 {c.links.map(([to, label, tid]) => (
-                  <li key={to + label}><Link to={to} data-testid={tid} className="link-line opacity-80 transition-opacity hover:opacity-100">{label}</Link></li>
+                  <li key={to + label}><Link to={to} onClick={(e) => handleNavClick(e, to)} data-testid={tid} className="link-line opacity-80 transition-opacity hover:opacity-100">{label}</Link></li>
                 ))}
               </ul>
               {c.t === "House" && <p className="mt-6 text-sm opacity-50">concierge@houseoftheknight.com</p>}
