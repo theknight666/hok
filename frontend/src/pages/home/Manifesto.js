@@ -12,7 +12,12 @@ export function Manifesto() {
   });
 
   // Bottle scroll entrance: gracefully glides into view from outside the screen on the right, then floats with subtle parallax
-  const bottleX = useTransform(scrollYProgress, [0, 0.35, 1], [360, 0, -20]);
+  const bottleX = useTransform(scrollYProgress, (v) => {
+    const isMobile = typeof window !== "undefined" && window.innerWidth < 1024;
+    const startX = isMobile ? 90 : 360;
+    if (v <= 0.35) return startX - (v / 0.35) * startX;
+    return -20 * ((v - 0.35) / 0.65);
+  });
   const bottleY = useTransform(scrollYProgress, [0, 0.35, 1], [140, 0, -75]);
   const bottleRotate = useTransform(scrollYProgress, [0, 0.35, 1], [16, 0, -4]);
   const bottleScale = useTransform(scrollYProgress, [0, 0.35, 1], [0.86, 1.03, 0.96]);
@@ -96,7 +101,7 @@ export function Manifesto() {
                 alt="House signature bottle - Blonde Amber"
                 loading="lazy"
                 draggable={false}
-                className="bottle-shadow h-[58svh] max-h-[740px] min-h-[420px] w-auto select-none object-contain transition-all duration-700 group-hover:brightness-110 sm:h-[66svh] lg:h-[72svh]"
+                className="bottle-shadow h-[45svh] max-h-[740px] min-h-[280px] sm:min-h-[420px] sm:h-[66svh] lg:h-[72svh] w-auto select-none object-contain transition-all duration-700 group-hover:brightness-110"
               />
             </Link>
           </motion.div>

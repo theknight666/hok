@@ -50,15 +50,15 @@ export function Armoury({ products: all }) {
                     disabled={p.stock <= 0}
                     data-testid={`armoury-pick-${p.slug}`}
                     aria-pressed={on}
-                    className={`flex w-full items-center gap-4 rounded-full border-2 py-2 pl-2 pr-5 text-left transition-all duration-400 disabled:opacity-40 ${on ? "border-foreground bg-foreground text-background" : "border-border hover:border-foreground"}`}
+                    className={`flex w-full items-center gap-2.5 sm:gap-4 rounded-full border-2 py-1.5 pl-1.5 pr-3 sm:py-2 sm:pl-2 sm:pr-5 text-left transition-all duration-400 disabled:opacity-40 ${on ? "border-foreground bg-foreground text-background" : "border-border hover:border-foreground"}`}
                   >
-                    <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full" style={{ background: w.bg }}>
-                      <Bottle p={p} className="h-10 w-auto" />
+                    <span className="grid h-10 w-10 sm:h-12 sm:w-12 shrink-0 place-items-center rounded-full" style={{ background: w.bg }}>
+                      <Bottle p={p} className="h-8 sm:h-10 w-auto" />
                     </span>
-                    <span className="flex-1 font-display text-xl leading-none sm:text-2xl">{p.name}</span>
-                    <span className="text-sm font-semibold tabular-nums">{p.stock <= 0 ? "Sold out" : inr(p.price)}</span>
-                    <span className={`grid h-7 w-7 place-items-center rounded-full border-2 ${on ? "border-background bg-background text-foreground" : "border-current"}`}>
-                      {on ? <Check className="h-4 w-4" strokeWidth={3} /> : <Plus className="h-4 w-4" strokeWidth={3} />}
+                    <span className="flex-1 font-display text-base leading-snug sm:text-2xl truncate">{p.name}</span>
+                    <span className="text-xs sm:text-sm font-semibold tabular-nums shrink-0">{p.stock <= 0 ? "Sold out" : inr(p.price)}</span>
+                    <span className={`grid h-6 w-6 sm:h-7 sm:w-7 shrink-0 place-items-center rounded-full border-2 ${on ? "border-background bg-background text-foreground" : "border-current"}`}>
+                      {on ? <Check className="h-3.5 w-3.5 sm:h-4 sm:w-4" strokeWidth={3} /> : <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4" strokeWidth={3} />}
                     </span>
                   </button>
                 </li>
@@ -68,20 +68,20 @@ export function Armoury({ products: all }) {
         </div>
 
         <FadeUp className="lg:col-span-7">
-          <div className="rounded-[2.5rem] bg-card p-6 shadow-xl sm:p-10" data-testid="armoury-tray">
-            <div className="grid grid-cols-4 gap-3 sm:gap-6">
+          <div className="rounded-[1.75rem] sm:rounded-[2.5rem] bg-card p-4 sm:p-10 shadow-xl" data-testid="armoury-tray">
+            <div className="grid grid-cols-4 gap-2 sm:gap-6">
               {Array.from({ length: SLOTS }).map((_, i) => {
                 const p = chosen[i];
                 const w = p ? worldOf(p) : null;
                 return (
-                  <div key={i} className="relative flex aspect-[3/4] items-end justify-center overflow-hidden rounded-[1.5rem] border-2 border-dashed border-border" style={w ? { background: w.bg, borderColor: w.bg } : undefined} data-testid={`armoury-slot-${i}`}>
+                  <div key={i} className="relative flex aspect-[3/4] items-end justify-center overflow-hidden rounded-[1.25rem] sm:rounded-[1.5rem] border-2 border-dashed border-border" style={w ? { background: w.bg, borderColor: w.bg } : undefined} data-testid={`armoury-slot-${i}`}>
                     <AnimatePresence mode="popLayout">
                       {p ? (
-                        <motion.div key={p.slug} initial={{ y: "100%", opacity: 0, rotate: -8 }} animate={{ y: 0, opacity: 1, rotate: 0 }} exit={{ y: "100%", opacity: 0 }} transition={{ duration: 0.6, ease: EASE }} className="flex h-full items-center p-3 will-change-transform transform-gpu">
+                        <motion.div key={p.slug} initial={{ y: "100%", opacity: 0, rotate: -8 }} animate={{ y: 0, opacity: 1, rotate: 0 }} exit={{ y: "100%", opacity: 0 }} transition={{ duration: 0.6, ease: EASE }} className="flex h-full items-center p-2 sm:p-3 will-change-transform transform-gpu">
                           <Bottle p={p} className="bottle-shadow max-h-full w-auto" />
                         </motion.div>
                       ) : (
-                        <motion.span key="ghost" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 grid place-items-center font-display text-5xl text-border">
+                        <motion.span key="ghost" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 grid place-items-center font-display text-3xl sm:text-5xl text-border">
                           {i + 1}
                         </motion.span>
                       )}
@@ -90,16 +90,16 @@ export function Armoury({ products: all }) {
                 );
               })}
             </div>
-            <div className="mt-8 flex flex-col gap-5 border-t pt-8 sm:flex-row sm:items-end sm:justify-between">
+            <div className="mt-6 sm:mt-8 flex flex-col gap-5 border-t pt-6 sm:pt-8 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <p className="text-[0.66rem] font-medium uppercase tracking-[0.3em] text-muted-foreground">{chosen.length} of {SLOTS} chosen</p>
-                <p className="mt-2 font-display text-5xl" data-testid="armoury-total">{inr(total)}</p>
-                <p className="mt-2 flex items-center gap-2 text-sm text-muted-foreground" data-testid="armoury-shipping">
-                  <Truck className="h-4 w-4" strokeWidth={2} />
+                <p className="mt-1 sm:mt-2 font-display text-4xl sm:text-5xl tabular-nums" data-testid="armoury-total">{inr(total)}</p>
+                <p className="mt-2 flex items-center gap-2 text-xs sm:text-sm text-muted-foreground" data-testid="armoury-shipping">
+                  <Truck className="h-4 w-4 shrink-0" strokeWidth={2} />
                   {chosen.length === 0 ? "Pick a bottle to begin" : left > 0 ? `${inr(left)} away from free shipping` : "Free shipping unlocked"}
                 </p>
               </div>
-              <button disabled={!chosen.length} onClick={addAll} className="btn-royal disabled:opacity-40 disabled:hover:transform-none" data-testid="armoury-add-btn">
+              <button disabled={!chosen.length} onClick={addAll} className="btn-royal w-full sm:w-auto disabled:opacity-40 disabled:hover:transform-none" data-testid="armoury-add-btn">
                 Add {chosen.length || ""} to bag
               </button>
             </div>

@@ -129,29 +129,29 @@ export default function Checkout() {
   return (
     <main className="mx-auto max-w-[1300px] px-5 pb-24 pt-[120px] sm:px-10" data-testid="checkout-page">
       <p className="eyebrow">Checkout</p>
-      <h1 className="mt-4 font-display text-5xl sm:text-6xl">Seal your order.</h1>
+      <h1 className="mt-4 font-display text-4xl sm:text-6xl">Seal your order.</h1>
       {!items.length ? (
         <div className="mt-12">
           <p className="text-muted-foreground">Your bag is empty.</p>
           <Link to="/#collection" className="btn-ghost-royal mt-8">Explore the collection</Link>
         </div>
       ) : (
-        <form onSubmit={submit} className="mt-14 grid gap-16 lg:grid-cols-12">
+        <form onSubmit={submit} className="mt-10 sm:mt-14 grid gap-10 lg:gap-16 lg:grid-cols-12">
           <div className="lg:col-span-7">
             <p className="font-display text-2xl">Contact</p>
             <input required type="email" placeholder="Email" value={mail} onChange={(e) => setEmail(e.target.value)} className={`${inputCls} mt-4`} data-testid="checkout-email" />
             {!user && <p className="mt-3 text-sm text-muted-foreground">Have an account? <Link to="/login" className="text-gold link-line">Sign in</Link> to track this order.</p>}
-            <p className="mt-12 font-display text-2xl">Delivery</p>
+            <p className="mt-10 sm:mt-12 font-display text-2xl">Delivery</p>
             <div className="mt-4 grid gap-x-6 gap-y-4 sm:grid-cols-2">
               {FIELDS.map(([k, label, span]) => (
                 <input key={k} required={k !== "line2"} placeholder={label} value={addr[k]} onChange={(e) => setAddr({ ...addr, [k]: e.target.value })} className={`${inputCls} ${span}`} data-testid={`checkout-${k}`} />
               ))}
             </div>
-            <p className="mt-12 font-display text-2xl">Gift note</p>
+            <p className="mt-10 sm:mt-12 font-display text-2xl">Gift note</p>
             <textarea rows={3} placeholder="An optional message, hand-written on the card" value={gift} onChange={(e) => setGift(e.target.value)} className={`${inputCls} mt-4 resize-none`} data-testid="checkout-gift" />
           </div>
           <aside className="lg:col-span-5">
-            <div className="rounded-[2rem] bg-card p-8 shadow-xl lg:sticky lg:top-28">
+            <div className="rounded-[1.75rem] sm:rounded-[2rem] bg-card p-5 sm:p-8 shadow-xl lg:sticky lg:top-28">
               <p className="eyebrow">Summary</p>
               {items.map((i) => {
                 const itemKey = i.key || `${i.slug}-${i.size || "50 ml"}`;

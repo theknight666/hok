@@ -129,16 +129,16 @@ export default function DiscoveryPage() {
                   ))}
                 </div>
 
-                <div className="mt-8 flex flex-wrap items-center gap-6">
+                <div className="mt-8 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
                   <div>
                     <span className="text-xs uppercase tracking-widest text-muted-foreground block">Set Price</span>
-                    <span className="font-display text-4xl text-foreground font-semibold">{inr(coffretPrice)}</span>
+                    <span className="font-display text-3xl sm:text-4xl text-foreground font-semibold tabular-nums">{inr(coffretPrice)}</span>
                   </div>
 
                   <button
                     onClick={handleAddCoffret}
                     disabled={addingAll || isLoading || !signatures.length}
-                    className="btn-royal inline-flex items-center gap-3 px-8 py-3.5 shadow-lg shadow-gold/20"
+                    className="btn-royal w-full sm:w-auto inline-flex items-center justify-center gap-3 px-6 sm:px-8 py-3.5 shadow-lg shadow-gold/20"
                     data-testid="add-coffret-btn"
                   >
                     <ShoppingBag className="h-4 w-4" />

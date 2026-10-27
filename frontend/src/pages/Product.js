@@ -68,13 +68,13 @@ export default function Product() {
             </div>
           </div>
 
-          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, ease: EASE, delay: 0.2 }} className="rounded-[2.5rem] bg-background p-7 text-foreground shadow-2xl sm:p-10 lg:col-span-6 lg:p-14">
+          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, ease: EASE, delay: 0.2 }} className="rounded-[2rem] sm:rounded-[2.5rem] bg-background p-5 sm:p-10 text-foreground shadow-2xl lg:col-span-6 lg:p-14">
             <div className="flex flex-wrap items-center gap-3">
               <span className="pill bg-foreground text-background">{p.badge}</span>
               <span className="text-[0.66rem] font-medium uppercase tracking-[0.3em] text-muted-foreground">{p.concentration} · {size}</span>
             </div>
-            <h1 className="display-lg mt-6 font-display">{p.name}</h1>
-            <p className="mt-6 max-w-lg text-xl font-medium leading-snug text-muted-foreground">{p.tagline}</p>
+            <h1 className="mt-3 sm:mt-6 font-display text-3xl sm:text-5xl lg:text-7xl leading-[0.95]">{p.name}</h1>
+            <p className="mt-4 sm:mt-6 max-w-lg text-base sm:text-xl font-medium leading-snug text-muted-foreground">{p.tagline}</p>
 
             {/* Volume / Size Selector */}
             <div className="mt-8 border-t pt-6">
@@ -118,7 +118,7 @@ export default function Product() {
             </div>
 
             <div className="mt-6 flex flex-wrap items-end justify-between gap-4 border-t pt-6">
-              <span className="font-display text-5xl sm:text-6xl" data-testid="product-price">{inr(currentPrice)}</span>
+              <span className="font-display text-4xl sm:text-6xl tabular-nums shrink-0" data-testid="product-price">{inr(currentPrice)}</span>
               {size === "50 ml" ? <StockLine p={p} /> : <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">In stock · Ready to dispatch</span>}
             </div>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">

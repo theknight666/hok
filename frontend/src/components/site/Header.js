@@ -153,12 +153,12 @@ export function Header() {
                       handleNavClick(e, l.to);
                     }}
                     data-testid={`mobile-nav-${l.label.toLowerCase().replace(/\s+/g, "-")}`}
-                    className="font-display text-5xl"
+                    className="font-display text-3xl sm:text-4xl leading-tight transition-colors hover:text-gold"
                   >
                     {l.label}
                   </Link>
                 ))}
-                <Link to={user ? "/account" : "/login"} onClick={() => setSheetOpen(false)} data-testid="mobile-nav-account" className="font-display text-5xl">
+                <Link to={user ? "/account" : "/login"} onClick={() => setSheetOpen(false)} data-testid="mobile-nav-account" className="font-display text-3xl sm:text-4xl leading-tight transition-colors hover:text-gold">
                   Account
                 </Link>
               </div>

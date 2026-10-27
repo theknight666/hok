@@ -126,9 +126,9 @@ export function Hero({ products }) {
           </div>
         </motion.div>
 
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1, duration: 0.9, ease: EASE }} className="flex flex-wrap items-center gap-x-6 gap-y-4 lg:justify-end">
-          <p className="font-display text-3xl" data-testid="hero-active-price">{inr(cur.price)}</p>
-          <div className="flex flex-wrap gap-3">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1, duration: 0.9, ease: EASE }} className="flex flex-wrap items-center justify-between sm:justify-start gap-x-6 gap-y-3 lg:justify-end">
+          <p className="font-display text-2xl sm:text-3xl shrink-0 tabular-nums" data-testid="hero-active-price">{inr(cur.price)}</p>
+          <div className="flex items-center gap-2.5 sm:gap-3">
             <button onClick={() => add(cur)} className="btn-world" data-testid="hero-shop-btn">Add to bag</button>
             <Link to={`/fragrance/${cur.slug}`} className="btn-world-ghost" data-testid="hero-discover-active">
               Discover <ArrowUpRight className="h-4 w-4" strokeWidth={1.8} />
