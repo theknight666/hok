@@ -961,7 +961,7 @@ async def media(path: str):
         logger.warning("Motor media lookup failed for %s: %s", clean_path, e)
 
     try:
-        data, ct = await asyncio.to_thread(storage.get_object, path)
+        data, ct = storage.get_disk_object(clean_path)
         return Response(content=data, media_type=ct,
                         headers={"Cache-Control": "public, max-age=31536000, immutable"})
     except FileNotFoundError:

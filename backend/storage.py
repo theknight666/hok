@@ -81,25 +81,9 @@ def put_object(path: str, data: bytes, content_type: str = "image/png") -> dict:
     return {"path": clean_path, "size": len(data), "content_type": content_type}
 
 
-def get_object(path: str) -> Tuple[bytes, str]:
-    """Retrieve raw image binary and content-type from MongoDB 'media' collection."""
+def get_disk_object(path: str) -> Tuple[bytes, str]:
+    """Retrieve raw image binary and content-type from local disk without database overhead."""
     clean_path = path.lstrip("/")
-    try:
-        db = get_db()
-        doc = db.media.find_one({
-            "$or": [
-                {"path": clean_path},
-                {"path": "/" + clean_path},
-                {"path": "images/" + clean_path},
-                {"path": clean_path.replace("images/", "")},
-            ]
-        })
-        if doc and "data" in doc:
-            return doc["data"], doc.get("content_type", "image/png")
-    except Exception as e:
-        logger.warning("MongoDB get_object failed for %s: %s", clean_path, e)
-
-    # Local disk fallback (e.g. if run during development or static builds)
     backend_dir = Path(__file__).resolve().parent
     root = backend_dir.parent
     candidates = [
@@ -116,6 +100,32 @@ def get_object(path: str) -> Tuple[bytes, str]:
             suffix = cand.suffix.lower()
             ct = "image/png" if suffix == ".png" else "image/jpeg" if suffix in [".jpg", ".jpeg"] else "image/webp"
             return data, ct
+
+    raise FileNotFoundError(clean_path)
+
+
+def get_object(path: str) -> Tuple[bytes, str]:
+    """Retrieve raw image binary, checking local disk first for sub-millisecond response."""
+    try:
+        return get_disk_object(path)
+    except FileNotFoundError:
+        pass
+
+    clean_path = path.lstrip("/")
+    try:
+        db = get_db()
+        doc = db.media.find_one({
+            "$or": [
+                {"path": clean_path},
+                {"path": "/" + clean_path},
+                {"path": "images/" + clean_path},
+                {"path": clean_path.replace("images/", "")},
+            ]
+        })
+        if doc and "data" in doc:
+            return doc["data"], doc.get("content_type", "image/png")
+    except Exception as e:
+        logger.warning("MongoDB get_object failed for %s: %s", clean_path, e)
 
     raise FileNotFoundError(clean_path)
 
