@@ -44,7 +44,7 @@ def get_client() -> AsyncIOMotorClient:
             "connect": False,
             "serverSelectionTimeoutMS": 5000,
             "connectTimeoutMS": 5000,
-            "socketTimeoutMS": 5000,
+            "socketTimeoutMS": 15000,
         }
         try:
             import certifi
@@ -990,7 +990,7 @@ async def admin_upload_generic_image(file: UploadFile = File(...),
     except Exception as e:
         logger.error("Image processing failed: %s", e)
         raise HTTPException(status_code=422, detail="Could not process that image")
-    ext = ".jpg" if opt_ct == "image/jpeg" else ".png"
+    ext = ".webp" if opt_ct == "image/webp" else ".jpg" if opt_ct == "image/jpeg" else ".png"
     path = f"{storage.APP_NAME}/uploads/{uuid.uuid4().hex}{ext}"
     now_utc = now()
     try:
@@ -1028,7 +1028,7 @@ async def admin_upload_image(slug: str, file: UploadFile = File(...),
     except Exception as e:
         logger.error("Image processing failed: %s", e)
         raise HTTPException(status_code=422, detail="Could not process that image")
-    ext = ".jpg" if opt_ct == "image/jpeg" else ".png"
+    ext = ".webp" if opt_ct == "image/webp" else ".jpg" if opt_ct == "image/jpeg" else ".png"
     path = f"{storage.APP_NAME}/products/{slug}/{uuid.uuid4().hex}{ext}"
     now_utc = now()
     try:

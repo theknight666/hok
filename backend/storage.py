@@ -33,7 +33,7 @@ def get_db():
                 kwargs = {
                     "serverSelectionTimeoutMS": 5000,
                     "connectTimeoutMS": 5000,
-                    "socketTimeoutMS": 5000,
+                    "socketTimeoutMS": 15000,
                 }
                 try:
                     import certifi
@@ -185,9 +185,13 @@ def optimize_image(data: bytes) -> Tuple[bytes, str]:
             rgb.save(buf, format="JPEG", quality=85, optimize=True)
             return buf.getvalue(), "image/jpeg"
         else:
-            # Has transparent pixels, preserve transparency with optimized PNG
-            im.save(buf, format="PNG", optimize=True)
-            return buf.getvalue(), "image/png"
+            # Has transparent pixels, preserve transparency using high-efficiency WebP (<60KB) or PNG
+            try:
+                im.save(buf, format="WEBP", quality=80, method=4)
+                return buf.getvalue(), "image/webp"
+            except Exception:
+                im.save(buf, format="PNG", optimize=True)
+                return buf.getvalue(), "image/png"
     else:
         rgb = im.convert("RGB")
         rgb.save(buf, format="JPEG", quality=85, optimize=True)
