@@ -323,6 +323,7 @@ export function ProductDialog({ product, onClose, onSaved }) {
       heart_list: heartNotes,
       base_list: baseNotes,
       ...product,
+      images: Array.isArray(product.images) && product.images.length > 0 ? product.images : (product.image ? [product.image] : []),
       top_list: topNotes,
       heart_list: heartNotes,
       base_list: baseNotes,

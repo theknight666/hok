@@ -895,12 +895,20 @@ async def admin_upload_image(slug: str, file: UploadFile = File(...), remove_bg:
                                "size": result.get("size", len(png)), "product_slug": slug, "by": admin["email"],
                                "is_deleted": False, "created_at": now().isoformat()})
     
+    # Fetch existing product to preserve existing primary photo in the images list
+    existing_prod = await db.products.find_one({"slug": slug})
+    existing_primary = existing_prod.get("image") if existing_prod else None
+
     update_doc = {
         "$addToSet": {"images": url},
         "$set": {"updated_at": now().isoformat()}
     }
     if set_primary:
         update_doc["$set"]["image"] = url
+
+    # Also backfill existing primary into images if not already there
+    if existing_primary:
+        await db.products.update_one({"slug": slug}, {"$addToSet": {"images": existing_primary}})
 
     p = await db.products.find_one_and_update(
         {"slug": slug},
@@ -909,7 +917,17 @@ async def admin_upload_image(slug: str, file: UploadFile = File(...), remove_bg:
         return_document=True
     )
     _products_cache = []
-    return p
+    if p is not None:
+        p["url"] = url
+        p["uploaded_url"] = url
+        all_imgs = list(p.get("images") or [])
+        if existing_primary and existing_primary not in all_imgs:
+            all_imgs.insert(0, existing_primary)
+        if url not in all_imgs:
+            all_imgs.append(url)
+        p["images"] = all_imgs
+        return p
+    return {"url": url, "image": url, "images": [url]}
 
 
 @api.post("/admin/products/{slug}/images")

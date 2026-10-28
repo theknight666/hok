@@ -1,6 +1,6 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { toast } from "sonner";
-import { Upload, Wand2, Loader2, Star, Trash2, Plus, Sparkles, Check } from "lucide-react";
+import { Upload, Wand2, Loader2, Star, Plus, Sparkles, X } from "lucide-react";
 import { api, formatErr } from "@/lib/api";
 
 /**
@@ -185,8 +185,8 @@ export async function prepareImage(file, removeBg = false, maxDim = 1600, qualit
 
 /**
  * Luxury Multi-Image Manager for Product Admin.
- * Supports uploading 10+ images, background removal, setting primary cover bottle,
- * deleting images, and previews via squircle cubes.
+ * Displays all uploaded images as squircle cubes with explicit "X" remove buttons,
+ * primary cover selector, and high-speed upload handling.
  */
 export function BottleUpload({ slug, image, images = [], onChange, onDone }) {
   const inputRef = useRef(null);
@@ -195,16 +195,26 @@ export function BottleUpload({ slug, image, images = [], onChange, onDone }) {
   const [progressMsg, setProgressMsg] = useState("");
   const [isDragOver, setIsDragOver] = useState(false);
 
-  // Normalize image gallery array
-  const rawGallery = Array.isArray(images) && images.length > 0 ? images : (image ? [image] : []);
-  const galleryList = Array.from(new Set(rawGallery.filter(Boolean)));
-  const primaryImage = image || galleryList[0] || "";
+  // Maintain local state so uploaded images display instantly
+  const [gallery, setGallery] = useState(() => {
+    const raw = Array.isArray(images) && images.length > 0 ? images : (image ? [image] : []);
+    return Array.from(new Set(raw.filter(Boolean)));
+  });
+  const [primaryUrl, setPrimaryUrl] = useState(() => image || gallery[0] || "");
+
+  const imagesKey = Array.isArray(images) ? images.join(",") : "";
+  // Synchronize when parent props change
+  useEffect(() => {
+    const raw = Array.isArray(images) && images.length > 0 ? images : (image ? [image] : []);
+    const unique = Array.from(new Set(raw.filter(Boolean)));
+    setGallery(unique);
+    setPrimaryUrl(image || unique[0] || "");
+  }, [image, images, imagesKey]);
 
   const handleUploadFiles = async (filesList) => {
     if (!filesList || filesList.length === 0) return;
     const files = Array.from(filesList);
 
-    // Filter valid image types
     const validFiles = files.filter((f) =>
       ["image/png", "image/jpeg", "image/webp", "image/jpg"].includes(f.type)
     );
@@ -213,45 +223,66 @@ export function BottleUpload({ slug, image, images = [], onChange, onDone }) {
     }
 
     setBusy(true);
-    const newUploadedUrls = [];
+    let currentGallery = [...gallery];
+    let activePrimary = primaryUrl || currentGallery[0] || "";
 
     try {
       for (let i = 0; i < validFiles.length; i++) {
         const file = validFiles[i];
         setProgressMsg(`Processing & optimizing ${i + 1}/${validFiles.length}…`);
 
-        // Client-side canvas optimization & background removal
         const optimizedFile = await prepareImage(file, removeBg);
 
         setProgressMsg(`Uploading ${i + 1}/${validFiles.length}…`);
         const fd = new FormData();
         fd.append("file", optimizedFile);
 
-        const isFirst = galleryList.length === 0 && i === 0;
+        const isFirst = currentGallery.length === 0 && i === 0;
         const endpoint = slug
           ? `/admin/products/${slug}/image?remove_bg=${removeBg}&set_primary=${isFirst}`
           : `/admin/media/upload?remove_bg=${removeBg}`;
 
         const { data } = await api.post(endpoint, fd, { timeout: 120000 });
-        const uploadedUrl = data.url || data.image;
-        if (uploadedUrl) {
-          newUploadedUrls.push(uploadedUrl);
+
+        // Extract uploaded URL from response
+        const newUrl =
+          data.url ||
+          data.uploaded_url ||
+          (Array.isArray(data.images) && data.images[data.images.length - 1]) ||
+          data.image;
+
+        if (newUrl && !currentGallery.includes(newUrl)) {
+          currentGallery = [...currentGallery, newUrl];
+          if (!activePrimary) activePrimary = newUrl;
         }
+
+        // If backend returned the full updated images array, merge it
+        if (Array.isArray(data.images) && data.images.length > 0) {
+          currentGallery = Array.from(new Set([...currentGallery, ...data.images]));
+        }
+
+        // Update local state right away after each image uploads so user sees progress
+        setGallery(currentGallery);
+        setPrimaryUrl(activePrimary);
       }
 
-      // Merge newly uploaded URLs with existing gallery
-      const updatedGallery = Array.from(new Set([...galleryList, ...newUploadedUrls]));
-      const newPrimary = primaryImage || updatedGallery[0] || "";
+      // Final unique gallery list
+      const finalGallery = Array.from(new Set(currentGallery.filter(Boolean)));
+      setGallery(finalGallery);
+      setPrimaryUrl(activePrimary);
 
       if (onChange) {
         onChange({
-          image: newPrimary,
-          images: updatedGallery,
+          image: activePrimary,
+          images: finalGallery,
         });
       }
 
       if (onDone) {
-        onDone({ image: newPrimary, images: updatedGallery });
+        onDone({
+          image: activePrimary,
+          images: finalGallery,
+        });
       }
 
       toast.success(
@@ -269,18 +300,25 @@ export function BottleUpload({ slug, image, images = [], onChange, onDone }) {
   };
 
   const handleSetPrimary = (imgUrl) => {
+    setPrimaryUrl(imgUrl);
     if (onChange) {
       onChange({
         image: imgUrl,
-        images: galleryList,
+        images: gallery,
       });
     }
-    toast.success("Set as primary bottle photo");
+    if (slug) {
+      api.patch(`/admin/products/${slug}`, { image: imgUrl }).catch(() => {});
+    }
+    toast.success("Set as primary cover photo");
   };
 
-  const handleDeleteImage = (imgUrlToDelete) => {
-    const updated = galleryList.filter((u) => u !== imgUrlToDelete);
-    const newPrimary = primaryImage === imgUrlToDelete ? (updated[0] || "") : primaryImage;
+  const handleDeleteImage = async (imgUrlToDelete) => {
+    const updated = gallery.filter((u) => u !== imgUrlToDelete);
+    const newPrimary = primaryUrl === imgUrlToDelete ? (updated[0] || "") : primaryUrl;
+
+    setGallery(updated);
+    setPrimaryUrl(newPrimary);
 
     if (onChange) {
       onChange({
@@ -288,6 +326,18 @@ export function BottleUpload({ slug, image, images = [], onChange, onDone }) {
         images: updated,
       });
     }
+
+    if (slug) {
+      try {
+        await api.patch(`/admin/products/${slug}`, {
+          images: updated,
+          image: newPrimary,
+        });
+      } catch (err) {
+        console.warn("Could not patch product after image deletion:", err);
+      }
+    }
+
     toast.info("Photo removed from gallery");
   };
 
@@ -316,14 +366,14 @@ export function BottleUpload({ slug, image, images = [], onChange, onDone }) {
           <div className="flex items-center gap-2">
             <Sparkles className="h-4 w-4 text-gold" />
             <span className="text-xs font-bold uppercase tracking-[0.2em] text-foreground">
-              Product Images Gallery ({galleryList.length} Photos)
+              Product Images Gallery ({gallery.length} Photos)
             </span>
             <span className="rounded-full bg-gold/20 px-2 py-0.5 text-[10px] font-semibold text-gold">
               Up to 20+ Photos
             </span>
           </div>
           <p className="mt-1 text-xs text-muted-foreground">
-            Upload bottle cutouts, packaging angles, texture details, or lifestyle shots. Select any photo to set as primary cover.
+            Upload bottle cutouts, packaging angles, texture details, or lifestyle shots. Click any photo or &ldquo;Make Cover&rdquo; to set as primary.
           </p>
         </div>
 
@@ -371,7 +421,7 @@ export function BottleUpload({ slug, image, images = [], onChange, onDone }) {
 
       {/* Gallery Squircle Cubes Grid */}
       <div className="mt-4">
-        {galleryList.length === 0 ? (
+        {gallery.length === 0 ? (
           <div
             onClick={() => inputRef.current?.click()}
             className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border/70 p-6 text-center cursor-pointer hover:border-gold/60 transition-colors"
@@ -383,16 +433,17 @@ export function BottleUpload({ slug, image, images = [], onChange, onDone }) {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-3">
-            {galleryList.map((imgUrl, idx) => {
-              const isPrimary = primaryImage === imgUrl || (!primaryImage && idx === 0);
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3.5 pt-1">
+            {gallery.map((imgUrl, idx) => {
+              const isPrimary = primaryUrl === imgUrl || (!primaryUrl && idx === 0);
               return (
                 <div
                   key={imgUrl + idx}
-                  className={`group relative aspect-square rounded-2xl overflow-hidden border-2 transition-all p-1.5 flex items-center justify-center backdrop-blur-md ${
+                  onClick={() => !isPrimary && handleSetPrimary(imgUrl)}
+                  className={`group relative aspect-square rounded-2xl border-2 transition-all p-2 flex items-center justify-center backdrop-blur-md cursor-pointer ${
                     isPrimary
-                      ? "border-gold bg-gold/10 shadow-[0_0_16px_rgba(212,175,55,0.35)] ring-1 ring-gold"
-                      : "border-border/60 bg-muted/40 hover:border-border hover:bg-muted/70"
+                      ? "border-gold bg-gold/15 shadow-[0_0_18px_rgba(212,175,55,0.4)] ring-2 ring-gold/40 scale-102"
+                      : "border-border/80 bg-muted/30 hover:border-border hover:bg-muted/60 hover:scale-102"
                   }`}
                 >
                   <img
@@ -403,39 +454,38 @@ export function BottleUpload({ slug, image, images = [], onChange, onDone }) {
                   />
 
                   {/* Primary Badge */}
-                  {isPrimary && (
-                    <span className="absolute top-1 left-1 flex items-center gap-0.5 rounded-full bg-gold px-1.5 py-0.5 text-[9px] font-bold text-black shadow-sm">
+                  {isPrimary ? (
+                    <span className="absolute top-1.5 left-1.5 z-10 flex items-center gap-1 rounded-full bg-gold px-2 py-0.5 text-[9px] font-bold text-black shadow-md tracking-wider">
                       <Star className="h-2.5 w-2.5 fill-black" /> Primary
                     </span>
-                  )}
-
-                  {/* Squircle Hover Actions */}
-                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl flex items-center justify-center gap-1.5 p-1">
-                    {!isPrimary && (
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleSetPrimary(imgUrl);
-                        }}
-                        title="Set as Primary Cover"
-                        className="p-1 rounded-full bg-gold text-black hover:scale-110 transition-transform shadow"
-                      >
-                        <Star className="h-3 w-3" />
-                      </button>
-                    )}
+                  ) : (
+                    /* Make Primary Cover button on hover */
                     <button
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleDeleteImage(imgUrl);
+                        handleSetPrimary(imgUrl);
                       }}
-                      title="Remove image"
-                      className="p-1 rounded-full bg-red-600/90 text-white hover:bg-red-600 hover:scale-110 transition-transform shadow"
+                      title="Set as Primary Cover"
+                      className="absolute bottom-1.5 left-1/2 -translate-x-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 rounded-full bg-black/85 px-2 py-0.5 text-[9px] font-bold text-gold border border-gold/40 shadow cursor-pointer whitespace-nowrap hover:bg-gold hover:text-black"
                     >
-                      <Trash2 className="h-3 w-3" />
+                      <Star className="h-2.5 w-2.5" /> Make Cover
                     </button>
-                  </div>
+                  )}
+
+                  {/* Explicit X Mark to Remove Image */}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteImage(imgUrl);
+                    }}
+                    title="Remove photo"
+                    aria-label={`Remove photo ${idx + 1}`}
+                    className="absolute -top-2 -right-2 z-20 flex h-6 w-6 items-center justify-center rounded-full bg-red-600 text-white shadow-lg hover:bg-red-700 hover:scale-115 active:scale-95 transition-all cursor-pointer border-2 border-background"
+                  >
+                    <X className="h-3.5 w-3.5 stroke-[3]" />
+                  </button>
                 </div>
               );
             })}
@@ -445,10 +495,11 @@ export function BottleUpload({ slug, image, images = [], onChange, onDone }) {
               type="button"
               disabled={busy}
               onClick={() => inputRef.current?.click()}
-              className="aspect-square rounded-2xl border-2 border-dashed border-border/80 hover:border-gold/60 bg-muted/20 hover:bg-gold/5 flex flex-col items-center justify-center gap-1 text-muted-foreground hover:text-foreground transition-all cursor-pointer"
+              className="aspect-square rounded-2xl border-2 border-dashed border-border/80 hover:border-gold/70 bg-muted/20 hover:bg-gold/10 flex flex-col items-center justify-center gap-1 text-muted-foreground hover:text-foreground transition-all cursor-pointer p-2"
+              title="Add more photos"
             >
-              <Plus className="h-5 w-5" />
-              <span className="text-[10px] font-semibold uppercase tracking-wider">Add</span>
+              <Plus className="h-5 w-5 text-gold" />
+              <span className="text-[10px] font-bold uppercase tracking-wider">Add</span>
             </button>
           </div>
         )}
