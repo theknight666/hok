@@ -183,7 +183,7 @@ export const FALLBACK_PRODUCTS = [
   },
 ];
 
-const CACHE_KEY = "hotk_catalog_cache_v7";
+const CACHE_KEY = "hotk_catalog_cache_v8";
 
 export function getCachedCatalog() {
   if (typeof window === "undefined") return FALLBACK_PRODUCTS.map(sanitizeProduct);

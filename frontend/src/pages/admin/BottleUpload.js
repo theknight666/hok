@@ -257,6 +257,16 @@ export function BottleUpload({ slug, image, images = [], onChange, onDone }) {
       });
     }
 
+    // 1. Permanently delete binary file from MongoDB media & files collections
+    if (imgUrlToDelete.startsWith("/api/media/") || imgUrlToDelete.includes("hotk/")) {
+      try {
+        await api.delete("/admin/media", { params: { url: imgUrlToDelete, slug } });
+      } catch (err) {
+        console.warn("Could not delete media file from storage:", err);
+      }
+    }
+
+    // 2. Patch product document in MongoDB
     if (slug) {
       try {
         await api.patch(`/admin/products/${slug}`, {
@@ -267,19 +277,28 @@ export function BottleUpload({ slug, image, images = [], onChange, onDone }) {
         qc.invalidateQueries({ queryKey: ["product", slug] });
         qc.invalidateQueries({ queryKey: ["admin-products"] });
         try {
-          const catalog = [...getCachedCatalog()];
-          const idx = catalog.findIndex((p) => p.slug === slug);
-          if (idx >= 0) {
-            catalog[idx] = { ...catalog[idx], image: newPrimary, images: updated };
-            setCachedCatalog(catalog);
-          }
+          const catalog = [...getCachedCatalog()].map((p) => {
+            if (p.slug === slug) {
+              return { ...p, image: newPrimary, images: finalUpdated };
+            }
+            if (p.image === imgUrlToDelete || (Array.isArray(p.images) && p.images.includes(imgUrlToDelete))) {
+              const pImages = (p.images || []).filter((u) => u !== imgUrlToDelete);
+              return {
+                ...p,
+                image: p.image === imgUrlToDelete ? (pImages[0] || defaultCutoutOf(p.slug)) : p.image,
+                images: pImages.length > 0 ? pImages : [defaultCutoutOf(p.slug)],
+              };
+            }
+            return p;
+          });
+          setCachedCatalog(catalog);
         } catch (e) {}
       } catch (err) {
         console.warn("Could not patch product after image deletion:", err);
       }
     }
 
-    toast.info("Photo removed from gallery");
+    toast.info("Photo permanently deleted");
   };
 
   return (

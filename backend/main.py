@@ -1085,6 +1085,52 @@ async def admin_upload_image(slug: str, file: UploadFile = File(...),
     return {"url": url, "image": url, "images": [url]}
 
 
+@api.delete("/admin/media")
+async def admin_delete_media(url: str = Query(...), slug: Optional[str] = None, _: dict = Depends(require_admin)):
+    global _products_cache
+    clean_url = url.strip()
+    path = clean_url.replace("/api/media/", "").lstrip("/")
+
+    # 1. Permanently remove binary from db.media
+    del_media = await db.media.delete_many({
+        "$or": [
+            {"path": path},
+            {"path": f"/{path}"},
+            {"path": f"hotk/{path}"},
+            {"path": path.replace("hotk/", "")},
+        ]
+    })
+
+    # 2. Permanently remove from db.files
+    del_files = await db.files.delete_many({
+        "$or": [
+            {"storage_path": path},
+            {"storage_path": f"hotk/{path}"},
+            {"storage_path": path.replace("hotk/", "")},
+        ]
+    })
+
+    # 3. Pull URL from all products
+    async for p in db.products.find({"$or": [{"images": clean_url}, {"image": clean_url}, {"images": f"/api/media/{path}"}, {"image": f"/api/media/{path}"}]}):
+        current_imgs = [img for img in (p.get("images") or []) if img != clean_url and img != f"/api/media/{path}"]
+        fallback_cut = f"/images/cut-{p.get('slug', '').replace('-on-the-rocks', '')}.png"
+        current_primary = p.get("image")
+        new_primary = current_imgs[0] if (current_primary == clean_url or current_primary == f"/api/media/{path}") and current_imgs else (current_imgs[0] if current_imgs else fallback_cut)
+        await db.products.update_one(
+            {"_id": p["_id"]},
+            {"$set": {"images": current_imgs if current_imgs else [new_primary], "image": new_primary, "updated_at": now().isoformat()}}
+        )
+
+    _products_cache = []
+    logger.info("Admin permanently deleted media: %s (media: %d, files: %d)", path, del_media.deleted_count, del_files.deleted_count)
+    return {
+        "ok": True,
+        "deleted": path,
+        "media_deleted": del_media.deleted_count,
+        "files_deleted": del_files.deleted_count,
+    }
+
+
 @api.post("/admin/products/{slug}/images")
 async def admin_upload_multiple_images(slug: str, files: List[UploadFile] = File(...),
                                        admin: dict = Depends(require_admin)):
