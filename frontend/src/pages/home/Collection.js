@@ -36,13 +36,17 @@ function Chapter({ p, idx, total }) {
   const notes = flatNotes(p.notes, 5);
 
   return (
-    <article
+    <div
       ref={ref}
       style={{ ...worldVars(world), zIndex: idx + 1 }}
-      className="grain sticky top-0 flex h-[100svh] flex-col overflow-hidden rounded-t-[2.5rem] shadow-[0_-30px_80px_-30px_rgba(0,0,0,0.45)] transform-gpu"
+      className="relative h-[120svh] sm:h-[125svh] rounded-t-[2.5rem]"
       data-testid={`product-card-${p.slug}`}
     >
-      <motion.p
+      <article
+        style={worldVars(world)}
+        className="grain sticky top-0 flex h-[100svh] flex-col overflow-hidden rounded-t-[2.5rem] shadow-[0_-30px_80px_-30px_rgba(0,0,0,0.45)] transform-gpu"
+      >
+        <motion.p
           style={{ x: ghostX }}
           aria-hidden="true"
           className="pointer-events-none absolute left-0 top-[16%] select-none whitespace-nowrap font-display text-[15vw] leading-none opacity-[0.1] will-change-transform"
@@ -93,6 +97,7 @@ function Chapter({ p, idx, total }) {
           </div>
         </div>
       </article>
+    </div>
   );
 }
 
@@ -114,7 +119,7 @@ export function Collection({ products }) {
           The signatures of the season — the bottles that get stopped in corridors. Each is built to be noticed from across the hall.
         </motion.p>
       </div>
-      <div className="relative pb-[40svh] sm:pb-[50svh]">
+      <div className="relative">
         {products.map((p, i) => (
           <Chapter key={p.slug} p={p} idx={i} total={products.length} />
         ))}
