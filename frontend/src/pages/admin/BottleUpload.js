@@ -1,7 +1,9 @@
 import { useRef, useState, useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Upload, Loader2, Star, Plus, Sparkles, X } from "lucide-react";
 import { api, formatErr } from "@/lib/api";
+import { getCachedCatalog, setCachedCatalog } from "@/hooks/useProducts";
 
 /**
  * Fast client-side image compression.
@@ -64,6 +66,7 @@ export async function prepareImage(file, maxDim = 1600, quality = 0.90) {
  * primary cover selector, and high-speed upload handling.
  */
 export function BottleUpload({ slug, image, images = [], onChange, onDone }) {
+  const qc = useQueryClient();
   const inputRef = useRef(null);
   const [busy, setBusy] = useState(false);
   const [progressMsg, setProgressMsg] = useState("");
@@ -159,6 +162,20 @@ export function BottleUpload({ slug, image, images = [], onChange, onDone }) {
         });
       }
 
+      if (slug) {
+        qc.invalidateQueries({ queryKey: ["products"] });
+        qc.invalidateQueries({ queryKey: ["product", slug] });
+        qc.invalidateQueries({ queryKey: ["admin-products"] });
+        try {
+          const catalog = [...getCachedCatalog()];
+          const idx = catalog.findIndex((p) => p.slug === slug);
+          if (idx >= 0) {
+            catalog[idx] = { ...catalog[idx], image: activePrimary, images: finalGallery };
+            setCachedCatalog(catalog);
+          }
+        } catch (e) {}
+      }
+
       toast.success(
         validFiles.length === 1
           ? "Photo added to gallery"
@@ -182,7 +199,21 @@ export function BottleUpload({ slug, image, images = [], onChange, onDone }) {
       });
     }
     if (slug) {
-      api.patch(`/admin/products/${slug}`, { image: imgUrl }).catch(() => {});
+      api.patch(`/admin/products/${slug}`, { image: imgUrl }).then(() => {
+        qc.invalidateQueries({ queryKey: ["products"] });
+        qc.invalidateQueries({ queryKey: ["product", slug] });
+        qc.invalidateQueries({ queryKey: ["admin-products"] });
+        try {
+          const catalog = [...getCachedCatalog()];
+          const idx = catalog.findIndex((p) => p.slug === slug);
+          if (idx >= 0) {
+            catalog[idx] = { ...catalog[idx], image: imgUrl };
+            setCachedCatalog(catalog);
+          }
+        } catch (e) {}
+      }).catch((err) => {
+        console.warn("Could not patch product cover:", err);
+      });
     }
     toast.success("Set as primary cover photo");
   };
@@ -207,6 +238,17 @@ export function BottleUpload({ slug, image, images = [], onChange, onDone }) {
           images: updated,
           image: newPrimary,
         });
+        qc.invalidateQueries({ queryKey: ["products"] });
+        qc.invalidateQueries({ queryKey: ["product", slug] });
+        qc.invalidateQueries({ queryKey: ["admin-products"] });
+        try {
+          const catalog = [...getCachedCatalog()];
+          const idx = catalog.findIndex((p) => p.slug === slug);
+          if (idx >= 0) {
+            catalog[idx] = { ...catalog[idx], image: newPrimary, images: updated };
+            setCachedCatalog(catalog);
+          }
+        } catch (e) {}
       } catch (err) {
         console.warn("Could not patch product after image deletion:", err);
       }

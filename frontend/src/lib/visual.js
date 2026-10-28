@@ -13,6 +13,10 @@ export const worldVars = (w) => ({ "--w-bg": w.bg, "--w-ink": w.ink, "--w-soft":
 
 export const cutout = (p) => {
   if (!p) return "";
+  // If user uploaded a custom primary image (e.g. /api/media/ or external), respect it everywhere!
+  if (p.image && (p.image.startsWith("/api/media/") || p.image.startsWith("data:") || p.image.startsWith("http"))) {
+    return p.image;
+  }
   const known = {
     "blonde-amber": "/images/cut-blonde-amber.png",
     layton: "/images/cut-layton.png",
@@ -31,6 +35,9 @@ export const cutout = (p) => {
 
 export const photoshoot = (p) => {
   if (!p) return "";
+  if (p.image && (p.image.startsWith("/api/media/") || p.image.startsWith("data:") || p.image.startsWith("http"))) {
+    return p.image;
+  }
   const known = {
     "blonde-amber": "/images/blonde-amber.jpg",
     layton: "/images/layton.jpg",
