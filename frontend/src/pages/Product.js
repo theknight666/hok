@@ -87,8 +87,10 @@ export default function Product() {
                       className="bottle-shadow h-[46svh] w-auto lg:h-[58svh] max-w-full select-none object-contain"
                       draggable={false}
                       onError={(e) => {
-                        if (e.currentTarget.src !== defaultCut) {
-                          e.currentTarget.src = defaultCut;
+                        if (activeImage && (activeImage.includes("/images/cut-") || activeImage.includes("/images/blonde-amber.jpg") || activeImage.includes("/images/layton.jpg") || activeImage.includes("/images/angels-share.jpg") || activeImage.includes("/images/side-effect.jpg"))) {
+                          if (e.currentTarget.src !== defaultCut) {
+                            e.currentTarget.src = defaultCut;
+                          }
                         }
                       }}
                     />
@@ -138,8 +140,10 @@ export default function Product() {
                               className="h-full w-full object-contain rounded-xl select-none transition-transform duration-300 group-hover:scale-110"
                               draggable={false}
                               onError={(e) => {
-                                if (e.currentTarget.src !== defaultCut) {
-                                  e.currentTarget.src = defaultCut;
+                                if (imgUrl && (imgUrl.includes("/images/cut-") || imgUrl.includes("/images/blonde-amber.jpg") || imgUrl.includes("/images/layton.jpg") || imgUrl.includes("/images/angels-share.jpg") || imgUrl.includes("/images/side-effect.jpg"))) {
+                                  if (e.currentTarget.src !== defaultCut) {
+                                    e.currentTarget.src = defaultCut;
+                                  }
                                 }
                               }}
                             />

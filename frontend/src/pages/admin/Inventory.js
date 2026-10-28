@@ -47,8 +47,10 @@ function Row({ p, onEdit, refresh }) {
             src={p.image}
             alt=""
             onError={(e) => {
-              const fallback = defaultCutoutOf(p.slug);
-              if (e.currentTarget.src !== fallback) e.currentTarget.src = fallback;
+              if (p.image && (p.image.includes("/images/cut-") || p.image.includes("/images/blonde-amber.jpg") || p.image.includes("/images/layton.jpg") || p.image.includes("/images/angels-share.jpg") || p.image.includes("/images/side-effect.jpg"))) {
+                const fallback = defaultCutoutOf(p.slug);
+                if (e.currentTarget.src !== fallback) e.currentTarget.src = fallback;
+              }
             }}
             className="h-14 w-11 rounded-lg bg-muted object-contain shrink-0"
             data-testid={`inventory-image-${p.slug}`}

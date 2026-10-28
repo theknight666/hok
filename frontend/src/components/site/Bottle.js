@@ -22,9 +22,11 @@ export function Bottle({ p, className = "", style, ...rest }) {
   }, [p, p?.image, p?.slug]);
 
   const handleImgError = () => {
-    const defaultCut = defaultCutoutOf(p?.slug);
-    if (src !== defaultCut) {
-      setSrc(defaultCut);
+    if (src && (src.includes("/images/cut-") || src.includes("/images/blonde-amber.jpg") || src.includes("/images/layton.jpg") || src.includes("/images/angels-share.jpg") || src.includes("/images/side-effect.jpg"))) {
+      const defaultCut = defaultCutoutOf(p?.slug);
+      if (src !== defaultCut) {
+        setSrc(defaultCut);
+      }
     }
   };
 
