@@ -175,7 +175,7 @@ export function Orders() {
         ))}
       </div>
       {!orders.length && <p className="text-muted-foreground">No orders here yet.</p>}
-      <div className="overflow-x-auto" data-lenis-prevent>
+      <div className="overflow-x-auto">
         <table className="w-full min-w-[820px] text-sm">
           <thead>
             <tr className="border-b text-left text-[0.62rem] uppercase tracking-[0.25em] text-muted-foreground">

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Minus, Plus, Pencil, Trash2 } from "lucide-react";
@@ -40,8 +40,8 @@ function Row({ p, onEdit, refresh }) {
 
   const low = p.stock <= p.low_stock_threshold;
   return (
-    <tr className="border-b align-middle" data-testid={`inventory-row-${p.slug}`}>
-      <td className="py-4 pr-4">
+    <tr className="border-b border-border/40 hover:bg-muted/15 transition-colors align-middle" data-testid={`inventory-row-${p.slug}`}>
+      <td className="py-4 pl-4 pr-4">
         <div className="flex items-center gap-4 min-w-0">
           <img
             src={p.image}
@@ -72,7 +72,7 @@ function Row({ p, onEdit, refresh }) {
         </div>
       </td>
       <td className="pr-4"><Switch checked={p.active} onCheckedChange={toggle} data-testid={`active-toggle-${p.slug}`} /></td>
-      <td className="text-right">
+      <td className="pr-4 text-right">
         {confirmDelete ? (
           <div className="inline-flex items-center gap-2">
             <span className="text-[11px] font-semibold text-destructive">Delete?</span>
@@ -117,27 +117,54 @@ export function Inventory() {
   const { data } = useQuery({ queryKey: ["admin-products"], queryFn: async () => (await api.get("/admin/products")).data });
   const { data: log } = useQuery({ queryKey: ["inv-log"], queryFn: async () => (await api.get("/admin/inventory-log")).data });
   const [editing, setEditing] = useState(null);
+  const scrollRef = useRef(null);
   const products = Array.isArray(data) ? data : [];
   const refresh = () => ["admin-products", "inv-log", "admin-stats", "products"].forEach((k) => qc.invalidateQueries({ queryKey: [k] }));
+
+  useEffect(() => {
+    if (scrollRef.current?._lenis) {
+      delete scrollRef.current._lenis;
+    }
+  }, [products.length]);
 
   return (
     <div data-testid="admin-inventory">
       <div className="mb-6 flex items-center justify-between">
-        <p className="font-display text-2xl">Fragrances</p>
+        <div>
+          <p className="font-display text-2xl">Fragrances</p>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            {products.length} {products.length === 1 ? "creation" : "creations"} in catalogue
+          </p>
+        </div>
         <button onClick={() => setEditing({})} className="btn-royal !px-5 !py-3" data-testid="new-product-btn"><span>New fragrance</span></button>
       </div>
-      <div className="overflow-x-auto" data-lenis-prevent>
-        <table className="w-full min-w-[860px] text-sm">
-          <thead>
-            <tr className="border-b text-left text-[0.62rem] uppercase tracking-[0.25em] text-muted-foreground">
-              <th className="pb-3">Fragrance</th><th className="pb-3">Price</th><th className="pb-3">Stock</th><th className="pb-3">Adjust stock</th><th className="pb-3">Live</th><th />
-            </tr>
-          </thead>
-          <tbody>
-            {products.map((p) => <Row key={p.slug} p={p} onEdit={setEditing} refresh={refresh} />)}
-          </tbody>
-        </table>
+
+      {/* Fragrances Dedicated Scroll Container with Native Luxury Scrollbar */}
+      <div className="relative rounded-2xl border border-border/70 bg-card/40 shadow-sm overflow-hidden">
+        <div
+          ref={scrollRef}
+          className="fragrance-table-scroll max-h-[350px] overflow-y-scroll overflow-x-auto"
+          tabIndex={0}
+          aria-label="Fragrances catalogue"
+        >
+          <table className="w-full min-w-[860px] text-sm border-collapse">
+            <thead className="sticky top-0 z-10 bg-card/95 backdrop-blur-md shadow-[0_1px_0_0_hsl(var(--border)/0.8)]">
+              <tr className="text-left text-[0.62rem] uppercase tracking-[0.25em] text-muted-foreground">
+                <th className="py-3.5 pl-4 pr-4">Fragrance</th>
+                <th className="py-3.5 pr-4">Price</th>
+                <th className="py-3.5 pr-4">Stock</th>
+                <th className="py-3.5 pr-4">Adjust stock</th>
+                <th className="py-3.5 pr-4">Live</th>
+                <th className="py-3.5 pr-4 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border/40">
+              {products.map((p) => <Row key={p.slug} p={p} onEdit={setEditing} refresh={refresh} />)}
+            </tbody>
+          </table>
+        </div>
       </div>
+
       <p className="mt-14 font-display text-2xl">Recent stock movements</p>
       <ul className="mt-4 divide-y border-y text-sm" data-testid="inventory-log">
         {(Array.isArray(log) ? log : []).slice(0, 12).map((l, i) => (

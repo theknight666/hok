@@ -5,7 +5,7 @@ export function Customers() {
   const { data } = useQuery({ queryKey: ["admin-customers"], queryFn: async () => (await api.get("/admin/customers")).data });
   const list = Array.isArray(data) ? data : [];
   return (
-    <div className="overflow-x-auto" data-testid="admin-customers" data-lenis-prevent>
+    <div className="overflow-x-auto" data-testid="admin-customers">
       {!list.length && <p className="text-muted-foreground">No customers yet.</p>}
       <table className="w-full min-w-[640px] text-sm">
         <thead>

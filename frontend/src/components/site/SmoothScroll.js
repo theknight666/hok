@@ -25,6 +25,7 @@ export function SmoothScroll() {
       wheelMultiplier: 1.0,
       touchMultiplier: 1.5,
       infinite: false,
+      allowNestedScroll: true,
     });
     window.__lenis = lenis;
 

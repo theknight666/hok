@@ -155,6 +155,32 @@
   }
 
   /* pill buttons */
+  .fragrance-table-scroll {
+    overflow-y: scroll;
+    overflow-x: auto;
+    overscroll-behavior-y: auto;
+    scrollbar-gutter: stable;
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--gold) / 0.75) hsl(var(--muted) / 0.4);
+  }
+  .fragrance-table-scroll::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  .fragrance-table-scroll::-webkit-scrollbar-track {
+    background: hsl(var(--muted) / 0.35);
+    border-radius: 9999px;
+  }
+  .fragrance-table-scroll::-webkit-scrollbar-thumb {
+    background: hsl(var(--gold) / 0.75);
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+  .fragrance-table-scroll::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--gold));
+  }
+
   .btn-royal {
     @apply relative inline-flex items-center justify-center gap-2.5 sm:gap-3 rounded-full px-5 py-3 sm:px-8 sm:py-4 text-xs font-medium uppercase tracking-[0.2em] sm:tracking-[0.26em];
     background: hsl(var(--foreground));
