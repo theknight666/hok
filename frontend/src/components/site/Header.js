@@ -11,7 +11,6 @@ const LINKS = [
   { to: "/collection", label: "Collection" },
   { to: "/discovery", label: "Discovery Sets" },
   { to: "/#best-sellers", label: "Best Sellers" },
-  { to: "/#house", label: "The House" },
   { to: "/track", label: "Track Order" },
   { to: "/contact", label: "Contact Us" },
 ];
