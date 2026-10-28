@@ -7,7 +7,7 @@ User choices: payment gateway later; currency INR (₹); perfumes Blonde Amber, 
 
 ## Architecture
 - FastAPI (server.py) + MongoDB (users, user_sessions, products, orders, inventory_log, login_attempts)
-- Auth: JWT httpOnly cookies (email/password, bcrypt, brute-force lockout) + Emergent Google Auth (session_token cookie). Admin role: seeded admin + ADMIN_GOOGLE_EMAILS allow-list.
+- Auth: JWT httpOnly cookies (email/password, bcrypt, brute-force lockout) stored in MongoDB Atlas. Image storage: MongoDB Atlas `media` collection with local caching and fallback.
 - React + react-three-fiber/drei (procedural 3D crystal bottle), framer-motion, lenis, shadcn UI.
 
 ## Personas

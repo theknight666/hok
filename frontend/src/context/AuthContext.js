@@ -16,10 +16,6 @@ export function AuthProvider({ children }) {
   }, []);
 
   useEffect(() => {
-    if (window.location.hash?.includes("session_id=")) {
-      setUser(false);
-      return;
-    }
     checkAuth();
   }, [checkAuth]);
 

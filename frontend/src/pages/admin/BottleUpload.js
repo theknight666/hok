@@ -19,7 +19,10 @@ export function BottleUpload({ slug, image, onDone }) {
     const fd = new FormData();
     fd.append("file", file);
     try {
-      const { data } = await api.post(`/admin/products/${slug}/image?remove_bg=${removeBg}`, fd, { timeout: 180000 });
+      const endpoint = slug
+        ? `/admin/products/${slug}/image?remove_bg=${removeBg}`
+        : `/admin/media/upload?remove_bg=${removeBg}`;
+      const { data } = await api.post(endpoint, fd, { timeout: 180000 });
       toast.success(removeBg ? "Bottle cut out and saved" : "Photo saved");
       onDone(data);
     } catch (e) {

@@ -5,7 +5,7 @@ import time
 import pytest
 import requests
 
-BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", "https://knight-house.preview.emergentagent.com").rstrip("/")
+BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", "http://localhost:8000").rstrip("/")
 ADMIN_EMAIL = "admin@houseoftheknight.com"
 ADMIN_PASS = "KnightAdmin#2026"
 REVIEWER_EMAIL = "reviewer@test.com"

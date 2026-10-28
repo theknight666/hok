@@ -382,30 +382,9 @@ async def refresh(request: Request, response: Response):
 
 
 @api.post("/auth/google/session")
-async def google_session(body: SessionIn, response: Response):
-    async with httpx.AsyncClient(timeout=15) as c:
-        r = await c.get("https://demobackend.emergentagent.com/auth/v1/env/oauth/session-data",
-                        headers={"X-Session-ID": body.session_id})
-    if r.status_code != 200:
-        raise HTTPException(status_code=401, detail="Google sign-in failed")
-    data = r.json()
-    email = data["email"].lower()
-    user = await db.users.find_one({"email": email}, {"_id": 0})
-    role = "admin" if email in google_admin_emails() else None
-    if user:
-        upd = {"name": user.get("name") or data.get("name"), "picture": data.get("picture")}
-        if role:
-            upd["role"] = role
-        await db.users.update_one({"email": email}, {"$set": upd})
-        user.update(upd)
-    else:
-        user = {"user_id": f"user_{uuid.uuid4().hex[:12]}", "email": email, "name": data.get("name") or email,
-                "picture": data.get("picture"), "role": role or "customer", "created_at": now().isoformat()}
-        await db.users.insert_one(dict(user))
-    await db.user_sessions.insert_one({"user_id": user["user_id"], "session_token": data["session_token"],
-                                       "expires_at": now() + timedelta(days=7), "created_at": now()})
-    set_cookie(response, "session_token", data["session_token"], 7 * 86400)
-    return public_user(user)
+async def google_session():
+    raise HTTPException(status_code=400, detail="Google authentication is disabled. Please sign in with email and password.")
+
 
 
 @api.get("/auth/me")
@@ -441,8 +420,11 @@ async def ensure_seeded():
             else:
                 seen_slugs.add(slug)
 
-        # 2. Ensure each seed fragrance exists initially if missing
+        # 2. Ensure each seed fragrance exists initially if missing and not explicitly deleted
+        deleted_slugs = set(await db.deleted_slugs.distinct("slug"))
         for p in SEED:
+            if p["slug"] in deleted_slugs:
+                continue
             existing = await db.products.find_one({"slug": p["slug"]})
             if not existing:
                 doc = {**p, "price": SEED_PRICES.get(p["slug"], 1499), "sample_price": SEED_SAMPLE_PRICES.get(p["slug"], 99),
@@ -507,17 +489,13 @@ async def list_products():
     try:
         await ensure_seeded()
         items = await db.products.find({"active": True}, {"_id": 0}).sort("order", 1).to_list(1000)
-        if items:
-            deduped, seen = [], set()
-            for it in items:
-                if it["slug"] not in seen:
-                    seen.add(it["slug"])
-                    deduped.append(it)
-            _products_cache = deduped
-            return deduped
-        if _products_cache:
-            return _products_cache
-        return _seed_fallback()
+        deduped, seen = [], set()
+        for it in items:
+            if it["slug"] not in seen:
+                seen.add(it["slug"])
+                deduped.append(it)
+        _products_cache = deduped
+        return deduped
     except Exception as e:
         logger.error("list_products DB error, using fallback: %s", e)
         if _products_cache:
@@ -734,6 +712,8 @@ async def admin_create_product(body: ProductIn, _: dict = Depends(require_admin)
     doc = body.model_dump()
     doc["updated_at"] = now().isoformat()
     await db.products.insert_one(dict(doc))
+    # Unmark from deleted_slugs if previously deleted
+    await db.deleted_slugs.delete_one({"slug": body.slug})
     _products_cache = []
     return doc
 
@@ -748,6 +728,22 @@ async def admin_update_product(slug: str, body: ProductPatch, _: dict = Depends(
         raise HTTPException(status_code=404, detail="Product not found")
     _products_cache = []
     return p
+
+
+@api.delete("/admin/products/{slug}")
+async def admin_delete_product(slug: str, _: dict = Depends(require_admin)):
+    global _products_cache
+    res = await db.products.delete_one({"slug": slug})
+    if not res.deleted_count:
+        raise HTTPException(status_code=404, detail="Product not found")
+    # Mark in deleted_slugs so ensure_seeded() never re-inserts it
+    await db.deleted_slugs.update_one(
+        {"slug": slug},
+        {"$set": {"slug": slug, "deleted_at": now().isoformat()}},
+        upsert=True
+    )
+    _products_cache = []
+    return {"ok": True, "deleted": slug}
 
 
 @api.post("/admin/products/{slug}/stock")
@@ -828,15 +824,38 @@ async def admin_customers(_: dict = Depends(require_admin)):
 # ---------- Media (object storage) ----------
 @api.get("/media/{path:path}")
 async def media(path: str):
-    rec = await db.files.find_one({"storage_path": path, "is_deleted": False}, {"_id": 0})
-    if not rec:
-        raise HTTPException(status_code=404, detail="File not found")
     try:
         data, ct = await asyncio.to_thread(storage.get_object, path)
+        return Response(content=data, media_type=ct,
+                        headers={"Cache-Control": "public, max-age=31536000, immutable"})
     except FileNotFoundError:
         raise HTTPException(status_code=404, detail="File not found")
-    return Response(content=data, media_type=rec.get("content_type", ct),
-                    headers={"Cache-Control": "public, max-age=31536000, immutable"})
+    except Exception as e:
+        logger.error("Media retrieval failed for %s: %s", path, e)
+        raise HTTPException(status_code=500, detail="Error fetching media")
+
+
+@api.post("/admin/media/upload")
+async def admin_upload_generic_image(file: UploadFile = File(...), remove_bg: bool = Query(False),
+                                     admin: dict = Depends(require_admin)):
+    if file.content_type not in storage.ALLOWED_TYPES:
+        raise HTTPException(status_code=400, detail="Upload a PNG, JPEG or WebP image")
+    data = await file.read()
+    if len(data) > storage.MAX_UPLOAD_BYTES:
+        raise HTTPException(status_code=413, detail="Image must be under 10 MB")
+    try:
+        png = await asyncio.to_thread(storage.cut_out_bottle if remove_bg else storage.to_png, data)
+    except Exception as e:
+        logger.error("Image processing failed: %s", e)
+        raise HTTPException(status_code=422, detail="Could not process that image")
+    path = f"{storage.APP_NAME}/uploads/{uuid.uuid4().hex}.png"
+    result = await asyncio.to_thread(storage.put_object, path, png, "image/png")
+    url = f"/api/media/{result['path']}"
+    await db.files.insert_one({"id": f"file_{uuid.uuid4().hex[:12]}", "storage_path": result["path"],
+                               "original_filename": file.filename, "content_type": "image/png",
+                               "size": result.get("size", len(png)), "by": admin["email"],
+                               "is_deleted": False, "created_at": now().isoformat()})
+    return {"url": url, "path": result["path"]}
 
 
 @api.post("/admin/products/{slug}/image")
@@ -1066,11 +1085,15 @@ async def startup():
         await db.users.create_index("email", unique=True)
         await db.users.create_index("user_id", unique=True)
         await db.products.create_index("slug", unique=True)
+        await db.deleted_slugs.create_index("slug", unique=True)
         await db.orders.create_index("order_id", unique=True)
         await db.login_attempts.create_index("identifier")
         await db.reviews.create_index([("product_slug", 1), ("user_id", 1)], unique=True)
         await db.reviews.create_index("id", unique=True)
         await db.files.create_index("storage_path", unique=True)
+        await db.media.create_index("path", unique=True)
+        # Sync existing images to MongoDB
+        await asyncio.to_thread(storage.seed_existing_images)
         await ensure_seeded()
         admin_email = os.environ.get("ADMIN_EMAIL", "admin@houseoftheknight.com").lower()
         admin_pw = os.environ.get("ADMIN_PASSWORD", "KnightAdmin#2026")

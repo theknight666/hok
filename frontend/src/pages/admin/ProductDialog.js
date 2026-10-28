@@ -342,7 +342,25 @@ export function ProductDialog({ product, onClose, onSaved }) {
 
   const qc = useQueryClient();
   const [busy, setBusy] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
+
+  const handleDelete = async () => {
+    setDeleting(true);
+    try {
+      await api.delete(`/admin/products/${product.slug}`);
+      toast.success(`"${product.name}" deleted permanently`);
+      qc.invalidateQueries({ queryKey: ["products"] });
+      qc.invalidateQueries({ queryKey: ["admin-products"] });
+      onSaved();
+      onClose();
+    } catch (err) {
+      toast.error(formatErr(err));
+      setDeleting(false);
+      setConfirmDelete(false);
+    }
+  };
 
   const updateTierNotes = (tierKey, nextList) => {
     setF((prev) => ({
@@ -440,11 +458,16 @@ export function ProductDialog({ product, onClose, onSaved }) {
         </DialogHeader>
 
         <form onSubmit={save} className="mt-4 grid gap-x-6 gap-y-5 sm:grid-cols-2">
-          {!isNew && (
-            <div className="sm:col-span-2">
-              <BottleUpload slug={product.slug} image={f.image} onDone={(p) => { setF((c) => ({ ...c, image: p.image })); onSaved(); }} />
-            </div>
-          )}
+          <div className="sm:col-span-2">
+            <BottleUpload
+              slug={isNew ? null : product.slug}
+              image={f.image}
+              onDone={(p) => {
+                setF((c) => ({ ...c, image: p.image || p.url }));
+                if (!isNew) onSaved();
+              }}
+            />
+          </div>
 
           <div className="sm:col-span-2 border-b pb-2">
             <h4 className="font-display text-lg">General Information</h4>
@@ -551,9 +574,56 @@ export function ProductDialog({ product, onClose, onSaved }) {
             ))}
           </div>
 
-          <button disabled={busy} className="btn-royal mt-4 sm:col-span-2" data-testid="pd-save">
-            <span>{busy ? "Saving…" : "Save fragrance"}</span>
-          </button>
+          <div className="mt-6 flex flex-wrap items-center justify-between gap-4 sm:col-span-2 pt-3 border-t border-border/50">
+            {!isNew ? (
+              confirmDelete ? (
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-destructive font-semibold">Delete permanently?</span>
+                  <button
+                    type="button"
+                    disabled={deleting}
+                    onClick={handleDelete}
+                    className="rounded-full bg-destructive px-3 py-1 text-xs font-semibold text-destructive-foreground hover:opacity-90 cursor-pointer"
+                  >
+                    {deleting ? "Deleting…" : "Yes, delete"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setConfirmDelete(false)}
+                    className="rounded-full border px-3 py-1 text-xs text-muted-foreground hover:text-foreground cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setConfirmDelete(true)}
+                  className="text-xs uppercase tracking-[0.2em] text-destructive/80 hover:text-destructive hover:underline cursor-pointer"
+                >
+                  Delete fragrance
+                </button>
+              )
+            ) : <div />}
+
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={onClose}
+                className="btn-ghost-royal !px-5 !py-2.5 text-xs uppercase tracking-[0.2em]"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={busy}
+                className="btn-royal !px-6 !py-2.5"
+                data-testid="pd-save"
+              >
+                <span>{busy ? "Saving…" : "Save fragrance"}</span>
+              </button>
+            </div>
+          </div>
         </form>
       </DialogContent>
     </Dialog>

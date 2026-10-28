@@ -18,7 +18,7 @@ const ITEMS = [
     numeral: "III",
     Icon: FlaskConical,
     t: "Eau de Parfum strength",
-    d: "Formulated up to 30% pure fragrance oil. A single morning application delivers all-day presence.",
+    d: "Formulated with high-grade perfume oils and pure absolutes. A single morning application delivers all-day presence.",
   },
   {
     numeral: "IV",

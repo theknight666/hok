@@ -1,13 +1,16 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Minus, Plus, Pencil } from "lucide-react";
+import { Minus, Plus, Pencil, Trash2 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { api, formatErr, inr } from "@/lib/api";
 import { ProductDialog } from "./ProductDialog";
 
 function Row({ p, onEdit, refresh }) {
   const [amount, setAmount] = useState(10);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
   const adjust = async (delta) => {
     try {
       await api.post(`/admin/products/${p.slug}/stock`, { delta });
@@ -21,6 +24,19 @@ function Row({ p, onEdit, refresh }) {
     await api.patch(`/admin/products/${p.slug}`, { active }).catch((e) => toast.error(formatErr(e)));
     refresh();
   };
+  const handleDelete = async () => {
+    setDeleting(true);
+    try {
+      await api.delete(`/admin/products/${p.slug}`);
+      toast.success(`"${p.name}" deleted permanently`);
+      refresh();
+    } catch (e) {
+      toast.error(formatErr(e));
+      setDeleting(false);
+      setConfirmDelete(false);
+    }
+  };
+
   const low = p.stock <= p.low_stock_threshold;
   return (
     <tr className="border-b align-middle" data-testid={`inventory-row-${p.slug}`}>
@@ -47,13 +63,44 @@ function Row({ p, onEdit, refresh }) {
       </td>
       <td className="pr-4"><Switch checked={p.active} onCheckedChange={toggle} data-testid={`active-toggle-${p.slug}`} /></td>
       <td className="text-right">
-        <button onClick={() => onEdit(p)} className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.25em] text-gold hover:opacity-70" data-testid={`edit-product-${p.slug}`}>
-          <Pencil className="h-3.5 w-3.5" /> Edit / Photo
-        </button>
+        {confirmDelete ? (
+          <div className="inline-flex items-center gap-2">
+            <span className="text-[11px] font-semibold text-destructive">Delete?</span>
+            <button
+              onClick={handleDelete}
+              disabled={deleting}
+              className="rounded bg-destructive px-2 py-1 text-xs font-semibold text-destructive-foreground hover:opacity-90"
+              data-testid={`confirm-delete-${p.slug}`}
+            >
+              {deleting ? "Deleting…" : "Yes"}
+            </button>
+            <button
+              onClick={() => setConfirmDelete(false)}
+              className="rounded border px-2 py-1 text-xs text-muted-foreground hover:text-foreground"
+            >
+              No
+            </button>
+          </div>
+        ) : (
+          <div className="inline-flex items-center gap-3">
+            <button onClick={() => onEdit(p)} className="inline-flex items-center gap-1.5 text-xs uppercase tracking-[0.2em] text-gold hover:opacity-70" data-testid={`edit-product-${p.slug}`}>
+              <Pencil className="h-3.5 w-3.5" /> Edit
+            </button>
+            <button
+              onClick={() => setConfirmDelete(true)}
+              className="p-1 text-muted-foreground transition-colors hover:text-destructive"
+              data-testid={`delete-product-${p.slug}`}
+              title="Delete fragrance"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        )}
       </td>
     </tr>
   );
 }
+
 
 export function Inventory() {
   const qc = useQueryClient();

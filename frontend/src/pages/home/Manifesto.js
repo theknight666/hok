@@ -1,39 +1,53 @@
 import { useRef } from "react";
 import { Link } from "react-router-dom";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import { ScrollWords, FadeUp } from "@/components/site/Reveal";
 import { KnightMark } from "@/components/site/Logo";
 
 export function Manifesto() {
-  const ref = useRef(null);
+  const act1Ref = useRef(null);
   const { scrollYProgress } = useScroll({
-    target: ref,
+    target: act1Ref,
     offset: ["start end", "end start"],
   });
 
-  // Bottle scroll entrance: gracefully glides into view from outside the screen on the right, then floats with subtle parallax
-  const bottleX = useTransform(scrollYProgress, (v) => {
-    const isMobile = typeof window !== "undefined" && window.innerWidth < 1024;
-    const startX = isMobile ? 90 : 360;
-    if (v <= 0.35) return startX - (v / 0.35) * startX;
-    return -20 * ((v - 0.35) / 0.65);
+  // Silky damped spring for weighted luxury physical inertia (direct scroll scrubbing)
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 85,
+    damping: 24,
+    mass: 0.6,
+    restDelta: 0.0005,
   });
-  const bottleY = useTransform(scrollYProgress, [0, 0.35, 1], [140, 0, -75]);
-  const bottleRotate = useTransform(scrollYProgress, [0, 0.35, 1], [16, 0, -4]);
-  const bottleScale = useTransform(scrollYProgress, [0, 0.35, 1], [0.86, 1.03, 0.96]);
-  const auraScale = useTransform(scrollYProgress, [0, 0.35, 1], [0.5, 1.35, 0.9]);
-  const bottleOpacity = useTransform(scrollYProgress, [0, 0.18, 0.85, 1], [0, 1, 1, 0.6]);
+
+  // 1. Vertical elevation: rises smoothly into place as you scroll, then continues with gentle parallax
+  const bottleY = useTransform(smoothProgress, [0.05, 0.42, 0.9], [70, 0, -32]);
+
+  // 2. Majestic scale expansion: from 0.90 to 1.0 at center, then slight float
+  const bottleScale = useTransform(smoothProgress, [0.05, 0.42, 0.9], [0.90, 1.0, 0.98]);
+
+  // 3. Cinematic Blur & Focus: emerges from a soft optical blur to crystal sharp focus
+  const bottleBlur = useTransform(smoothProgress, [0.05, 0.38], [10, 0]);
+  const bottleFilter = useTransform(bottleBlur, (v) => `blur(${v}px)`);
+
+  // 4. Smooth Opacity Fade-in
+  const bottleOpacity = useTransform(smoothProgress, [0.05, 0.35, 0.85, 1], [0, 1, 1, 0.4]);
+
+  // 5. Regal Poise Tilt: settles from 2.8 degrees into proud upright alignment
+  const bottleRotate = useTransform(smoothProgress, [0.05, 0.42, 0.9], [2.8, 0, -1.2]);
+
+  // 6. Atmospheric Golden Halo Bloom
+  const auraScale = useTransform(smoothProgress, [0.05, 0.45, 0.9], [0.6, 1.25, 1.0]);
+  const auraOpacity = useTransform(smoothProgress, [0.05, 0.35, 0.85, 1], [0, 0.48, 0.48, 0.2]);
 
   return (
     <section
-      ref={ref}
       className="relative mx-auto max-w-[1600px] overflow-x-clip px-5 py-16 sm:px-10 lg:py-24"
       data-testid="manifesto-section"
     >
       {/* ======================================================== */}
       {/* ACT I: The Philosophy & The Animated Flacon Entrance     */}
       {/* ======================================================== */}
-      <div className="grid grid-cols-1 gap-14 lg:grid-cols-12 lg:items-center">
+      <div ref={act1Ref} className="grid grid-cols-1 gap-14 lg:grid-cols-12 lg:items-center">
         {/* Left Column: First Statement & Craft Hallmarks */}
         <div className="relative z-10 lg:col-span-7">
           <p className="font-display text-base font-semibold uppercase tracking-[0.32em] text-gold sm:text-lg">
@@ -50,7 +64,7 @@ export function Manifesto() {
             <div>
               <p className="text-[0.62rem] font-medium uppercase tracking-[0.28em] text-gold">Extraction</p>
               <p className="mt-1 font-display text-base tracking-tight text-foreground sm:text-lg">
-                30% Oil Concentration
+                Artisanal Distillation
               </p>
             </div>
             <div className="hidden h-8 w-px bg-border/50 sm:block" />
@@ -70,40 +84,56 @@ export function Manifesto() {
           </FadeUp>
         </div>
 
-        {/* Right Column: Free-Floating Unconfined Perfume Bottle (Scroll Entrance from Outside Screen) */}
-        <div className="relative flex items-center justify-center lg:col-span-5">
-          {/* Ambient Warm Golden Aura */}
+        {/* Right Column: Architectural Pedestal for the Signature Flacon */}
+        <div className="relative flex items-center justify-center lg:col-span-5 min-h-[580px] sm:min-h-[700px]">
+          {/* Ambient Warm Golden Aura with subtle breathing */}
           <motion.div
-            style={{ scale: auraScale }}
-            className="pointer-events-none absolute h-[360px] w-[360px] rounded-full bg-gold/25 blur-[110px] dark:bg-gold/35 sm:h-[460px] sm:w-[460px]"
+            style={{ scale: auraScale, opacity: auraOpacity }}
+            className="pointer-events-none absolute h-[520px] w-[520px] rounded-full bg-gold/30 blur-[120px] dark:bg-gold/35 sm:h-[650px] sm:w-[650px]"
             aria-hidden="true"
           />
 
+          {/* Scroll-Scrubbed Flacon Reveal Container */}
           <motion.div
             style={{
-              x: bottleX,
               y: bottleY,
-              rotate: bottleRotate,
               scale: bottleScale,
+              rotate: bottleRotate,
               opacity: bottleOpacity,
+              filter: bottleFilter,
             }}
-            whileHover={{ scale: 1.07, rotate: 2, y: -14 }}
-            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className="relative flex flex-col items-center will-change-transform transform-gpu cursor-pointer"
+            className="relative flex flex-col items-center will-change-transform transform-gpu"
           >
-            <Link
-              to="/fragrance/blonde-amber"
-              className="group relative block"
-              aria-label="Discover Blonde Amber - Signature Eau de Parfum"
+            {/* Subtle Ethereal Ambient Levitation Loop */}
+            <motion.div
+              animate={{ y: [-3.5, 3.5, -3.5] }}
+              transition={{
+                duration: 5.5,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+              className="will-change-transform transform-gpu"
             >
-              <img
-                src="/images/cut-blonde-amber.png"
-                alt="House signature bottle - Blonde Amber"
-                loading="lazy"
-                draggable={false}
-                className="bottle-shadow h-[45svh] max-h-[740px] min-h-[280px] sm:min-h-[420px] sm:h-[66svh] lg:h-[72svh] w-auto select-none object-contain transition-all duration-700 group-hover:brightness-110"
-              />
-            </Link>
+              <Link
+                to="/fragrance/blonde-amber"
+                className="group relative block cursor-pointer"
+                aria-label="Discover Blonde Amber - Signature Eau de Parfum"
+              >
+                <motion.div
+                  whileHover={{ scale: 1.04, y: -6, rotate: 0.8 }}
+                  transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                  className="will-change-transform transform-gpu"
+                >
+                  <img
+                    src="/images/cut-blonde-amber.png"
+                    alt="House signature bottle - Blonde Amber"
+                    loading="eager"
+                    draggable={false}
+                    className="bottle-shadow h-[68svh] max-h-[810px] min-h-[440px] sm:h-[78svh] sm:max-h-[845px] lg:h-[80svh] lg:max-h-[880px] w-auto select-none object-contain transition-all duration-700 group-hover:brightness-105 group-hover:drop-shadow-[0_20px_45px_rgba(212,162,76,0.25)]"
+                  />
+                </motion.div>
+              </Link>
+            </motion.div>
           </motion.div>
         </div>
       </div>
@@ -202,7 +232,7 @@ export function Manifesto() {
             </span>
             <h4 className="mt-2 font-display text-xl text-foreground">Cold Macerated</h4>
             <p className="mt-2 text-xs font-light text-muted-foreground">
-              Macerated for six weeks in sealed dark vessels and hand-bottled at 30% pure concentration.
+              Macerated for six weeks in sealed dark vessels and hand-bottled in small artisanal batches.
             </p>
           </div>
         </div>

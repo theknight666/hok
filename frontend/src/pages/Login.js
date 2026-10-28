@@ -7,11 +7,6 @@ import { KnightMark } from "@/components/site/Logo";
 
 const inputCls = "w-full border-b border-input bg-transparent py-3 text-base outline-none transition-colors focus:border-gold";
 
-function googleLogin() {
-  // REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
-  const redirectUrl = window.location.origin + "/account";
-  window.location.href = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`;
-}
 
 export default function Login() {
   const { user, login, register } = useAuth();
@@ -63,13 +58,7 @@ export default function Login() {
               <span>{busy ? "One moment…" : mode === "login" ? "Sign in" : "Create account"}</span>
             </button>
           </form>
-          <div className="my-8 flex items-center gap-4 text-xs uppercase tracking-[0.3em] text-muted-foreground">
-            <span className="h-px flex-1 bg-border" /> or <span className="h-px flex-1 bg-border" />
-          </div>
-          <button onClick={googleLogin} className="btn-ghost-royal w-full justify-center" data-testid="google-login-btn">
-            <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden="true"><path fill="#EA4335" d="M12 10.2v3.9h5.5c-.2 1.3-1.6 3.9-5.5 3.9-3.3 0-6-2.7-6-6.1s2.7-6.1 6-6.1c1.9 0 3.1.8 3.8 1.5l2.6-2.5C16.8 3.3 14.6 2.3 12 2.3 6.6 2.3 2.3 6.6 2.3 12s4.3 9.7 9.7 9.7c5.6 0 9.3-3.9 9.3-9.5 0-.6-.1-1.1-.2-1.6H12z"/></svg>
-            Continue with Google
-          </button>
+
         </div>
       </div>
     </main>

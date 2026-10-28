@@ -13,7 +13,7 @@ export function Intro() {
     if (typeof window === "undefined") return false;
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has("intro") || urlParams.has("preloader")) return true;
-    return !sessionStorage.getItem("hotk_intro_v5");
+    return !sessionStorage.getItem("hotk_intro_restored");
   });
   const [isBeating, setIsBeating] = useState(false);
   const containerRef = useRef(null);
@@ -51,7 +51,7 @@ export function Intro() {
   useEffect(() => {
     if (!show) return undefined;
 
-    sessionStorage.setItem("hotk_intro_v5", "1");
+    sessionStorage.setItem("hotk_intro_restored", "1");
 
     // Force scroll to top (0, 0) so the page behind curtain is strictly at the Hero section
     window.scrollTo(0, 0);
@@ -96,7 +96,7 @@ export function Intro() {
       window.__lenis.start();
     }
     setShow(false);
-    sessionStorage.setItem("hotk_intro_v5", "1");
+    sessionStorage.setItem("hotk_intro_restored", "1");
   };
 
   return (
@@ -260,7 +260,7 @@ export function Intro() {
               transition={{ opacity: { duration: 0.18 } }}
               className="relative flex items-center justify-center p-6 will-change-transform"
             >
-              <div className="relative h-[6.8rem] w-[6.8rem] sm:h-[8.4rem] sm:w-[8.4rem] lg:h-[9.6rem] lg:w-[9.6rem] flex items-center justify-center transform-gpu">
+              <div className="relative h-[6.12rem] w-[6.12rem] sm:h-[7.56rem] sm:w-[7.56rem] lg:h-[8.64rem] lg:w-[8.64rem] flex items-center justify-center transform-gpu">
                 {/* Primary Monogram Logo: Grey on Dark mode, Dark Obsidian on White mode */}
                 <img
                   src={isDark ? "/images/hok-monogram.png" : "/images/hok-monogram-dark.png"}

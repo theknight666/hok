@@ -25,8 +25,8 @@ const TOPICS = [
 
 const FAQS = [
   {
-    q: "How close are your fragrances to the originals?",
-    a: "We formulate our fragrances using high-quality oils to closely match the scent profiles of popular niche fragrances, offering great longevity and projection."
+    q: "What concentration are your fragrances and how long do they last?",
+    a: "All our creations are formulated at Eau de Parfum strength, cold-macerated for six weeks with heavy resins and pure absolutes to deliver a powerful, all-day presence with 12+ hours of longevity."
   },
   {
     q: "How long does shipping take?",
@@ -184,10 +184,10 @@ export default function Contact() {
                 </span>
               </div>
               <h4 className="mt-2 font-display text-lg text-foreground">
-                Looking for a specific clone?
+                Looking for a specific fragrance?
               </h4>
               <p className="mt-1 text-xs font-light leading-relaxed text-muted-foreground">
-                If there is a niche fragrance you'd like us to create next, let us know! We prioritize community suggestions for our upcoming batches.
+                If there is a fragrance you'd like us to create next, let us know! We prioritize community suggestions for our upcoming batches.
               </p>
             </div>
           </div>
