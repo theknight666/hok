@@ -36,12 +36,13 @@ function Chapter({ p, idx, total }) {
   const notes = flatNotes(p.notes, 5);
 
   return (
-    <div ref={ref} className="h-[110svh] sm:h-[115svh]" data-testid={`product-card-${p.slug}`}>
-      <article
-        style={{ ...worldVars(world), zIndex: idx + 1 }}
-        className="grain sticky top-0 flex h-[100svh] flex-col overflow-hidden rounded-t-[2.5rem] shadow-[0_-30px_80px_-30px_rgba(0,0,0,0.45)] transform-gpu"
-      >
-        <motion.p
+    <article
+      ref={ref}
+      style={{ ...worldVars(world), zIndex: idx + 1 }}
+      className="grain sticky top-0 flex h-[100svh] flex-col overflow-hidden rounded-t-[2.5rem] shadow-[0_-30px_80px_-30px_rgba(0,0,0,0.45)] transform-gpu"
+      data-testid={`product-card-${p.slug}`}
+    >
+      <motion.p
           style={{ x: ghostX }}
           aria-hidden="true"
           className="pointer-events-none absolute left-0 top-[16%] select-none whitespace-nowrap font-display text-[15vw] leading-none opacity-[0.1] will-change-transform"
@@ -92,7 +93,6 @@ function Chapter({ p, idx, total }) {
           </div>
         </div>
       </article>
-    </div>
   );
 }
 
@@ -114,7 +114,7 @@ export function Collection({ products }) {
           The signatures of the season — the bottles that get stopped in corridors. Each is built to be noticed from across the hall.
         </motion.p>
       </div>
-      <div className="relative">
+      <div className="relative pb-[40svh] sm:pb-[50svh]">
         {products.map((p, i) => (
           <Chapter key={p.slug} p={p} idx={i} total={products.length} />
         ))}
