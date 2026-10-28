@@ -49,7 +49,6 @@ export default function Product() {
     ? Array.from(new Set(p.images.filter(Boolean)))
     : (p.image ? [p.image] : []);
   const activeImage = gallery[selectedIdx] || gallery[0] || p.image;
-  const isCutoutActive = Boolean(activeImage && (activeImage.includes("/cut-") || activeImage.includes("cutout")));
 
   return (
     <main data-testid="product-page" className="w-full max-w-full overflow-x-hidden">
@@ -62,44 +61,29 @@ export default function Product() {
                 <ArrowLeft className="h-4 w-4" strokeWidth={2.6} /> Collection
               </Link>
 
-              {/* Upper Main Stage (Shows active image in bigger state) */}
+              {/* Upper Main Stage (Shows active image floating cleanly without any background cube) */}
               <div className="relative mt-4 sm:mt-6 flex h-[48svh] items-center justify-center lg:h-[62svh]">
                 <div className="world-glow pointer-events-none absolute left-1/2 top-1/2 h-[80%] w-[80%] -translate-x-1/2 -translate-y-1/2 will-change-transform" />
                 <AnimatePresence mode="wait">
-                  {isCutoutActive ? (
-                    <motion.div
-                      key="main-bottle-cutout"
-                      initial={{ opacity: 0, scale: 0.94, y: 30 }}
-                      animate={{ opacity: 1, scale: 1, y: 0 }}
-                      exit={{ opacity: 0, scale: 0.94 }}
-                      transition={{ duration: 0.45, ease: EASE }}
-                      className="animate-floaty relative will-change-transform transform-gpu flex items-center justify-center h-full w-full"
-                      style={{ "--tilt": "-3deg" }}
-                    >
-                      <Bottle p={p} className="bottle-shadow h-[46svh] w-auto lg:h-[58svh] max-w-full select-none" />
-                    </motion.div>
-                  ) : (
-                    <motion.div
-                      key={activeImage}
-                      initial={{ opacity: 0, scale: 0.92, y: 15 }}
-                      animate={{ opacity: 1, scale: 1, y: 0 }}
-                      exit={{ opacity: 0, scale: 0.92, y: -15 }}
-                      transition={{ duration: 0.35, ease: EASE }}
-                      className="relative flex items-center justify-center h-full w-full p-2"
-                    >
-                      <div className="relative max-h-[46svh] lg:max-h-[58svh] aspect-square w-auto max-w-[90%] overflow-hidden rounded-[2.5rem] border border-white/20 bg-black/30 backdrop-blur-xl shadow-2xl flex items-center justify-center p-3 sm:p-5 group">
-                        <img
-                          src={activeImage}
-                          alt={`${p.name} - View ${selectedIdx + 1}`}
-                          className="h-full w-full object-contain rounded-2xl select-none transition-transform duration-500 group-hover:scale-105"
-                          draggable={false}
-                          onError={(e) => {
-                            if (activeImage !== p.image) e.currentTarget.src = p.image;
-                          }}
-                        />
-                      </div>
-                    </motion.div>
-                  )}
+                  <motion.div
+                    key={activeImage}
+                    initial={{ opacity: 0, scale: 0.94, y: 20 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.94 }}
+                    transition={{ duration: 0.45, ease: EASE }}
+                    className="animate-floaty relative will-change-transform transform-gpu flex items-center justify-center h-full w-full"
+                    style={{ "--tilt": "-3deg" }}
+                  >
+                    <img
+                      src={activeImage}
+                      alt={`${p.name} - View ${selectedIdx + 1}`}
+                      className="bottle-shadow h-[46svh] w-auto lg:h-[58svh] max-w-full select-none object-contain"
+                      draggable={false}
+                      onError={(e) => {
+                        if (activeImage !== p.image) e.currentTarget.src = p.image;
+                      }}
+                    />
+                  </motion.div>
                 </AnimatePresence>
               </div>
 
