@@ -941,6 +941,25 @@ async def admin_customers(_: dict = Depends(require_admin)):
 # ---------- Media (object storage) ----------
 @api.get("/media/{path:path}")
 async def media(path: str):
+    clean_path = path.lstrip("/")
+    try:
+        doc = await db.media.find_one({
+            "$or": [
+                {"path": clean_path},
+                {"path": "/" + clean_path},
+                {"path": "images/" + clean_path},
+                {"path": clean_path.replace("images/", "")},
+            ]
+        })
+        if doc and "data" in doc:
+            return Response(
+                content=doc["data"],
+                media_type=doc.get("content_type", "image/png"),
+                headers={"Cache-Control": "public, max-age=31536000, immutable"},
+            )
+    except Exception as e:
+        logger.warning("Motor media lookup failed for %s: %s", clean_path, e)
+
     try:
         data, ct = await asyncio.to_thread(storage.get_object, path)
         return Response(content=data, media_type=ct,
@@ -966,13 +985,23 @@ async def admin_upload_generic_image(file: UploadFile = File(...),
         logger.error("Image processing failed: %s", e)
         raise HTTPException(status_code=422, detail="Could not process that image")
     path = f"{storage.APP_NAME}/uploads/{uuid.uuid4().hex}.png"
+    now_utc = now()
+    try:
+        await db.media.update_one(
+            {"path": path},
+            {"$set": {"path": path, "data": png, "content_type": "image/png", "size": len(png), "updated_at": now_utc},
+             "$setOnInsert": {"created_at": now_utc}},
+            upsert=True
+        )
+    except Exception as e:
+        logger.warning("Motor media store warning: %s", e)
     result = await asyncio.to_thread(storage.put_object, path, png, "image/png")
-    url = f"/api/media/{result['path']}"
-    await db.files.insert_one({"id": f"file_{uuid.uuid4().hex[:12]}", "storage_path": result["path"],
+    url = f"/api/media/{path}"
+    await db.files.insert_one({"id": f"file_{uuid.uuid4().hex[:12]}", "storage_path": path,
                                "original_filename": file.filename, "content_type": "image/png",
-                               "size": result.get("size", len(png)), "by": admin["email"],
+                               "size": len(png), "by": admin["email"],
                                "is_deleted": False, "created_at": now().isoformat()})
-    return {"url": url, "path": result["path"]}
+    return {"url": url, "path": path}
 
 
 @api.post("/admin/products/{slug}/image")
@@ -993,15 +1022,24 @@ async def admin_upload_image(slug: str, file: UploadFile = File(...),
         logger.error("Image processing failed: %s", e)
         raise HTTPException(status_code=422, detail="Could not process that image")
     path = f"{storage.APP_NAME}/products/{slug}/{uuid.uuid4().hex}.png"
+    now_utc = now()
+    try:
+        await db.media.update_one(
+            {"path": path},
+            {"$set": {"path": path, "data": png, "content_type": "image/png", "size": len(png), "updated_at": now_utc},
+             "$setOnInsert": {"created_at": now_utc}},
+            upsert=True
+        )
+    except Exception as e:
+        logger.warning("Motor media store warning: %s", e)
     try:
         result = await asyncio.to_thread(storage.put_object, path, png, "image/png")
     except Exception as e:
-        logger.error("Storage upload failed: %s", e)
-        raise HTTPException(status_code=502, detail="Image storage is unavailable right now")
-    url = f"/api/media/{result['path']}"
-    await db.files.insert_one({"id": f"file_{uuid.uuid4().hex[:12]}", "storage_path": result["path"],
+        logger.warning("Storage upload warning: %s", e)
+    url = f"/api/media/{path}"
+    await db.files.insert_one({"id": f"file_{uuid.uuid4().hex[:12]}", "storage_path": path,
                                "original_filename": file.filename, "content_type": "image/png",
-                               "size": result.get("size", len(png)), "product_slug": slug, "by": admin["email"],
+                               "size": len(png), "product_slug": slug, "by": admin["email"],
                                "is_deleted": False, "created_at": now().isoformat()})
     
     update_doc = {
