@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
-import { isValidImageUrl, defaultCutoutOf, defaultPhotoOf } from "@/lib/visual";
+import { isValidImageUrl, defaultCutoutOf, defaultPhotoOf, DEFAULT_MAJOR_NOTES } from "@/lib/visual";
 
 export function sanitizeProduct(p) {
   if (!p) return p;
@@ -11,11 +11,15 @@ export function sanitizeProduct(p) {
   const validImages = Array.from(new Set(rawImages.filter(isValidImageUrl)));
   const finalImages = validImages.length > 0 ? validImages : [defaultCut, defaultPhoto].filter(Boolean);
   const finalImage = isValidImageUrl(p.image) ? p.image : (finalImages[0] || defaultCut);
+  const finalMajorNotes = Array.isArray(p.major_notes) && p.major_notes.length > 0
+    ? p.major_notes
+    : (DEFAULT_MAJOR_NOTES[p.slug] || []);
 
   return {
     ...p,
     image: finalImage,
     images: finalImages,
+    major_notes: finalMajorNotes,
   };
 }
 
@@ -53,6 +57,7 @@ export const FALLBACK_PRODUCTS = [
       heart: ["Blonde Tobacco", "Orris", "Dried Fruits", "Sandalwood", "Saffron", "White Pepper", "Jasmine"],
       base: ["Amber", "Vanilla", "Tonka Bean", "Cedarwood", "Labdanum", "Myrrh", "Patchouli", "Musk"],
     },
+    major_notes: ["Rum", "Blonde Tobacco", "Amber", "Bourbon Vanilla", "Dried Fruits", "Olibanum"],
     image: "/images/blonde-amber.jpg",
     low_stock_threshold: 10,
     active: true,
@@ -91,6 +96,7 @@ export const FALLBACK_PRODUCTS = [
       heart: ["Jasmine", "Violet", "Cardamom", "Pink Pepper"],
       base: ["Vanilla", "Sandalwood", "Guaiac Wood", "Amber", "Patchouli"],
     },
+    major_notes: ["French Lavender", "Crisp Apple", "Bourbon Vanilla", "Sandalwood", "Cardamom", "Bergamot"],
     image: "/images/layton.jpg",
     low_stock_threshold: 10,
     active: true,
@@ -129,6 +135,7 @@ export const FALLBACK_PRODUCTS = [
       heart: ["Oak", "Praline", "Tonka Bean", "Cardamom"],
       base: ["Vanilla", "Sandalwood", "Amber", "Cedarwood"],
     },
+    major_notes: ["Oak-Aged Cognac", "Cinnamon", "Roasted Praline", "Tonka Bean", "Bourbon Vanilla", "French Oak"],
     image: "/images/angels-share.jpg",
     low_stock_threshold: 10,
     active: true,
@@ -167,6 +174,7 @@ export const FALLBACK_PRODUCTS = [
       heart: ["Saffron", "Dried Fruits", "Cardamom"],
       base: ["Leather", "Vanilla", "Woody Amber", "Sandalwood", "Patchouli"],
     },
+    major_notes: ["Vintage Rum", "Rich Tobacco", "Dark Leather", "Crimson Saffron", "Bourbon Vanilla", "Cinnamon"],
     image: "/images/side-effect.jpg",
     low_stock_threshold: 10,
     active: true,

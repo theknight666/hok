@@ -5,7 +5,7 @@ import { ArrowUpRight, Plus } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { Bottle } from "@/components/site/Bottle";
 import { SplitChars, EASE } from "@/components/site/Reveal";
-import { worldOf, worldVars, flatNotes, getNoteImage } from "@/lib/visual";
+import { worldOf, worldVars, flatNotes, getNoteImage, getMajorNotes } from "@/lib/visual";
 import { inr } from "@/lib/api";
 
 function NotePill({ name, color }) {
@@ -69,7 +69,7 @@ function Chapter({ p, idx, total }) {
   const ghostX = useTransform(scrollYProgress, [0, 1], ["6%", "-10%"]);
   const world = worldOf(p);
   const sold = p.stock <= 0;
-  const notes = flatNotes(p.notes, 5);
+  const notes = getMajorNotes(p, 6);
 
   return (
     <div

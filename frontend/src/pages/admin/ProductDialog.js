@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { api, formatErr } from "@/lib/api";
 import { BottleUpload } from "./BottleUpload";
 import { getCachedCatalog, setCachedCatalog } from "@/hooks/useProducts";
-import { getNoteImage, KNOWN_NOTES, isValidImageUrl, defaultCutoutOf } from "@/lib/visual";
+import { getNoteImage, KNOWN_NOTES, isValidImageUrl, defaultCutoutOf, DEFAULT_MAJOR_NOTES } from "@/lib/visual";
 
 const TEXT = [
   ["name", "Name"],
@@ -285,12 +285,193 @@ function NoteTierBuilder({ tierKey, title, subtitle, notesList, onNotesChange, r
   );
 }
 
+function MajorNotesManager({ majorNotes = [], onChange, allNotesList = [] }) {
+  const [customInput, setCustomInput] = useState("");
+  const [isPickerOpen, setIsPickerOpen] = useState(false);
+
+  const handleAdd = (name) => {
+    const trimmed = (name || "").trim();
+    if (!trimmed) return;
+    if (majorNotes.includes(trimmed)) return;
+    onChange([...majorNotes, trimmed]);
+  };
+
+  const handleRemove = (idx) => {
+    onChange(majorNotes.filter((_, i) => i !== idx));
+  };
+
+  const handleMove = (idx, dir) => {
+    const targetIdx = idx + dir;
+    if (targetIdx < 0 || targetIdx >= majorNotes.length) return;
+    const next = [...majorNotes];
+    const [moved] = next.splice(idx, 1);
+    next.splice(targetIdx, 0, moved);
+    onChange(next);
+  };
+
+  const candidateNotes = Array.from(new Set([
+    ...allNotesList,
+    ...KNOWN_NOTES.map((k) => k.name),
+  ])).filter((name) => !majorNotes.includes(name));
+
+  return (
+    <div className="sm:col-span-2 rounded-2xl border border-gold/40 bg-card/60 p-4 space-y-3.5 shadow-sm" data-testid="major-notes-manager">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/50 pb-2.5">
+        <div>
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-4 w-4 text-gold" />
+            <span className="text-xs font-bold uppercase tracking-[0.2em] text-foreground">
+              Homepage Display Notes ({majorNotes.length} Major Notes)
+            </span>
+            <span className="rounded-full bg-gold/20 px-2 py-0.5 text-[10px] font-semibold text-gold">
+              Featured Cards · Bottom-Left Pills
+            </span>
+          </div>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Customize the prominent notes displayed on the home page card at the bottom-left (e.g. Rum, Blonde Tobacco, Amber, Bourbon Vanilla, Dried Fruits, Olibanum).
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => setIsPickerOpen(!isPickerOpen)}
+          className="rounded-lg border border-gold/60 bg-gold/15 px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-gold hover:text-black transition-colors cursor-pointer"
+        >
+          {isPickerOpen ? "Done Picking" : "+ Select / Add Note"}
+        </button>
+      </div>
+
+      {/* Selected Major Notes Pills */}
+      <div className="flex flex-wrap gap-2.5 pt-1">
+        {majorNotes.length === 0 ? (
+          <p className="text-xs text-muted-foreground italic py-2">
+            No custom notes selected. The House will automatically display the top defining accords of this fragrance.
+          </p>
+        ) : (
+          majorNotes.map((note, idx) => {
+            const img = getNoteImage(note);
+            return (
+              <div
+                key={note + idx}
+                className="group relative inline-flex items-center gap-2 rounded-full border border-gold/50 bg-background/90 py-1 pl-1.5 pr-2.5 text-xs font-medium shadow-sm hover:border-gold transition-all"
+              >
+                <div className="h-6 w-6 shrink-0 overflow-hidden rounded-full border border-border/50 bg-background flex items-center justify-center">
+                  {img ? (
+                    <img src={img} alt="" className="h-full w-full object-cover" />
+                  ) : (
+                    <span className="text-[10px] font-bold uppercase text-muted-foreground">
+                      {note.slice(0, 2)}
+                    </span>
+                  )}
+                </div>
+
+                <span className="text-xs font-semibold text-foreground">{note}</span>
+
+                <div className="flex items-center gap-0.5 opacity-60 group-hover:opacity-100 transition-opacity">
+                  {idx > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => handleMove(idx, -1)}
+                      className="text-[10px] text-muted-foreground hover:text-foreground px-0.5 cursor-pointer"
+                      title="Move left"
+                    >
+                      ◀
+                    </button>
+                  )}
+                  {idx < majorNotes.length - 1 && (
+                    <button
+                      type="button"
+                      onClick={() => handleMove(idx, 1)}
+                      className="text-[10px] text-muted-foreground hover:text-foreground px-0.5 cursor-pointer"
+                      title="Move right"
+                    >
+                      ▶
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => handleRemove(idx)}
+                    className="ml-1 text-muted-foreground hover:text-destructive text-xs font-bold leading-none cursor-pointer"
+                    title="Remove note"
+                  >
+                    ×
+                  </button>
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+
+      {/* Note Picker Drawer */}
+      {isPickerOpen && (
+        <div className="rounded-xl border border-border/80 bg-background/95 p-3.5 space-y-3 shadow-lg">
+          <div className="flex gap-2">
+            <input
+              type="text"
+              placeholder="Type any custom note (e.g. Olibanum, Tuberose, Rum)..."
+              value={customInput}
+              onChange={(e) => setCustomInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  handleAdd(customInput);
+                  setCustomInput("");
+                }
+              }}
+              className="flex-1 rounded-lg border border-border bg-transparent px-3 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:border-gold focus:outline-none"
+            />
+            <button
+              type="button"
+              onClick={() => {
+                handleAdd(customInput);
+                setCustomInput("");
+              }}
+              disabled={!customInput.trim()}
+              className="rounded-lg bg-foreground px-3 py-1.5 text-xs font-semibold text-background hover:bg-gold hover:text-black transition-colors disabled:opacity-50 cursor-pointer"
+            >
+              Add
+            </button>
+          </div>
+
+          <div>
+            <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+              Suggested Notes from Pyramid & Catalog
+            </p>
+            <div className="flex flex-wrap gap-1.5 max-h-48 overflow-y-auto pr-1">
+              {candidateNotes.map((name) => {
+                const img = getNoteImage(name);
+                return (
+                  <button
+                    key={name}
+                    type="button"
+                    onClick={() => handleAdd(name)}
+                    className="group inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-muted/30 px-2 py-1 text-xs hover:border-gold hover:bg-gold/10 transition-colors cursor-pointer"
+                  >
+                    {img && (
+                      <img src={img} alt="" className="h-4 w-4 rounded-full object-cover" />
+                    )}
+                    <span>+ {name}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function ProductDialog({ product, onClose, onSaved }) {
   const isNew = !product.slug;
   const [f, setF] = useState(() => {
     const topNotes = product.notes?.top || (product.top ? toList(product.top) : []);
     const heartNotes = product.notes?.heart || (product.heart ? toList(product.heart) : []);
     const baseNotes = product.notes?.base || (product.base ? toList(product.base) : []);
+    const initialMajorNotes = Array.isArray(product.major_notes) && product.major_notes.length > 0
+      ? product.major_notes
+      : (product.slug && DEFAULT_MAJOR_NOTES[product.slug] ? DEFAULT_MAJOR_NOTES[product.slug] : []);
 
     return {
       name: "",
@@ -321,7 +502,9 @@ export function ProductDialog({ product, onClose, onSaved }) {
       top_list: topNotes,
       heart_list: heartNotes,
       base_list: baseNotes,
+      major_notes: initialMajorNotes,
       ...product,
+      major_notes: initialMajorNotes,
       images: Array.isArray(product.images) && product.images.length > 0 ? product.images : (product.image ? [product.image] : []),
       top_list: topNotes,
       heart_list: heartNotes,
@@ -413,6 +596,7 @@ export function ProductDialog({ product, onClose, onSaved }) {
         heart: f.heart_list && f.heart_list.length ? f.heart_list : toList(f.heart),
         base: f.base_list && f.base_list.length ? f.base_list : toList(f.base),
       },
+      major_notes: Array.isArray(f.major_notes) ? f.major_notes : [],
       olfactory_family: f.olfactory_family || "",
       accords: parsedAccordsList,
       architecture: {
@@ -529,6 +713,17 @@ export function ProductDialog({ product, onClose, onSaved }) {
             Olfactory Family
             <input value={f.olfactory_family} onChange={set("olfactory_family")} className={cls} placeholder="e.g. Warm Amber Spicy · Oriental Gourmand" data-testid="pd-olfactory-family" />
           </label>
+
+          {/* Interactive Homepage Display Notes Builder */}
+          <MajorNotesManager
+            majorNotes={f.major_notes || []}
+            onChange={(nextNotes) => setF((prev) => ({ ...prev, major_notes: nextNotes }))}
+            allNotesList={[
+              ...(f.top_list || []),
+              ...(f.heart_list || []),
+              ...(f.base_list || []),
+            ]}
+          />
 
           {/* Interactive Visual Note Tier Builders */}
           {TIERS_CONFIG.map(({ key, title, subtitle }) => (

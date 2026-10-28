@@ -117,6 +117,30 @@ const NOTE_IMAGE_MAP = {
   "myrrh": "/images/notes/myrrh.jpg",
   "labdanum": "/images/notes/labdanum.jpg",
   "musk": "/images/notes/musk.jpg",
+  "tuberose": "/images/notes/jasmine.jpg",
+  "tuberuse": "/images/notes/jasmine.jpg",
+};
+
+export const DEFAULT_MAJOR_NOTES = {
+  "blonde-amber": ["Rum", "Blonde Tobacco", "Amber", "Bourbon Vanilla", "Dried Fruits", "Olibanum"],
+  "layton": ["French Lavender", "Crisp Apple", "Bourbon Vanilla", "Sandalwood", "Cardamom", "Bergamot"],
+  "angels-share-on-the-rocks": ["Oak-Aged Cognac", "Cinnamon", "Roasted Praline", "Tonka Bean", "Bourbon Vanilla", "French Oak"],
+  "side-effect": ["Vintage Rum", "Rich Tobacco", "Dark Leather", "Crimson Saffron", "Bourbon Vanilla", "Cinnamon"],
+};
+
+export const getMajorNotes = (p, limit = 6) => {
+  if (Array.isArray(p?.major_notes) && p.major_notes.length > 0) {
+    return p.major_notes.slice(0, limit);
+  }
+  if (p?.slug && DEFAULT_MAJOR_NOTES[p.slug]) {
+    return DEFAULT_MAJOR_NOTES[p.slug].slice(0, limit);
+  }
+  const heart = p?.notes?.heart || [];
+  const base = p?.notes?.base || [];
+  const top = p?.notes?.top || [];
+  const combined = [...heart, ...base, ...top];
+  const unique = Array.from(new Set(combined));
+  return unique.slice(0, limit);
 };
 
 export const getNoteImage = (n) => {
@@ -171,6 +195,7 @@ export const KNOWN_NOTES = [
   { name: "Sandalwood", category: "Woods" },
   { name: "Tobacco", category: "Tobacco & Leather" },
   { name: "Tonka Bean", category: "Spirits & Gourmands" },
+  { name: "Tuberose", category: "Florals" },
   { name: "Vanilla", category: "Spirits & Gourmands" },
   { name: "Violet", category: "Florals" },
   { name: "White Pepper", category: "Spices" },

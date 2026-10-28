@@ -231,6 +231,7 @@ class ProductIn(BaseModel):
     image: str = ""
     images: List[str] = []
     notes: Notes = Notes()
+    major_notes: Optional[List[str]] = None
     olfactory_family: Optional[str] = None
     accords: Optional[List[dict]] = None
     architecture: Optional[dict] = None
@@ -254,6 +255,7 @@ class ProductPatch(BaseModel):
     image: Optional[str] = None
     images: Optional[List[str]] = None
     notes: Optional[Notes] = None
+    major_notes: Optional[List[str]] = None
     olfactory_family: Optional[str] = None
     accords: Optional[List[dict]] = None
     architecture: Optional[dict] = None
@@ -1221,6 +1223,7 @@ SEED = [
             "heart": ["Blonde Tobacco", "Orris", "Dried Fruits", "Sandalwood", "Saffron", "White Pepper", "Jasmine"],
             "base": ["Amber", "Vanilla", "Tonka Bean", "Cedarwood", "Labdanum", "Myrrh", "Patchouli", "Musk"],
         },
+        "major_notes": ["Rum", "Blonde Tobacco", "Amber", "Bourbon Vanilla", "Dried Fruits", "Olibanum"],
     },
     {
         "slug": "layton", "name": "Layton", "order": 2, "color": "#1E2F5C", "badge": "The Noble",
@@ -1247,6 +1250,7 @@ SEED = [
             "heart": ["Jasmine", "Violet", "Cardamom", "Pink Pepper"],
             "base": ["Vanilla", "Sandalwood", "Guaiac Wood", "Amber", "Patchouli"],
         },
+        "major_notes": ["French Lavender", "Crisp Apple", "Bourbon Vanilla", "Sandalwood", "Cardamom", "Bergamot"],
     },
     {
         "slug": "angels-share-on-the-rocks", "name": "Angels Share On The Rocks", "order": 3, "color": "#8A4B1F",
@@ -1273,6 +1277,7 @@ SEED = [
             "heart": ["Oak", "Praline", "Tonka Bean", "Cardamom"],
             "base": ["Vanilla", "Sandalwood", "Amber", "Cedarwood"],
         },
+        "major_notes": ["Oak-Aged Cognac", "Cinnamon", "Roasted Praline", "Tonka Bean", "Bourbon Vanilla", "French Oak"],
     },
     {
         "slug": "side-effect", "name": "Side Effect", "order": 4, "color": "#5A1420", "badge": "The Enigma",
@@ -1299,6 +1304,7 @@ SEED = [
             "heart": ["Saffron", "Dried Fruits", "Cardamom"],
             "base": ["Leather", "Vanilla", "Woody Amber", "Sandalwood", "Patchouli"],
         },
+        "major_notes": ["Vintage Rum", "Rich Tobacco", "Dark Leather", "Crimson Saffron", "Bourbon Vanilla", "Cinnamon"],
     },
 ]
 SEED_PRICES = {"blonde-amber": 1599, "layton": 1499, "angels-share-on-the-rocks": 1549, "side-effect": 1499}
