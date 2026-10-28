@@ -20,15 +20,26 @@ export function AuthProvider({ children }) {
   const checkAuth = useCallback(async () => {
     try {
       const { data } = await api.get("/auth/me");
-      setUser(data);
+      const currentStored = getStoredUser();
+      const finalUser = currentStored?.token && !data.token ? { ...data, token: currentStored.token } : data;
+      setUser(finalUser);
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(finalUser));
       } catch {}
-    } catch {
-      setUser(false);
-      try {
-        localStorage.removeItem(STORAGE_KEY);
-      } catch {}
+    } catch (err) {
+      if (err?.response?.status === 401) {
+        setUser(false);
+        try {
+          localStorage.removeItem(STORAGE_KEY);
+        } catch {}
+      } else {
+        const stored = getStoredUser();
+        if (stored) {
+          setUser(stored);
+        } else {
+          setUser(false);
+        }
+      }
     }
   }, []);
 

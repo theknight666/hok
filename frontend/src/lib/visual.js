@@ -18,10 +18,9 @@ export function isValidImageUrl(url) {
   if (trimmed.startsWith("data:image/")) return true;
   if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) return true;
   if (trimmed.startsWith("/images/")) return true;
-  if (trimmed.startsWith("/api/media/")) {
-    return /\.(png|jpe?g|webp|gif|svg)$/i.test(trimmed);
-  }
-  return /\.(png|jpe?g|webp|gif|svg)$/i.test(trimmed);
+  if (trimmed.startsWith("/api/media/")) return true;
+  if (trimmed.startsWith("blob:")) return true;
+  return /\.(png|jpe?g|webp|gif|svg)(\?.*)?$/i.test(trimmed);
 }
 
 export const KNOWN_CUTOUTS = {
@@ -50,27 +49,21 @@ export const defaultPhotoOf = (slug) =>
 
 export const cutout = (p) => {
   if (!p) return "/images/cut-blonde-amber.png";
-  // If user uploaded a valid custom primary image, respect it
-  if (isValidImageUrl(p.image) && (p.image.startsWith("/api/media/") || p.image.startsWith("data:") || p.image.startsWith("http"))) {
+  // Always prioritize the user's primary image
+  if (isValidImageUrl(p.image)) {
     return p.image;
   }
   if (p.slug && KNOWN_CUTOUTS[p.slug]) return KNOWN_CUTOUTS[p.slug];
-  if (isValidImageUrl(p.image)) {
-    if (p.image.includes("/images/") && !p.image.includes("/images/cut-")) {
-      return p.image.replace("/images/", "/images/cut-").replace(/\.(jpg|jpeg|webp)$/i, ".png");
-    }
-    return p.image;
-  }
   return defaultCutoutOf(p?.slug);
 };
 
 export const photoshoot = (p) => {
   if (!p) return "/images/blonde-amber.jpg";
-  if (isValidImageUrl(p.image) && (p.image.startsWith("/api/media/") || p.image.startsWith("data:") || p.image.startsWith("http"))) {
+  if (isValidImageUrl(p.image)) {
     return p.image;
   }
   if (p.slug && KNOWN_PHOTOS[p.slug]) return KNOWN_PHOTOS[p.slug];
-  return isValidImageUrl(p.image) ? p.image : defaultPhotoOf(p?.slug);
+  return defaultPhotoOf(p?.slug);
 };
 
 export const flatNotes = (notes, n = 5) =>

@@ -2,7 +2,24 @@ import axios from "axios";
 
 const rawBase = process.env.REACT_APP_BACKEND_URL;
 const backendUrl = rawBase && rawBase !== "undefined" ? rawBase.replace(/\/+$/, "") : "";
-export const api = axios.create({ baseURL: `${backendUrl}/api`, withCredentials: true });
+export const api = axios.create({
+  baseURL: `${backendUrl}/api`,
+  withCredentials: true,
+  timeout: 10000,
+});
+
+api.interceptors.request.use((config) => {
+  try {
+    const raw = typeof window !== "undefined" ? localStorage.getItem("hotk_user") : null;
+    if (raw) {
+      const user = JSON.parse(raw);
+      if (user?.token && !config.headers["Authorization"]) {
+        config.headers["Authorization"] = `Bearer ${user.token}`;
+      }
+    }
+  } catch (e) {}
+  return config;
+});
 
 const NO_RETRY = ["/auth/refresh", "/auth/login", "/auth/register", "/auth/google/session"];
 let refreshing = null;

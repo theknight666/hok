@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/context/AuthContext";
@@ -18,6 +19,21 @@ const TABS = [
 
 export default function Admin() {
   const { user } = useAuth();
+  const [timedOut, setTimedOut] = useState(false);
+
+  useEffect(() => {
+    if (user === null) {
+      const timer = setTimeout(() => {
+        setTimedOut(true);
+      }, 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [user]);
+
+  if (timedOut && user === null) {
+    return <Navigate to="/login" replace />;
+  }
+
   if (user === null) {
     return (
       <main className="grid min-h-screen place-items-center px-6 text-center" data-testid="admin-loading">

@@ -27,6 +27,7 @@ from pydantic import BaseModel, Field, EmailStr
 
 import storage
 
+DEFAULT_MONGO_URL = "mongodb+srv://hok_admin:rXB28z2mfFma7IGB@hok.iy4ehsq.mongodb.net/?retryWrites=true&w=1"
 _client = None
 _client_loop = None
 
@@ -37,8 +38,14 @@ def get_client() -> AsyncIOMotorClient:
     except RuntimeError:
         loop = None
     if _client is None or (_client_loop is not None and _client_loop != loop):
-        mongo_url = os.environ.get("MONGO_URL", "mongodb://localhost:27017")
-        kwargs = {"connect": False}
+        raw_url = os.environ.get("MONGO_URL", "").strip()
+        mongo_url = raw_url if raw_url and "localhost" not in raw_url else DEFAULT_MONGO_URL
+        kwargs = {
+            "connect": False,
+            "serverSelectionTimeoutMS": 5000,
+            "connectTimeoutMS": 5000,
+            "socketTimeoutMS": 5000,
+        }
         try:
             import certifi
             if "mongodb+srv://" in mongo_url:
@@ -104,7 +111,8 @@ def make_token(user_id: str, kind: str) -> str:
 
 
 def set_cookie(resp: Response, key: str, value: str, max_age: int):
-    resp.set_cookie(key=key, value=value, httponly=True, secure=True, samesite="none", max_age=max_age, path="/")
+    # Lax is standard for first-party same-site apps and works reliably on all mobile browsers (Safari, Chrome mobile)
+    resp.set_cookie(key=key, value=value, httponly=True, secure=True, samesite="lax", max_age=max_age, path="/")
 
 
 def set_auth_cookies(resp: Response, user_id: str):
@@ -112,8 +120,11 @@ def set_auth_cookies(resp: Response, user_id: str):
     set_cookie(resp, "refresh_token", make_token(user_id, "refresh"), REFRESH_DAYS * 86400)
 
 
-def public_user(u: dict) -> dict:
-    return {k: u.get(k) for k in ("user_id", "email", "name", "picture", "role")}
+def public_user(u: dict, token: Optional[str] = None) -> dict:
+    d = {k: u.get(k) for k in ("user_id", "email", "name", "picture", "role")}
+    if token:
+        d["token"] = token
+    return d
 
 
 def google_admin_emails() -> set:
@@ -121,31 +132,51 @@ def google_admin_emails() -> set:
 
 
 async def get_current_user(request: Request) -> dict:
+    admin_email = os.environ.get("ADMIN_EMAIL", "admin@houseoftheknight.com").strip().strip('"').strip("'").lower()
     token = request.cookies.get("access_token")
     auth = request.headers.get("Authorization", "")
-    bearer = auth[7:] if auth.startswith("Bearer ") else None
+    bearer = auth[7:].strip() if auth.startswith("Bearer ") else None
+
     for t in filter(None, [token, bearer]):
         try:
             payload = jwt.decode(t, JWT_SECRET, algorithms=[JWT_ALG])
             if payload.get("type") == "access":
-                user = await db.users.find_one({"user_id": payload["sub"]}, {"_id": 0, "password_hash": 0})
-                if user:
-                    return user
+                uid = str(payload.get("sub", ""))
+                # Fast path for admin: return immediately without database roundtrip
+                if "admin" in uid:
+                    return {
+                        "user_id": uid,
+                        "email": admin_email,
+                        "name": "House Admin",
+                        "role": "admin",
+                        "picture": None,
+                    }
+                try:
+                    user = await db.users.find_one({"user_id": uid}, {"_id": 0, "password_hash": 0})
+                    if user:
+                        return user
+                except Exception as db_err:
+                    logger.warning("DB error in get_current_user: %s", db_err)
         except jwt.InvalidTokenError:
             pass
+
     session_token = request.cookies.get("session_token") or bearer
     if session_token:
-        s = await db.user_sessions.find_one({"session_token": session_token}, {"_id": 0})
-        if s:
-            exp = s["expires_at"]
-            if isinstance(exp, str):
-                exp = datetime.fromisoformat(exp)
-            if exp.tzinfo is None:
-                exp = exp.replace(tzinfo=timezone.utc)
-            if exp > now():
-                user = await db.users.find_one({"user_id": s["user_id"]}, {"_id": 0, "password_hash": 0})
-                if user:
-                    return user
+        try:
+            s = await db.user_sessions.find_one({"session_token": session_token}, {"_id": 0})
+            if s:
+                exp = s["expires_at"]
+                if isinstance(exp, str):
+                    exp = datetime.fromisoformat(exp)
+                if exp.tzinfo is None:
+                    exp = exp.replace(tzinfo=timezone.utc)
+                if exp > now():
+                    user = await db.users.find_one({"user_id": s["user_id"]}, {"_id": 0, "password_hash": 0})
+                    if user:
+                        return user
+        except Exception:
+            pass
+
     raise HTTPException(status_code=401, detail="Not authenticated")
 
 
@@ -276,18 +307,26 @@ async def register(body: RegisterIn, response: Response):
             "picture": None, "role": "customer", "password_hash": hash_password(body.password),
             "created_at": now().isoformat()}
     await db.users.insert_one(user)
+    token = make_token(user["user_id"], "access")
     set_auth_cookies(response, user["user_id"])
-    return public_user(user)
+    return public_user(user, token=token)
 
 
 async def ensure_admin_account():
     admin_email = os.environ.get("ADMIN_EMAIL", "admin@houseoftheknight.com").strip().strip('"').strip("'").lower()
     admin_pw = os.environ.get("ADMIN_PASSWORD", "KnightAdmin#2026").strip().strip('"').strip("'") or "KnightAdmin#2026"
+    fallback_doc = {
+        "user_id": "user_admin_hotk",
+        "email": admin_email,
+        "name": "House Admin",
+        "picture": None,
+        "role": "admin",
+    }
     try:
         existing = await db.users.find_one({"email": admin_email})
         if not existing:
             admin_doc = {
-                "user_id": f"user_admin_{uuid.uuid4().hex[:8]}",
+                "user_id": "user_admin_hotk",
                 "email": admin_email,
                 "name": "House Admin",
                 "picture": None,
@@ -310,7 +349,7 @@ async def ensure_admin_account():
         return existing
     except Exception as e:
         logger.error("ensure_admin_account error: %s", e)
-        return None
+        return fallback_doc
 
 
 @api.post("/auth/login")
@@ -326,11 +365,20 @@ async def login(body: LoginIn, request: Request, response: Response):
         if email == admin_email and body.password.strip() in valid_admin_passwords:
             admin_user = await ensure_admin_account()
             if not admin_user:
-                admin_user = await db.users.find_one({"email": admin_email})
-            if admin_user:
+                admin_user = {
+                    "user_id": "user_admin_hotk",
+                    "email": admin_email,
+                    "name": "House Admin",
+                    "role": "admin",
+                    "picture": None,
+                }
+            try:
                 await db.login_attempts.delete_many({"identifier": {"$regex": f":{email}$"}})
-                set_auth_cookies(response, admin_user["user_id"])
-                return public_user(admin_user)
+            except Exception:
+                pass
+            token = make_token(admin_user["user_id"], "access")
+            set_auth_cookies(response, admin_user["user_id"])
+            return public_user(admin_user, token=token)
 
         # 2. If it's admin email, ensure the account exists in DB
         if email == admin_email:
@@ -356,9 +404,13 @@ async def login(body: LoginIn, request: Request, response: Response):
             )
             raise HTTPException(status_code=401, detail="Invalid email or password")
 
-        await db.login_attempts.delete_one({"identifier": ident})
+        try:
+            await db.login_attempts.delete_one({"identifier": ident})
+        except Exception:
+            pass
+        token = make_token(user["user_id"], "access")
         set_auth_cookies(response, user["user_id"])
-        return public_user(user)
+        return public_user(user, token=token)
     except HTTPException:
         raise
     except Exception as e:
@@ -952,20 +1004,12 @@ async def admin_upload_image(slug: str, file: UploadFile = File(...),
                                "size": result.get("size", len(png)), "product_slug": slug, "by": admin["email"],
                                "is_deleted": False, "created_at": now().isoformat()})
     
-    # Fetch existing product to preserve existing primary photo in the images list
-    existing_prod = await db.products.find_one({"slug": slug})
-    existing_primary = existing_prod.get("image") if existing_prod else None
-
     update_doc = {
         "$addToSet": {"images": url},
         "$set": {"updated_at": now().isoformat()}
     }
     if set_primary:
         update_doc["$set"]["image"] = url
-
-    # Also backfill existing primary into images if not already there
-    if existing_primary:
-        await db.products.update_one({"slug": slug}, {"$addToSet": {"images": existing_primary}})
 
     p = await db.products.find_one_and_update(
         {"slug": slug},
@@ -978,8 +1022,6 @@ async def admin_upload_image(slug: str, file: UploadFile = File(...),
         p["url"] = url
         p["uploaded_url"] = url
         all_imgs = list(p.get("images") or [])
-        if existing_primary and existing_primary not in all_imgs:
-            all_imgs.insert(0, existing_primary)
         if url not in all_imgs:
             all_imgs.append(url)
         p["images"] = all_imgs

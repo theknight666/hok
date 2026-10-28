@@ -195,14 +195,16 @@ export function BottleUpload({ slug, image, images = [], onChange, onDone }) {
 
   const handleSetPrimary = (imgUrl) => {
     setPrimaryUrl(imgUrl);
+    const reordered = [imgUrl, ...gallery.filter((u) => u !== imgUrl)];
+    setGallery(reordered);
     if (onChange) {
       onChange({
         image: imgUrl,
-        images: gallery,
+        images: reordered,
       });
     }
     if (slug) {
-      api.patch(`/admin/products/${slug}`, { image: imgUrl }).then(() => {
+      api.patch(`/admin/products/${slug}`, { image: imgUrl, images: reordered }).then(() => {
         qc.invalidateQueries({ queryKey: ["products"] });
         qc.invalidateQueries({ queryKey: ["product", slug] });
         qc.invalidateQueries({ queryKey: ["admin-products"] });
@@ -210,7 +212,7 @@ export function BottleUpload({ slug, image, images = [], onChange, onDone }) {
           const catalog = [...getCachedCatalog()];
           const idx = catalog.findIndex((p) => p.slug === slug);
           if (idx >= 0) {
-            catalog[idx] = { ...catalog[idx], image: imgUrl };
+            catalog[idx] = { ...catalog[idx], image: imgUrl, images: reordered };
             setCachedCatalog(catalog);
           }
         } catch (e) {}

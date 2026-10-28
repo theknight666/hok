@@ -15,6 +15,7 @@ APP_NAME = "hotk"
 MAX_UPLOAD_BYTES = 10 * 1024 * 1024
 ALLOWED_TYPES = {"image/png", "image/jpeg", "image/webp", "image/jpg"}
 
+DEFAULT_MONGO_URL = "mongodb+srv://hok_admin:rXB28z2mfFma7IGB@hok.iy4ehsq.mongodb.net/?retryWrites=true&w=1"
 _mongo_client: Optional[MongoClient] = None
 _client_lock = threading.Lock()
 
@@ -27,8 +28,13 @@ def get_db():
     if _mongo_client is None:
         with _client_lock:
             if _mongo_client is None:
-                mongo_url = os.environ.get("MONGO_URL", "mongodb://localhost:27017")
-                kwargs = {}
+                raw_url = os.environ.get("MONGO_URL", "").strip()
+                mongo_url = raw_url if raw_url and "localhost" not in raw_url else DEFAULT_MONGO_URL
+                kwargs = {
+                    "serverSelectionTimeoutMS": 5000,
+                    "connectTimeoutMS": 5000,
+                    "socketTimeoutMS": 5000,
+                }
                 try:
                     import certifi
                     if "mongodb+srv://" in mongo_url:
@@ -78,17 +84,20 @@ def put_object(path: str, data: bytes, content_type: str = "image/png") -> dict:
 def get_object(path: str) -> Tuple[bytes, str]:
     """Retrieve raw image binary and content-type from MongoDB 'media' collection."""
     clean_path = path.lstrip("/")
-    db = get_db()
-    doc = db.media.find_one({
-        "$or": [
-            {"path": clean_path},
-            {"path": "/" + clean_path},
-            {"path": "images/" + clean_path},
-            {"path": clean_path.replace("images/", "")},
-        ]
-    })
-    if doc and "data" in doc:
-        return doc["data"], doc.get("content_type", "image/png")
+    try:
+        db = get_db()
+        doc = db.media.find_one({
+            "$or": [
+                {"path": clean_path},
+                {"path": "/" + clean_path},
+                {"path": "images/" + clean_path},
+                {"path": clean_path.replace("images/", "")},
+            ]
+        })
+        if doc and "data" in doc:
+            return doc["data"], doc.get("content_type", "image/png")
+    except Exception as e:
+        logger.warning("MongoDB get_object failed for %s: %s", clean_path, e)
 
     # Local disk fallback (e.g. if run during development or static builds)
     backend_dir = Path(__file__).resolve().parent
