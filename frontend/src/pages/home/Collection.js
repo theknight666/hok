@@ -51,13 +51,13 @@ function Chapter({ p, idx, total }) {
 
         <div className="relative mx-auto flex h-full w-full max-w-[1600px] flex-col justify-between px-5 pb-6 pt-20 sm:px-10 sm:pb-8 sm:pt-24 lg:grid lg:grid-cols-12 lg:gap-6 lg:pb-12">
           {/* Column 1: Header / Details */}
-          <div className="z-10 flex flex-col justify-end lg:col-span-4">
+          <div className="z-10 flex flex-col justify-end lg:col-span-4 min-w-0 max-w-full">
             <div className="flex items-center gap-3">
               <span className="pill border border-current text-[0.62rem] py-0.5 px-2.5 sm:text-xs sm:py-1 sm:px-3">{p.badge || "Signature"}</span>
               <span className="text-[0.62rem] font-medium uppercase tracking-[0.25em] opacity-70 sm:text-[0.66rem] sm:tracking-[0.3em]">0{idx + 1} / 0{total}</span>
             </div>
-            <h3 className="mt-2 font-display text-3xl leading-[0.95] sm:mt-4 sm:text-4xl lg:mt-6 lg:display-lg">{p.name}</h3>
-            <p className="mt-2 max-w-sm text-xs font-medium leading-snug opacity-85 sm:mt-4 sm:text-base lg:mt-5 lg:text-lg line-clamp-2 lg:line-clamp-none">{p.tagline}</p>
+            <h3 className="mt-2 font-display text-3xl leading-[0.95] sm:mt-4 sm:text-4xl lg:mt-6 lg:display-lg break-words [overflow-wrap:anywhere]">{p.name}</h3>
+            <p className="mt-2 max-w-sm text-xs font-medium leading-snug opacity-85 sm:mt-4 sm:text-base lg:mt-5 lg:text-lg line-clamp-2 lg:line-clamp-none break-words [overflow-wrap:anywhere]">{p.tagline}</p>
             <ul className="mt-3 flex flex-wrap gap-1.5 sm:mt-5 sm:gap-2 lg:mt-6" data-testid={`chapter-notes-${p.slug}`}>
               {notes.map((n, ni) => (
                 <li key={n} className={`rounded-full border border-current/40 px-2.5 py-0.5 text-[11px] font-semibold sm:px-3 sm:py-1 sm:text-xs ${ni >= 3 ? "hidden sm:inline-block" : ""}`}>{n}</li>

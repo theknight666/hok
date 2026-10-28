@@ -447,7 +447,7 @@ export function ProductDialog({ product, onClose, onSaved }) {
 
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-h-[92vh] max-w-3xl overflow-y-auto rounded-[2rem] bg-background p-6 sm:p-8" data-lenis-prevent data-testid="product-dialog">
+      <DialogContent className="max-h-[92vh] max-w-3xl w-[95vw] sm:w-full overflow-y-auto overflow-x-hidden rounded-[2rem] bg-background p-5 sm:p-8 min-w-0" data-lenis-prevent data-testid="product-dialog">
         <DialogHeader>
           <DialogTitle className="font-display text-3xl">
             {isNew ? "New fragrance" : `Edit ${product.name}`}
@@ -494,8 +494,9 @@ export function ProductDialog({ product, onClose, onSaved }) {
 
           <label className="text-xs uppercase tracking-[0.18em] text-muted-foreground sm:col-span-2">
             Story Narrative
-            <textarea rows={4} value={f.story} onChange={set("story")} className={`${cls} resize-none leading-relaxed`} data-testid="pd-story" placeholder="Write the fragrance story..." />
+            <textarea rows={4} value={f.story} onChange={set("story")} className={`${cls} resize-none leading-relaxed break-words [overflow-wrap:anywhere]`} data-testid="pd-story" placeholder="Write the fragrance story..." />
           </label>
+
 
           <div className="sm:col-span-2 border-b pt-4 pb-2">
             <h4 className="font-display text-lg flex items-center gap-2">

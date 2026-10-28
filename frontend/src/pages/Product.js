@@ -43,11 +43,11 @@ export default function Product() {
   const isSoldOut = size === "50 ml" && p.stock <= 0;
 
   return (
-    <main data-testid="product-page">
-      <section style={worldVars(world)} className="grain relative overflow-hidden transform-gpu">
-        <p aria-hidden="true" className="pointer-events-none absolute left-0 top-24 select-none whitespace-nowrap font-display text-[13vw] leading-none opacity-[0.1] will-change-transform">{p.name}</p>
-        <div className="relative mx-auto grid max-w-[1600px] gap-10 px-5 pb-16 pt-28 sm:px-10 lg:grid-cols-12 lg:pb-24">
-          <div className="lg:col-span-6">
+    <main data-testid="product-page" className="w-full max-w-full overflow-x-hidden">
+      <section style={worldVars(world)} className="grain relative overflow-hidden transform-gpu w-full max-w-full">
+        <p aria-hidden="true" className="pointer-events-none absolute left-0 top-24 select-none whitespace-nowrap font-display text-[13vw] leading-none opacity-[0.1] will-change-transform max-w-full overflow-hidden truncate">{p.name}</p>
+        <div className="relative mx-auto grid max-w-[1600px] gap-10 px-5 pb-16 pt-28 sm:px-10 lg:grid-cols-12 lg:pb-24 w-full min-w-0 max-w-full">
+          <div className="min-w-0 w-full max-w-full lg:col-span-6">
             <div className="lg:sticky lg:top-28">
               <Link to="/#collection" className="pill border border-current" data-testid="back-to-collection">
                 <ArrowLeft className="h-4 w-4" strokeWidth={2.6} /> Collection
@@ -68,13 +68,13 @@ export default function Product() {
             </div>
           </div>
 
-          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, ease: EASE, delay: 0.2 }} className="rounded-[2rem] sm:rounded-[2.5rem] bg-background p-5 sm:p-10 text-foreground shadow-2xl lg:col-span-6 lg:p-14">
+          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, ease: EASE, delay: 0.2 }} className="min-w-0 w-full max-w-full overflow-hidden rounded-[2rem] sm:rounded-[2.5rem] bg-background p-5 sm:p-10 text-foreground shadow-2xl lg:col-span-6 lg:p-14">
             <div className="flex flex-wrap items-center gap-3">
               <span className="pill bg-foreground text-background">{p.badge}</span>
               <span className="text-[0.66rem] font-medium uppercase tracking-[0.3em] text-muted-foreground">{p.concentration} · {size}</span>
             </div>
-            <h1 className="mt-3 sm:mt-6 font-display text-3xl sm:text-5xl lg:text-7xl leading-[0.95]">{p.name}</h1>
-            <p className="mt-4 sm:mt-6 max-w-lg text-base sm:text-xl font-medium leading-snug text-muted-foreground">{p.tagline}</p>
+            <h1 className="mt-3 sm:mt-6 font-display text-3xl sm:text-5xl lg:text-7xl leading-[0.95] break-words [overflow-wrap:anywhere] [word-break:break-word] max-w-full">{p.name}</h1>
+            <p className="mt-4 sm:mt-6 max-w-lg text-base sm:text-xl font-medium leading-snug text-muted-foreground break-words [overflow-wrap:anywhere] [word-break:break-word] max-w-full">{p.tagline}</p>
 
             {/* Volume / Size Selector */}
             <div className="mt-8 border-t pt-6">
@@ -132,11 +132,11 @@ export default function Product() {
               </button>
             </div>
 
-            <FadeUp className="mt-16">
+            <FadeUp className="mt-16 min-w-0 w-full max-w-full overflow-hidden">
               <p className="eyebrow">The Story</p>
-              <p className="mt-4 font-display text-2xl leading-tight sm:text-3xl">{p.story}</p>
+              <p className="mt-4 font-display text-xl sm:text-2xl lg:text-3xl leading-snug sm:leading-tight break-words [overflow-wrap:anywhere] [word-break:break-word] max-w-full whitespace-pre-line">{p.story}</p>
             </FadeUp>
-            <FadeUp className="mt-14">
+            <FadeUp className="mt-14 min-w-0 w-full max-w-full overflow-hidden">
               <p className="eyebrow mb-6">The Composition</p>
               <NotesPyramid notes={p.notes} color={world.bg} product={p} />
             </FadeUp>

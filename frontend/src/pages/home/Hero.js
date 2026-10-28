@@ -119,10 +119,11 @@ export function Hero({ products }) {
           <div className="max-w-[320px]">
             <AnimatePresence mode="wait">
               <motion.div key={cur.slug} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.4 }}>
-                <p className="font-display text-xl sm:text-2xl" data-testid="hero-active-name">{cur.name}</p>
-                <p className="mt-1 text-sm font-light leading-snug opacity-80">{cur.tagline}</p>
+                <p className="font-display text-xl sm:text-2xl break-words [overflow-wrap:anywhere]" data-testid="hero-active-name">{cur.name}</p>
+                <p className="mt-1 text-sm font-light leading-snug opacity-80 break-words [overflow-wrap:anywhere]">{cur.tagline}</p>
               </motion.div>
             </AnimatePresence>
+
           </div>
         </motion.div>
 
