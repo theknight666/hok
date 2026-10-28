@@ -1,14 +1,13 @@
 import { useRef, useState, useEffect } from "react";
 import { toast } from "sonner";
-import { Upload, Wand2, Loader2, Star, Plus, Sparkles, X } from "lucide-react";
+import { Upload, Loader2, Star, Plus, Sparkles, X } from "lucide-react";
 import { api, formatErr } from "@/lib/api";
 
 /**
- * High-performance client-side image compression and intelligent background removal.
- * Prevents Vercel 4.5MB HTTP 413 Payload Too Large by scaling max dimension to 1600px.
- * Performs fast canvas-based background isolation when removeBg is true.
+ * Fast client-side image compression.
+ * Scales max dimension to 1600px to ensure quick uploads and avoid Vercel 4.5MB payload limit.
  */
-export async function prepareImage(file, removeBg = false, maxDim = 1600, quality = 0.90) {
+export async function prepareImage(file, maxDim = 1600, quality = 0.90) {
   return new Promise((resolve) => {
     const reader = new FileReader();
     reader.onerror = () => resolve(file);
@@ -31,139 +30,15 @@ export async function prepareImage(file, removeBg = false, maxDim = 1600, qualit
           const canvas = document.createElement("canvas");
           canvas.width = width;
           canvas.height = height;
-          const ctx = canvas.getContext("2d", { willReadFrequently: true });
+          const ctx = canvas.getContext("2d");
           if (!ctx) return resolve(file);
 
           ctx.drawImage(img, 0, 0, width, height);
 
-          if (removeBg) {
-            try {
-              const imgData = ctx.getImageData(0, 0, width, height);
-              const data = imgData.data;
+          const isPng = file.type === "image/png";
+          const mime = isPng ? "image/png" : "image/jpeg";
+          const ext = isPng ? ".png" : ".jpg";
 
-              // Sample outer corners and edges to get background color
-              const sampleIndices = [
-                0,
-                (width - 1) * 4,
-                ((height - 1) * width) * 4,
-                ((height - 1) * width + width - 1) * 4,
-                Math.floor(width / 2) * 4,
-                ((Math.floor(height / 2) * width)) * 4,
-                ((Math.floor(height / 2) * width) + width - 1) * 4,
-              ];
-
-              let rSum = 0, gSum = 0, bSum = 0;
-              sampleIndices.forEach((idx) => {
-                rSum += data[idx];
-                gSum += data[idx + 1];
-                bSum += data[idx + 2];
-              });
-              const count = sampleIndices.length;
-              const bgR = rSum / count;
-              const bgG = gSum / count;
-              const bgB = bSum / count;
-
-              const isLightBg = (bgR + bgG + bgB) / 3 > 200;
-              const tolSq = isLightBg ? 55 * 55 : 45 * 45;
-
-              // BFS Flood Fill from edges so interior glass / highlights are preserved
-              const totalPixels = width * height;
-              const isBg = new Uint8Array(totalPixels);
-              const visited = new Uint8Array(totalPixels);
-              const queue = [];
-
-              const isBgPixel = (x, y) => {
-                const idx = (y * width + x) * 4;
-                const r = data[idx], g = data[idx + 1], b = data[idx + 2];
-                if (isLightBg && r > 228 && g > 228 && b > 228) return true;
-                const distSq = (r - bgR) ** 2 + (g - bgG) ** 2 + (b - bgB) ** 2;
-                return distSq < tolSq;
-              };
-
-              // Seed edge pixels
-              for (let x = 0; x < width; x++) {
-                queue.push(x, 0);
-                queue.push(x, height - 1);
-                visited[x] = 1;
-                visited[(height - 1) * width + x] = 1;
-              }
-              for (let y = 0; y < height; y++) {
-                queue.push(0, y);
-                queue.push(width - 1, y);
-                visited[y * width] = 1;
-                visited[y * width + (width - 1)] = 1;
-              }
-
-              let head = 0;
-              while (head < queue.length) {
-                const cx = queue[head++];
-                const cy = queue[head++];
-                const cPos = cy * width + cx;
-                if (isBgPixel(cx, cy)) {
-                  isBg[cPos] = 1;
-                  const neighbors = [
-                    [cx + 1, cy], [cx - 1, cy], [cx, cy + 1], [cx, cy - 1]
-                  ];
-                  for (let i = 0; i < 4; i++) {
-                    const nx = neighbors[i][0];
-                    const ny = neighbors[i][1];
-                    if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
-                      const nPos = ny * width + nx;
-                      if (!visited[nPos]) {
-                        visited[nPos] = 1;
-                        queue.push(nx, ny);
-                      }
-                    }
-                  }
-                }
-              }
-
-              // Apply alpha transparency and compute bounding box
-              let minX = width, minY = height, maxX = 0, maxY = 0;
-              for (let y = 0; y < height; y++) {
-                for (let x = 0; x < width; x++) {
-                  const pos = y * width + x;
-                  const idx = pos * 4;
-                  if (isBg[pos]) {
-                    data[idx + 3] = 0;
-                  } else {
-                    if (x < minX) minX = x;
-                    if (x > maxX) maxX = x;
-                    if (y < minY) minY = y;
-                    if (y > maxY) maxY = y;
-                  }
-                }
-              }
-
-              ctx.putImageData(imgData, 0, 0);
-
-              // Auto-crop to bounding box if valid
-              if (minX < maxX && minY < maxY && (maxX - minX) > 60 && (maxY - minY) > 60) {
-                const cropW = maxX - minX + 1;
-                const cropH = maxY - minY + 1;
-                const cropCanvas = document.createElement("canvas");
-                cropCanvas.width = cropW;
-                cropCanvas.height = cropH;
-                const cropCtx = cropCanvas.getContext("2d");
-                cropCtx.drawImage(canvas, minX, minY, cropW, cropH, 0, 0, cropW, cropH);
-
-                cropCanvas.toBlob((blob) => {
-                  if (blob) {
-                    const newFile = new File([blob], file.name.replace(/\.[^.]+$/, ".png"), { type: "image/png" });
-                    return resolve(newFile);
-                  }
-                  resolve(file);
-                }, "image/png");
-                return;
-              }
-            } catch (err) {
-              console.warn("Client background isolation fallback:", err);
-            }
-          }
-
-          // Export compressed PNG or JPEG
-          const mime = removeBg || file.type === "image/png" ? "image/png" : "image/jpeg";
-          const ext = mime === "image/png" ? ".png" : ".jpg";
           canvas.toBlob((blob) => {
             if (blob) {
               const compressedFile = new File([blob], file.name.replace(/\.[^.]+$/, ext), { type: mime });
@@ -190,7 +65,6 @@ export async function prepareImage(file, removeBg = false, maxDim = 1600, qualit
  */
 export function BottleUpload({ slug, image, images = [], onChange, onDone }) {
   const inputRef = useRef(null);
-  const [removeBg, setRemoveBg] = useState(true);
   const [busy, setBusy] = useState(false);
   const [progressMsg, setProgressMsg] = useState("");
   const [isDragOver, setIsDragOver] = useState(false);
@@ -229,9 +103,9 @@ export function BottleUpload({ slug, image, images = [], onChange, onDone }) {
     try {
       for (let i = 0; i < validFiles.length; i++) {
         const file = validFiles[i];
-        setProgressMsg(`Processing & optimizing ${i + 1}/${validFiles.length}…`);
+        setProgressMsg(`Processing ${i + 1}/${validFiles.length}…`);
 
-        const optimizedFile = await prepareImage(file, removeBg);
+        const optimizedFile = await prepareImage(file);
 
         setProgressMsg(`Uploading ${i + 1}/${validFiles.length}…`);
         const fd = new FormData();
@@ -239,8 +113,8 @@ export function BottleUpload({ slug, image, images = [], onChange, onDone }) {
 
         const isFirst = currentGallery.length === 0 && i === 0;
         const endpoint = slug
-          ? `/admin/products/${slug}/image?remove_bg=${removeBg}&set_primary=${isFirst}`
-          : `/admin/media/upload?remove_bg=${removeBg}`;
+          ? `/admin/products/${slug}/image?set_primary=${isFirst}`
+          : `/admin/media/upload`;
 
         const { data } = await api.post(endpoint, fd, { timeout: 120000 });
 
@@ -256,12 +130,12 @@ export function BottleUpload({ slug, image, images = [], onChange, onDone }) {
           if (!activePrimary) activePrimary = newUrl;
         }
 
-        // If backend returned the full updated images array, merge it
+        // If backend returned updated images array, merge it
         if (Array.isArray(data.images) && data.images.length > 0) {
           currentGallery = Array.from(new Set([...currentGallery, ...data.images]));
         }
 
-        // Update local state right away after each image uploads so user sees progress
+        // Update local state right away
         setGallery(currentGallery);
         setPrimaryUrl(activePrimary);
       }
@@ -287,7 +161,7 @@ export function BottleUpload({ slug, image, images = [], onChange, onDone }) {
 
       toast.success(
         validFiles.length === 1
-          ? (removeBg ? "Bottle isolated and added to gallery" : "Photo added to gallery")
+          ? "Photo added to gallery"
           : `${validFiles.length} photos added to gallery`
       );
     } catch (err) {
@@ -373,22 +247,11 @@ export function BottleUpload({ slug, image, images = [], onChange, onDone }) {
             </span>
           </div>
           <p className="mt-1 text-xs text-muted-foreground">
-            Upload bottle cutouts, packaging angles, texture details, or lifestyle shots. Click any photo or &ldquo;Make Cover&rdquo; to set as primary.
+            Upload bottle photos, packaging angles, texture details, or lifestyle shots. Click any photo or &ldquo;Make Cover&rdquo; to set as primary.
           </p>
         </div>
 
         <div className="flex items-center gap-3">
-          <label className="flex cursor-pointer items-center gap-1.5 text-xs font-semibold text-foreground select-none">
-            <input
-              type="checkbox"
-              checked={removeBg}
-              onChange={(e) => setRemoveBg(e.target.checked)}
-              className="h-3.5 w-3.5 accent-[hsl(var(--gold))]"
-              data-testid="bottle-upload-removebg"
-            />
-            <Wand2 className="h-3.5 w-3.5 text-gold" /> Auto-isolate background
-          </label>
-
           <input
             ref={inputRef}
             type="file"

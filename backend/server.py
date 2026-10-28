@@ -429,8 +429,9 @@ async def ensure_seeded():
                 continue
             existing = await db.products.find_one({"slug": p["slug"]})
             if not existing:
+                img_url = f"/images/{p['slug'].replace('-on-the-rocks', '')}.jpg"
                 doc = {**p, "price": SEED_PRICES.get(p["slug"], 1499), "sample_price": SEED_SAMPLE_PRICES.get(p["slug"], 99),
-                       "volume": "50 ml", "image": f"/images/{p['slug'].replace('-on-the-rocks', '')}.jpg",
+                       "volume": "50 ml", "image": img_url, "images": [img_url],
                        "low_stock_threshold": 10, "active": True, "featured": True, "updated_at": now().isoformat()}
                 await db.products.insert_one(doc)
                 logger.info("Seeded missing fragrance: %s", p["slug"])
@@ -442,6 +443,8 @@ async def ensure_seeded():
                     missing["sample_price"] = SEED_SAMPLE_PRICES.get(p["slug"], 99)
                 if "volume" not in existing:
                     missing["volume"] = "50 ml"
+                if "images" not in existing or not existing.get("images"):
+                    missing["images"] = [existing.get("image")] if existing.get("image") else [f"/images/{p['slug'].replace('-on-the-rocks', '')}.jpg"]
                 if missing:
                     await db.products.update_one({"slug": p["slug"]}, {"$set": missing})
 
@@ -838,7 +841,7 @@ async def media(path: str):
 
 
 @api.post("/admin/media/upload")
-async def admin_upload_generic_image(file: UploadFile = File(...), remove_bg: bool = Query(False),
+async def admin_upload_generic_image(file: UploadFile = File(...),
                                      admin: dict = Depends(require_admin)):
     if file.content_type not in storage.ALLOWED_TYPES:
         raise HTTPException(status_code=400, detail="Upload a PNG, JPEG or WebP image")
@@ -846,13 +849,10 @@ async def admin_upload_generic_image(file: UploadFile = File(...), remove_bg: bo
     if len(data) > storage.MAX_UPLOAD_BYTES:
         raise HTTPException(status_code=413, detail="Image must be under 10 MB")
     try:
-        png = await asyncio.to_thread(storage.cut_out_bottle if remove_bg else storage.to_png, data)
+        png = await asyncio.to_thread(storage.to_png, data)
     except Exception as e:
-        logger.warning("cut_out_bottle failed in generic upload, falling back to to_png: %s", e)
-        try:
-            png = await asyncio.to_thread(storage.to_png, data)
-        except Exception:
-            raise HTTPException(status_code=422, detail="Could not process that image")
+        logger.error("Image processing failed: %s", e)
+        raise HTTPException(status_code=422, detail="Could not process that image")
     path = f"{storage.APP_NAME}/uploads/{uuid.uuid4().hex}.png"
     result = await asyncio.to_thread(storage.put_object, path, png, "image/png")
     url = f"/api/media/{result['path']}"
@@ -864,7 +864,7 @@ async def admin_upload_generic_image(file: UploadFile = File(...), remove_bg: bo
 
 
 @api.post("/admin/products/{slug}/image")
-async def admin_upload_image(slug: str, file: UploadFile = File(...), remove_bg: bool = Query(True),
+async def admin_upload_image(slug: str, file: UploadFile = File(...),
                              set_primary: bool = Query(True),
                              admin: dict = Depends(require_admin)):
     global _products_cache
@@ -876,13 +876,10 @@ async def admin_upload_image(slug: str, file: UploadFile = File(...), remove_bg:
     if len(data) > storage.MAX_UPLOAD_BYTES:
         raise HTTPException(status_code=413, detail="Image must be under 10 MB")
     try:
-        png = await asyncio.to_thread(storage.cut_out_bottle if remove_bg else storage.to_png, data)
+        png = await asyncio.to_thread(storage.to_png, data)
     except Exception as e:
-        logger.warning("cut_out_bottle failed in product image upload, falling back to to_png: %s", e)
-        try:
-            png = await asyncio.to_thread(storage.to_png, data)
-        except Exception:
-            raise HTTPException(status_code=422, detail="Could not process that image")
+        logger.error("Image processing failed: %s", e)
+        raise HTTPException(status_code=422, detail="Could not process that image")
     path = f"{storage.APP_NAME}/products/{slug}/{uuid.uuid4().hex}.png"
     try:
         result = await asyncio.to_thread(storage.put_object, path, png, "image/png")
@@ -931,7 +928,7 @@ async def admin_upload_image(slug: str, file: UploadFile = File(...), remove_bg:
 
 
 @api.post("/admin/products/{slug}/images")
-async def admin_upload_multiple_images(slug: str, files: List[UploadFile] = File(...), remove_bg: bool = Query(False),
+async def admin_upload_multiple_images(slug: str, files: List[UploadFile] = File(...),
                                        admin: dict = Depends(require_admin)):
     global _products_cache
     prod = await db.products.find_one({"slug": slug})
@@ -946,12 +943,9 @@ async def admin_upload_multiple_images(slug: str, files: List[UploadFile] = File
         if len(raw) > storage.MAX_UPLOAD_BYTES:
             continue
         try:
-            png = await asyncio.to_thread(storage.cut_out_bottle if remove_bg else storage.to_png, raw)
+            png = await asyncio.to_thread(storage.to_png, raw)
         except Exception:
-            try:
-                png = await asyncio.to_thread(storage.to_png, raw)
-            except Exception:
-                continue
+            continue
         path = f"{storage.APP_NAME}/products/{slug}/{uuid.uuid4().hex}.png"
         try:
             res = await asyncio.to_thread(storage.put_object, path, png, "image/png")
