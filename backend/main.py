@@ -1310,6 +1310,7 @@ _startup_done = False
 
 async def _init_background():
     try:
+        await db.media.create_index("path")
         await ensure_admin_account()
         await ensure_seeded()
     except Exception as e:
