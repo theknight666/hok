@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { api, formatErr } from "@/lib/api";
 import { BottleUpload } from "./BottleUpload";
 import { getCachedCatalog, setCachedCatalog } from "@/hooks/useProducts";
-import { getNoteImage, KNOWN_NOTES, isValidImageUrl, defaultCutoutOf, DEFAULT_MAJOR_NOTES } from "@/lib/visual";
+import { getNoteImage, KNOWN_NOTES, NOTE_CATEGORIES, isValidImageUrl, defaultCutoutOf, DEFAULT_MAJOR_NOTES } from "@/lib/visual";
 
 const TEXT = [
   ["name", "Name"],
@@ -52,6 +52,7 @@ function NoteTierBuilder({ tierKey, title, subtitle, notesList, onNotesChange, r
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [showRaw, setShowRaw] = useState(false);
   const [search, setSearch] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("All");
   const [customNote, setCustomNote] = useState("");
 
   const move = (idx, delta) => {
@@ -87,7 +88,8 @@ function NoteTierBuilder({ tierKey, title, subtitle, notesList, onNotesChange, r
   const availableNotes = KNOWN_NOTES.filter(
     (n) =>
       !notesList.some((existing) => existing.toLowerCase() === n.name.toLowerCase()) &&
-      n.name.toLowerCase().includes(search.toLowerCase())
+      (selectedCategory === "All" || n.category === selectedCategory) &&
+      (n.name.toLowerCase().includes(search.toLowerCase()) || n.category.toLowerCase().includes(search.toLowerCase()))
   );
 
   return (
@@ -243,6 +245,24 @@ function NoteTierBuilder({ tierKey, title, subtitle, notesList, onNotesChange, r
             </form>
           </div>
 
+          {/* Luxury Category Filter Pills */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar text-[11px]" data-lenis-prevent>
+            {NOTE_CATEGORIES.map((cat) => (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => setSelectedCategory(cat)}
+                className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors cursor-pointer ${
+                  selectedCategory === cat
+                    ? "bg-gold text-black font-semibold shadow-sm"
+                    : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+
           {/* Quick-Click Visual Note Chips */}
           <div className="max-h-52 overflow-y-auto space-y-2 pr-1" data-lenis-prevent>
             <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
@@ -287,6 +307,8 @@ function NoteTierBuilder({ tierKey, title, subtitle, notesList, onNotesChange, r
 
 function MajorNotesManager({ majorNotes = [], onChange, allNotesList = [] }) {
   const [customInput, setCustomInput] = useState("");
+  const [searchFilter, setSearchFilter] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("All");
   const [isPickerOpen, setIsPickerOpen] = useState(false);
 
   const handleAdd = (name) => {
@@ -312,7 +334,13 @@ function MajorNotesManager({ majorNotes = [], onChange, allNotesList = [] }) {
   const candidateNotes = Array.from(new Set([
     ...allNotesList,
     ...KNOWN_NOTES.map((k) => k.name),
-  ])).filter((name) => !majorNotes.includes(name));
+  ])).filter((name) => {
+    if (majorNotes.includes(name)) return false;
+    const item = KNOWN_NOTES.find((k) => k.name.toLowerCase() === name.toLowerCase());
+    const matchesCategory = selectedCategory === "All" || (item && item.category === selectedCategory);
+    const matchesSearch = !searchFilter.trim() || name.toLowerCase().includes(searchFilter.toLowerCase().trim());
+    return matchesCategory && matchesSearch;
+  });
 
   return (
     <div className="sm:col-span-2 rounded-2xl border border-gold/40 bg-card/60 p-4 space-y-3.5 shadow-sm" data-testid="major-notes-manager">
@@ -406,37 +434,64 @@ function MajorNotesManager({ majorNotes = [], onChange, allNotesList = [] }) {
       {/* Note Picker Drawer */}
       {isPickerOpen && (
         <div className="rounded-xl border border-border/80 bg-background/95 p-3.5 space-y-3 shadow-lg">
-          <div className="flex gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <input
               type="text"
-              placeholder="Type any custom note (e.g. Olibanum, Tuberose, Rum)..."
-              value={customInput}
-              onChange={(e) => setCustomInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
+              placeholder="Search note catalog (e.g. Saffron, Oud, Rum)..."
+              value={searchFilter}
+              onChange={(e) => setSearchFilter(e.target.value)}
+              className="rounded-lg border border-border bg-transparent px-3 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:border-gold focus:outline-none"
+            />
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder="Type custom note..."
+                value={customInput}
+                onChange={(e) => setCustomInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleAdd(customInput);
+                    setCustomInput("");
+                  }
+                }}
+                className="flex-1 rounded-lg border border-border bg-transparent px-3 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:border-gold focus:outline-none"
+              />
+              <button
+                type="button"
+                onClick={() => {
                   handleAdd(customInput);
                   setCustomInput("");
-                }
-              }}
-              className="flex-1 rounded-lg border border-border bg-transparent px-3 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:border-gold focus:outline-none"
-            />
-            <button
-              type="button"
-              onClick={() => {
-                handleAdd(customInput);
-                setCustomInput("");
-              }}
-              disabled={!customInput.trim()}
-              className="rounded-lg bg-foreground px-3 py-1.5 text-xs font-semibold text-background hover:bg-gold hover:text-black transition-colors disabled:opacity-50 cursor-pointer"
-            >
-              Add
-            </button>
+                }}
+                disabled={!customInput.trim()}
+                className="rounded-lg bg-foreground px-3 py-1.5 text-xs font-semibold text-background hover:bg-gold hover:text-black transition-colors disabled:opacity-50 cursor-pointer"
+              >
+                Add
+              </button>
+            </div>
+          </div>
+
+          {/* Luxury Category Filter Tabs */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar text-[11px]" data-lenis-prevent>
+            {NOTE_CATEGORIES.map((cat) => (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => setSelectedCategory(cat)}
+                className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors cursor-pointer ${
+                  selectedCategory === cat
+                    ? "bg-gold text-black font-semibold shadow-sm"
+                    : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
           </div>
 
           <div>
             <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-              Suggested Notes from Pyramid & Catalog
+              Select from Note Dictionary ({candidateNotes.length} notes available)
             </p>
             <div className="flex flex-wrap gap-1.5 max-h-48 overflow-y-auto pr-1">
               {candidateNotes.map((name) => {

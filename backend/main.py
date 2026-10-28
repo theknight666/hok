@@ -1288,7 +1288,7 @@ SEED = [
             "heart": ["Blonde Tobacco", "Orris", "Dried Fruits", "Sandalwood", "Saffron", "White Pepper", "Jasmine"],
             "base": ["Amber", "Vanilla", "Tonka Bean", "Cedarwood", "Labdanum", "Myrrh", "Patchouli", "Musk"],
         },
-        "major_notes": ["Rum", "Blonde Tobacco", "Amber", "Bourbon Vanilla", "Dried Fruits", "Olibanum"],
+        "major_notes": ["Rum", "Blonde Tobacco", "Amber", "Dried Fruits", "Olibanum", "Bitter Orange"],
     },
     {
         "slug": "layton", "name": "Layton", "order": 2, "color": "#1E2F5C", "badge": "The Noble",
@@ -1300,7 +1300,6 @@ SEED = [
             {"name": "Warm Spicy", "pct": 94},
             {"name": "Aromatic Lavender", "pct": 88},
             {"name": "Crisp Apple & Citrus", "pct": 85},
-            {"name": "Bourbon Vanilla", "pct": 80},
             {"name": "Noble Woods", "pct": 74},
         ],
         "architecture": {
@@ -1315,7 +1314,7 @@ SEED = [
             "heart": ["Jasmine", "Violet", "Cardamom", "Pink Pepper"],
             "base": ["Vanilla", "Sandalwood", "Guaiac Wood", "Amber", "Patchouli"],
         },
-        "major_notes": ["French Lavender", "Crisp Apple", "Bourbon Vanilla", "Sandalwood", "Cardamom", "Bergamot"],
+        "major_notes": ["French Lavender", "Crisp Apple", "Bergamot", "Cardamom", "Sandalwood", "Guaiac Wood"],
     },
     {
         "slug": "angels-share-on-the-rocks", "name": "Angels Share On The Rocks", "order": 3, "color": "#8A4B1F",
@@ -1342,7 +1341,7 @@ SEED = [
             "heart": ["Oak", "Praline", "Tonka Bean", "Cardamom"],
             "base": ["Vanilla", "Sandalwood", "Amber", "Cedarwood"],
         },
-        "major_notes": ["Oak-Aged Cognac", "Cinnamon", "Roasted Praline", "Tonka Bean", "Bourbon Vanilla", "French Oak"],
+        "major_notes": ["Oak-Aged Cognac", "Cinnamon", "Roasted Praline", "Tonka Bean", "French Oak", "Nutmeg"],
     },
     {
         "slug": "side-effect", "name": "Side Effect", "order": 4, "color": "#5A1420", "badge": "The Enigma",
@@ -1354,7 +1353,6 @@ SEED = [
             {"name": "Rich Tobacco", "pct": 96},
             {"name": "Dark Rum", "pct": 92},
             {"name": "Warm Cinnamon", "pct": 88},
-            {"name": "Vanilla Absolute", "pct": 82},
             {"name": "Leather & Saffron", "pct": 78},
         ],
         "architecture": {
@@ -1369,7 +1367,7 @@ SEED = [
             "heart": ["Saffron", "Dried Fruits", "Cardamom"],
             "base": ["Leather", "Vanilla", "Woody Amber", "Sandalwood", "Patchouli"],
         },
-        "major_notes": ["Vintage Rum", "Rich Tobacco", "Dark Leather", "Crimson Saffron", "Bourbon Vanilla", "Cinnamon"],
+        "major_notes": ["Vintage Rum", "Rich Tobacco", "Dark Leather", "Crimson Saffron", "Cinnamon", "Woody Amber"],
     },
 ]
 SEED_PRICES = {"blonde-amber": 1599, "layton": 1499, "angels-share-on-the-rocks": 1549, "side-effect": 1499}
