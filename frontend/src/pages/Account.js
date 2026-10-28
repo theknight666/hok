@@ -20,7 +20,18 @@ export const StatusPill = ({ s }) => (
 export default function Account() {
   const { user, logout } = useAuth();
   const { data } = useQuery({ queryKey: ["my-orders"], queryFn: async () => (await api.get("/orders/mine")).data, enabled: !!user });
-  if (user === null) return <div className="min-h-screen" />;
+  if (user === null) {
+    return (
+      <main className="grid min-h-screen place-items-center px-6 text-center" data-testid="account-loading">
+        <div className="flex flex-col items-center gap-4">
+          <KnightMark className="h-12 w-12 animate-pulse text-[hsl(var(--gold))]" />
+          <p className="eyebrow tracking-[0.3em] text-muted-foreground animate-pulse">
+            Accessing Account Chamber…
+          </p>
+        </div>
+      </main>
+    );
+  }
   if (!user) return <Navigate to="/login" replace />;
   const orders = Array.isArray(data) ? data : [];
 

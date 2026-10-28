@@ -18,7 +18,18 @@ const TABS = [
 
 export default function Admin() {
   const { user } = useAuth();
-  if (user === null) return <div className="min-h-screen" />;
+  if (user === null) {
+    return (
+      <main className="grid min-h-screen place-items-center px-6 text-center" data-testid="admin-loading">
+        <div className="flex flex-col items-center gap-4">
+          <KnightMark className="h-12 w-12 animate-pulse text-[hsl(var(--gold))]" />
+          <p className="eyebrow tracking-[0.3em] text-muted-foreground animate-pulse">
+            Authenticating House Ledger…
+          </p>
+        </div>
+      </main>
+    );
+  }
   if (!user) return <Navigate to="/login" replace />;
   if (user.role !== "admin")
     return (
