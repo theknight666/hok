@@ -9,7 +9,6 @@ import { worldOf, worldVars, flatNotes, getNoteImage, getMajorNotes } from "@/li
 import { inr } from "@/lib/api";
 
 function NotePill({ name, color }) {
-  const [imgError, setImgError] = useState(false);
   const imgSrc = getNoteImage(name);
 
   return (
@@ -22,19 +21,17 @@ function NotePill({ name, color }) {
           className="relative flex h-6 w-6 sm:h-7 sm:w-7 flex-shrink-0 items-center justify-center overflow-hidden rounded-full border border-border/60 bg-muted/70 shadow-inner"
           style={{ borderColor: color ? `${color}55` : undefined }}
         >
-          {!imgError && imgSrc ? (
-            <img
-              src={imgSrc}
-              alt={name}
-              onError={() => setImgError(true)}
-              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-115"
-              loading="lazy"
-            />
-          ) : (
-            <span className="flex h-full w-full items-center justify-center text-[10px] font-black uppercase tracking-wider text-muted-foreground">
-              {name.slice(0, 2)}
-            </span>
-          )}
+          <img
+            src={imgSrc || "/images/notes/amber.jpg"}
+            alt={name}
+            onError={(e) => {
+              if (!e.currentTarget.src.includes("amber.jpg")) {
+                e.currentTarget.src = "/images/notes/amber.jpg";
+              }
+            }}
+            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-115"
+            loading="lazy"
+          />
         </span>
         <span className="leading-none text-foreground/90 transition-colors group-hover:text-foreground whitespace-nowrap">
           {name}

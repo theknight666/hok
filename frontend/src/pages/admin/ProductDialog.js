@@ -149,13 +149,16 @@ function NoteTierBuilder({ tierKey, title, subtitle, notesList, onNotesChange, r
 
                 {/* Note Thumbnail Icon */}
                 <div className="relative flex h-6 w-6 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border/60 bg-muted shadow-inner">
-                  {img ? (
-                    <img src={img} alt={note} className="h-full w-full object-cover" />
-                  ) : (
-                    <span className="text-[9px] font-bold uppercase text-muted-foreground">
-                      {note.slice(0, 2)}
-                    </span>
-                  )}
+                  <img
+                    src={img || "/images/notes/amber.jpg"}
+                    alt={note}
+                    onError={(e) => {
+                      if (!e.currentTarget.src.includes("amber.jpg")) {
+                        e.currentTarget.src = "/images/notes/amber.jpg";
+                      }
+                    }}
+                    className="h-full w-full object-cover"
+                  />
                 </div>
 
                 {/* Note Title */}
@@ -279,13 +282,16 @@ function NoteTierBuilder({ tierKey, title, subtitle, notesList, onNotesChange, r
                     className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-muted/40 py-1 pl-1 pr-2.5 text-xs text-foreground transition-all hover:scale-105 hover:border-gold hover:bg-gold/15 cursor-pointer"
                   >
                     <div className="h-5 w-5 shrink-0 overflow-hidden rounded-full border border-border/50 bg-background">
-                      {img ? (
-                        <img src={img} alt={item.name} className="h-full w-full object-cover" />
-                      ) : (
-                        <span className="flex h-full w-full items-center justify-center text-[8px] font-bold">
-                          {item.name.slice(0, 2)}
-                        </span>
-                      )}
+                      <img
+                        src={img || "/images/notes/amber.jpg"}
+                        alt={item.name}
+                        onError={(e) => {
+                          if (!e.currentTarget.src.includes("amber.jpg")) {
+                            e.currentTarget.src = "/images/notes/amber.jpg";
+                          }
+                        }}
+                        className="h-full w-full object-cover"
+                      />
                     </div>
                     <span>{item.name}</span>
                     <Plus className="h-3 w-3 opacity-50" />
@@ -384,13 +390,16 @@ function MajorNotesManager({ majorNotes = [], onChange, allNotesList = [] }) {
                 className="group relative inline-flex items-center gap-2 rounded-full border border-gold/50 bg-background/90 py-1 pl-1.5 pr-2.5 text-xs font-medium shadow-sm hover:border-gold transition-all"
               >
                 <div className="h-6 w-6 shrink-0 overflow-hidden rounded-full border border-border/50 bg-background flex items-center justify-center">
-                  {img ? (
-                    <img src={img} alt="" className="h-full w-full object-cover" />
-                  ) : (
-                    <span className="text-[10px] font-bold uppercase text-muted-foreground">
-                      {note.slice(0, 2)}
-                    </span>
-                  )}
+                  <img
+                    src={img || "/images/notes/amber.jpg"}
+                    alt=""
+                    onError={(e) => {
+                      if (!e.currentTarget.src.includes("amber.jpg")) {
+                        e.currentTarget.src = "/images/notes/amber.jpg";
+                      }
+                    }}
+                    className="h-full w-full object-cover"
+                  />
                 </div>
 
                 <span className="text-xs font-semibold text-foreground">{note}</span>
@@ -503,9 +512,16 @@ function MajorNotesManager({ majorNotes = [], onChange, allNotesList = [] }) {
                     onClick={() => handleAdd(name)}
                     className="group inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-muted/30 px-2 py-1 text-xs hover:border-gold hover:bg-gold/10 transition-colors cursor-pointer"
                   >
-                    {img && (
-                      <img src={img} alt="" className="h-4 w-4 rounded-full object-cover" />
-                    )}
+                    <img
+                      src={img || "/images/notes/amber.jpg"}
+                      alt=""
+                      onError={(e) => {
+                        if (!e.currentTarget.src.includes("amber.jpg")) {
+                          e.currentTarget.src = "/images/notes/amber.jpg";
+                        }
+                      }}
+                      className="h-4 w-4 rounded-full object-cover"
+                    />
                     <span>+ {name}</span>
                   </button>
                 );

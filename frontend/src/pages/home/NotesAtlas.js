@@ -5,7 +5,6 @@ import { EASE } from "@/components/site/Reveal";
 import { getNoteImage } from "@/lib/visual";
 
 function NotePill({ name, color, delay }) {
-  const [imgError, setImgError] = useState(false);
   const imgSrc = getNoteImage(name);
 
   return (
@@ -21,19 +20,17 @@ function NotePill({ name, color, delay }) {
         className="relative flex h-7 w-7 flex-shrink-0 items-center justify-center overflow-hidden rounded-full border border-border/50 bg-muted/60 shadow-inner"
         style={{ borderColor: color ? `${color}55` : undefined }}
       >
-        {!imgError && imgSrc ? (
-          <img
-            src={imgSrc}
-            alt={name}
-            onError={() => setImgError(true)}
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-115"
-            loading="lazy"
-          />
-        ) : (
-          <span className="flex h-full w-full items-center justify-center text-[10px] font-black uppercase tracking-wider text-muted-foreground">
-            {name.slice(0, 2)}
-          </span>
-        )}
+        <img
+          src={imgSrc || "/images/notes/amber.jpg"}
+          alt={name}
+          onError={(e) => {
+            if (!e.currentTarget.src.includes("amber.jpg")) {
+              e.currentTarget.src = "/images/notes/amber.jpg";
+            }
+          }}
+          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-115"
+          loading="lazy"
+        />
       </span>
       <span className="leading-none text-foreground/90 transition-colors group-hover:text-foreground">
         {name}

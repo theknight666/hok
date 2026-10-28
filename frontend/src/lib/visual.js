@@ -301,6 +301,177 @@ const NOTE_IMAGE_MAP = {
   "peppermint": "/images/notes/lavender.png",
   "eucalyptus": "/images/notes/lavender.png",
   "basil": "/images/notes/lavender.png",
+
+  // Citrus & Fruits (extended)
+  "guava": "/images/notes/apple.png",
+  "kumquat": "/images/notes/mandarin-orange.png",
+  "lychee": "/images/notes/bitter-orange.png",
+  "melon": "/images/notes/apple.png",
+  "rhubarb": "/images/notes/pink-pepper.jpg",
+  "watermelon": "/images/notes/apple.png",
+  "sour-cherry": "/images/notes/dried-fruits.jpg",
+  "white-peach": "/images/notes/dried-fruits.jpg",
+  "fig-leaf": "/images/notes/patchouli.jpg",
+
+  // Tobacco & Leather (extended)
+  "burley-tobacco": "/images/notes/tobacco.png",
+  "castoreum-leather": "/images/notes/leather.jpg",
+  "cured-tobacco": "/images/notes/tobacco.png",
+  "dark-saddle-leather": "/images/notes/leather.jpg",
+  "fine-leather": "/images/notes/leather.jpg",
+  "smokey-birch-leather": "/images/notes/leather.jpg",
+
+  // Spices (extended)
+  "caraway": "/images/notes/cardamom.jpg",
+  "cumin": "/images/notes/nutmeg.png",
+  "coriander-seed": "/images/notes/nutmeg.png",
+  "fennel-seed": "/images/notes/cardamom.jpg",
+  "fenugreek": "/images/notes/nutmeg.png",
+  "paprika": "/images/notes/pink-pepper.jpg",
+  "pimento": "/images/notes/pink-pepper.jpg",
+
+  // Woods (extended)
+  "akigalawood": "/images/notes/patchouli.jpg",
+  "assamese-oud": "/images/notes/cedarwood.jpg",
+  "birch": "/images/notes/cedarwood.jpg",
+  "birch-tar": "/images/notes/leather.jpg",
+  "cambodian-oud": "/images/notes/cedarwood.jpg",
+  "clearwood": "/images/notes/cedarwood.jpg",
+  "hinoki-wood": "/images/notes/cedarwood.jpg",
+  "italian-cypress": "/images/notes/cedarwood.jpg",
+  "palisander": "/images/notes/sandalwood.png",
+  "papyrus": "/images/notes/cedarwood.jpg",
+  "sandalwood-cream": "/images/notes/sandalwood.png",
+  "siberian-pine-needle": "/images/notes/cedarwood.jpg",
+  "teakwood": "/images/notes/oak.png",
+
+  // Spirits & Gourmands (extended)
+  "absinthe": "/images/notes/rum.jpg",
+  "amaretto": "/images/notes/praline.jpg",
+  "bitter-almond": "/images/notes/praline.jpg",
+  "brioche": "/images/notes/praline.jpg",
+  "brown-sugar": "/images/notes/tonka-bean.jpg",
+  "chestnut": "/images/notes/praline.jpg",
+  "cotton-candy": "/images/notes/vanilla.png",
+  "cream": "/images/notes/vanilla.png",
+  "dulce-de-leche": "/images/notes/praline.jpg",
+  "honeycomb": "/images/notes/praline.jpg",
+  "malt": "/images/notes/cognac.png",
+  "maple-syrup": "/images/notes/amber.jpg",
+  "marshmallow": "/images/notes/vanilla.png",
+  "marzipan": "/images/notes/praline.jpg",
+  "red-wine": "/images/notes/cognac.png",
+  "roasted-coffee": "/images/notes/praline.jpg",
+  "white-chocolate": "/images/notes/vanilla.png",
+  "white-rum": "/images/notes/rum.jpg",
+  "tonka-bean-absolute": "/images/notes/tonka-bean.jpg",
+
+  // Florals (extended)
+  "blue-lotus": "/images/notes/jasmine.jpg",
+  "bourbon-geranium": "/images/notes/lavender.png",
+  "broom": "/images/notes/jasmine.jpg",
+  "champaca": "/images/notes/jasmine.jpg",
+  "cherry-blossom": "/images/notes/jasmine.jpg",
+  "cyclamen": "/images/notes/violet.jpg",
+  "english-lavender": "/images/notes/lavender.png",
+  "frangipani": "/images/notes/jasmine.jpg",
+  "freesia": "/images/notes/jasmine.jpg",
+  "grandiflorum-jasmine": "/images/notes/jasmine.jpg",
+  "hibiscus": "/images/notes/pink-pepper.jpg",
+  "immortelle": "/images/notes/amber.jpg",
+  "marigold": "/images/notes/saffron.png",
+  "may-rose": "/images/notes/jasmine.jpg",
+  "narcissus": "/images/notes/jasmine.jpg",
+  "night-blooming-jasmine": "/images/notes/jasmine.jpg",
+  "taif-rose": "/images/notes/jasmine.jpg",
+  "tiare-flower": "/images/notes/jasmine.jpg",
+  "tuscan-orris": "/images/notes/orris.jpg",
+  "white-lily": "/images/notes/jasmine.jpg",
+  "white-rose": "/images/notes/jasmine.jpg",
+
+  // Resins & Amber (extended)
+  "balsam-of-peru": "/images/notes/amber.jpg",
+  "choya-loban": "/images/notes/olibanum.jpg",
+  "copahu-balsam": "/images/notes/amber.jpg",
+  "copal": "/images/notes/olibanum.jpg",
+  "incense-smoke": "/images/notes/olibanum.jpg",
+  "opoponax": "/images/notes/myrrh.jpg",
+  "tolu-balsam": "/images/notes/amber.jpg",
+  "white-incense": "/images/notes/olibanum.jpg",
+
+  // Herbs & Aromatics (extended)
+  "angelica": "/images/notes/lavender.png",
+  "artemisia": "/images/notes/lavender.png",
+  "bay-leaf": "/images/notes/lavender.png",
+  "chamomile": "/images/notes/jasmine.jpg",
+  "costus": "/images/notes/orris.jpg",
+  "holy-basil": "/images/notes/lavender.png",
+  "laurel": "/images/notes/lavender.png",
+  "lemongrass": "/images/notes/lavender.png",
+  "marjoram": "/images/notes/lavender.png",
+  "myrtle": "/images/notes/lavender.png",
+  "oregano": "/images/notes/lavender.png",
+  "spearmint": "/images/notes/lavender.png",
+  "sweet-basil": "/images/notes/lavender.png",
+  "tarragon": "/images/notes/lavender.png",
+  "wild-rosemary": "/images/notes/lavender.png",
+
+  // Musk & Animalic (extended)
+  "ambrette": "/images/notes/musk.jpg",
+  "cetalox": "/images/notes/amber.jpg",
+  "civet": "/images/notes/musk.jpg",
+  "clean-musk": "/images/notes/musk.jpg",
+  "egyptian-musk": "/images/notes/musk.jpg",
+  "grey-ambergris": "/images/notes/amber.jpg",
+  "sensual-musk": "/images/notes/musk.jpg",
+  "velvet-musk": "/images/notes/musk.jpg",
+
+  // Earth & Greens (extended)
+  "bamboo": "/images/notes/cedarwood.jpg",
+  "black-truffle": "/images/notes/patchouli.jpg",
+  "bourbon-vetiver": "/images/notes/patchouli.jpg",
+  "cut-grass": "/images/notes/patchouli.jpg",
+  "forest-floor": "/images/notes/patchouli.jpg",
+  "green-leaves": "/images/notes/patchouli.jpg",
+  "ivy": "/images/notes/patchouli.jpg",
+  "java-vetiver": "/images/notes/patchouli.jpg",
+  "petrichor": "/images/notes/patchouli.jpg",
+  "seaweed": "/images/notes/frozen-bergamot.jpg",
+  "tomato-leaf": "/images/notes/patchouli.jpg",
+  "tree-moss": "/images/notes/patchouli.jpg",
+  "truffle": "/images/notes/patchouli.jpg",
+  "wet-clay": "/images/notes/patchouli.jpg",
+  "white-patchouli": "/images/notes/patchouli.jpg",
+
+  // Aquatic & Atmospheric (extended)
+  "aldehydes": "/images/notes/frozen-bergamot.jpg",
+  "clean-linen": "/images/notes/musk.jpg",
+  "flint": "/images/notes/frozen-bergamot.jpg",
+  "ice-accord": "/images/notes/frozen-bergamot.jpg",
+  "marine-accord": "/images/notes/frozen-bergamot.jpg",
+  "metallic-accord": "/images/notes/frozen-bergamot.jpg",
+  "mineral-notes": "/images/notes/frozen-bergamot.jpg",
+  "ocean-breeze": "/images/notes/frozen-bergamot.jpg",
+  "ozone": "/images/notes/frozen-bergamot.jpg",
+  "rain-accord": "/images/notes/frozen-bergamot.jpg",
+  "sea-salt": "/images/notes/frozen-bergamot.jpg",
+  "solar-notes": "/images/notes/amber.jpg",
+  "sunlit-citrus": "/images/notes/bergamot.jpg",
+  "white-smoke": "/images/notes/olibanum.jpg",
+};
+
+export const CATEGORY_FALLBACK_IMAGE = {
+  "Fruits & Citrus": "/images/notes/bitter-orange.png",
+  "Florals": "/images/notes/jasmine.jpg",
+  "Spices": "/images/notes/cardamom.jpg",
+  "Woods": "/images/notes/cedarwood.jpg",
+  "Resins & Amber": "/images/notes/amber.jpg",
+  "Tobacco & Leather": "/images/notes/leather.jpg",
+  "Spirits & Gourmands": "/images/notes/rum.jpg",
+  "Herbs & Aromatics": "/images/notes/lavender.png",
+  "Musk & Animalic": "/images/notes/musk.jpg",
+  "Earth & Greens": "/images/notes/patchouli.jpg",
+  "Aquatic & Atmospheric": "/images/notes/frozen-bergamot.jpg",
 };
 
 export const DEFAULT_MAJOR_NOTES = {
@@ -326,13 +497,17 @@ export const getMajorNotes = (p, limit = 6) => {
 };
 
 export const getNoteImage = (n) => {
-  if (!n) return null;
+  if (!n) return "/images/notes/amber.jpg";
   const slug = noteSlug(n);
   if (NOTE_IMAGE_MAP[slug]) return NOTE_IMAGE_MAP[slug];
   for (const [key, path] of Object.entries(NOTE_IMAGE_MAP)) {
     if (slug.includes(key) || key.includes(slug)) return path;
   }
-  return null;
+  const matched = KNOWN_NOTES.find((item) => noteSlug(item.name) === slug);
+  if (matched && CATEGORY_FALLBACK_IMAGE[matched.category]) {
+    return CATEGORY_FALLBACK_IMAGE[matched.category];
+  }
+  return "/images/notes/amber.jpg";
 };
 
 export const noteImages = (notes, n = 3) =>
