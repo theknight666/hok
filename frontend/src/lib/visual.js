@@ -11,41 +11,66 @@ export const worldOf = (p) => WORLDS[p?.slug] || { ...DEFAULT_WORLD, bg: p?.colo
 
 export const worldVars = (w) => ({ "--w-bg": w.bg, "--w-ink": w.ink, "--w-soft": w.soft, background: w.bg, color: w.ink });
 
+export function isValidImageUrl(url) {
+  if (!url || typeof url !== "string") return false;
+  const trimmed = url.trim();
+  if (!trimmed) return false;
+  if (trimmed.startsWith("data:image/")) return true;
+  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) return true;
+  if (trimmed.startsWith("/images/")) return true;
+  if (trimmed.startsWith("/api/media/")) {
+    return /\.(png|jpe?g|webp|gif|svg)$/i.test(trimmed);
+  }
+  return /\.(png|jpe?g|webp|gif|svg)$/i.test(trimmed);
+}
+
+export const KNOWN_CUTOUTS = {
+  "blonde-amber": "/images/cut-blonde-amber.png",
+  layton: "/images/cut-layton.png",
+  "angels-share-on-the-rocks": "/images/cut-angels-share.png",
+  "side-effect": "/images/cut-side-effect.png",
+};
+
+export const KNOWN_PHOTOS = {
+  "blonde-amber": "/images/blonde-amber.jpg",
+  layton: "/images/layton.jpg",
+  "angels-share-on-the-rocks": "/images/angels-share.jpg",
+  "side-effect": "/images/side-effect.jpg",
+};
+
+export const defaultCutoutOf = (slug) =>
+  (slug && KNOWN_CUTOUTS[slug]) ||
+  (slug && `/images/cut-${slug.replace("-on-the-rocks", "")}.png`) ||
+  "/images/cut-blonde-amber.png";
+
+export const defaultPhotoOf = (slug) =>
+  (slug && KNOWN_PHOTOS[slug]) ||
+  (slug && `/images/${slug.replace("-on-the-rocks", "")}.jpg`) ||
+  defaultCutoutOf(slug);
+
 export const cutout = (p) => {
-  if (!p) return "";
-  // If user uploaded a custom primary image (e.g. /api/media/ or external), respect it everywhere!
-  if (p.image && (p.image.startsWith("/api/media/") || p.image.startsWith("data:") || p.image.startsWith("http"))) {
+  if (!p) return "/images/cut-blonde-amber.png";
+  // If user uploaded a valid custom primary image, respect it
+  if (isValidImageUrl(p.image) && (p.image.startsWith("/api/media/") || p.image.startsWith("data:") || p.image.startsWith("http"))) {
     return p.image;
   }
-  const known = {
-    "blonde-amber": "/images/cut-blonde-amber.png",
-    layton: "/images/cut-layton.png",
-    "angels-share-on-the-rocks": "/images/cut-angels-share.png",
-    "side-effect": "/images/cut-side-effect.png",
-  };
-  if (p.slug && known[p.slug]) return known[p.slug];
-  if (p.image) {
+  if (p.slug && KNOWN_CUTOUTS[p.slug]) return KNOWN_CUTOUTS[p.slug];
+  if (isValidImageUrl(p.image)) {
     if (p.image.includes("/images/") && !p.image.includes("/images/cut-")) {
       return p.image.replace("/images/", "/images/cut-").replace(/\.(jpg|jpeg|webp)$/i, ".png");
     }
     return p.image;
   }
-  return "";
+  return defaultCutoutOf(p?.slug);
 };
 
 export const photoshoot = (p) => {
-  if (!p) return "";
-  if (p.image && (p.image.startsWith("/api/media/") || p.image.startsWith("data:") || p.image.startsWith("http"))) {
+  if (!p) return "/images/blonde-amber.jpg";
+  if (isValidImageUrl(p.image) && (p.image.startsWith("/api/media/") || p.image.startsWith("data:") || p.image.startsWith("http"))) {
     return p.image;
   }
-  const known = {
-    "blonde-amber": "/images/blonde-amber.jpg",
-    layton: "/images/layton.jpg",
-    "angels-share-on-the-rocks": "/images/angels-share.jpg",
-    "side-effect": "/images/side-effect.jpg",
-  };
-  if (p.slug && known[p.slug]) return known[p.slug];
-  return p.image || "";
+  if (p.slug && KNOWN_PHOTOS[p.slug]) return KNOWN_PHOTOS[p.slug];
+  return isValidImageUrl(p.image) ? p.image : defaultPhotoOf(p?.slug);
 };
 
 export const flatNotes = (notes, n = 5) =>

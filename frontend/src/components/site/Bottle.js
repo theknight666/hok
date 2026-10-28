@@ -1,16 +1,17 @@
 import { useState, useEffect } from "react";
-import { cutout } from "@/lib/visual";
+import { cutout, defaultCutoutOf, isValidImageUrl } from "@/lib/visual";
 
 /**
  * Responsive bottle render that always respects the primary image chosen in admin,
- * with graceful fallback to transparent cutouts when using default catalog assets.
+ * with graceful fallback to transparent cutouts when using default catalog assets
+ * or if a custom image fails to load.
  */
 function resolveBottleSrc(p) {
-  if (!p) return "";
-  if (p.image && (p.image.startsWith("/api/media/") || p.image.startsWith("data:") || p.image.startsWith("http"))) {
+  if (!p) return "/images/cut-blonde-amber.png";
+  if (isValidImageUrl(p.image)) {
     return p.image;
   }
-  return cutout(p) || p.image || "";
+  return cutout(p) || defaultCutoutOf(p?.slug);
 }
 
 export function Bottle({ p, className = "", style, ...rest }) {
@@ -20,15 +21,19 @@ export function Bottle({ p, className = "", style, ...rest }) {
     setSrc(resolveBottleSrc(p));
   }, [p, p?.image, p?.slug]);
 
+  const handleImgError = () => {
+    const defaultCut = defaultCutoutOf(p?.slug);
+    if (src !== defaultCut) {
+      setSrc(defaultCut);
+    }
+  };
+
   return (
     <img
       src={src}
       alt={p?.name || "Perfume bottle"}
       draggable={false}
-      onError={() => {
-        const fallback = p?.image || cutout(p);
-        if (src !== fallback) setSrc(fallback);
-      }}
+      onError={handleImgError}
       className={`select-none object-contain ${className}`}
       style={style}
       {...rest}

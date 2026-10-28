@@ -8,7 +8,7 @@ import { Bottle } from "@/components/site/Bottle";
 import { EASE, FadeUp } from "@/components/site/Reveal";
 import { NotesPyramid } from "./home/NotesAtlas";
 import { ReviewsBlock } from "@/components/site/ReviewsBlock";
-import { worldOf, worldVars, featuredFirst } from "@/lib/visual";
+import { worldOf, worldVars, featuredFirst, isValidImageUrl, defaultCutoutOf, defaultPhotoOf } from "@/lib/visual";
 import { inr } from "@/lib/api";
 
 function StockLine({ p }) {
@@ -44,11 +44,14 @@ export default function Product() {
   const currentPrice = size === "2 ml" ? samplePrice : p.price;
   const isSoldOut = size === "50 ml" && p.stock <= 0;
 
-  // The gallery comes directly from the product's saved images so admin has 100% control
-  const gallery = Array.isArray(p.images) && p.images.length > 0
-    ? Array.from(new Set(p.images.filter(Boolean)))
-    : (p.image ? [p.image] : []);
-  const activeImage = gallery[selectedIdx] || gallery[0] || p.image;
+  const defaultCut = defaultCutoutOf(p.slug);
+  const defaultPhoto = defaultPhotoOf(p.slug);
+
+  // Filter gallery strictly to valid image URLs, with guaranteed fallback to authentic catalog cutouts
+  const rawImages = Array.isArray(p.images) && p.images.length > 0 ? p.images : (p.image ? [p.image] : []);
+  const validImages = Array.from(new Set(rawImages.filter(isValidImageUrl)));
+  const gallery = validImages.length > 0 ? validImages : [defaultCut, defaultPhoto].filter(Boolean);
+  const activeImage = gallery[selectedIdx] || gallery[0] || defaultCut;
 
   return (
     <main data-testid="product-page" className="w-full max-w-full overflow-x-hidden">
@@ -80,7 +83,9 @@ export default function Product() {
                       className="bottle-shadow h-[46svh] w-auto lg:h-[58svh] max-w-full select-none object-contain"
                       draggable={false}
                       onError={(e) => {
-                        if (activeImage !== p.image) e.currentTarget.src = p.image;
+                        if (e.currentTarget.src !== defaultCut) {
+                          e.currentTarget.src = defaultCut;
+                        }
                       }}
                     />
                   </motion.div>
@@ -129,7 +134,9 @@ export default function Product() {
                               className="h-full w-full object-contain rounded-xl select-none transition-transform duration-300 group-hover:scale-110"
                               draggable={false}
                               onError={(e) => {
-                                if (imgUrl !== p.image) e.currentTarget.src = p.image;
+                                if (e.currentTarget.src !== defaultCut) {
+                                  e.currentTarget.src = defaultCut;
+                                }
                               }}
                             />
                             {isActive && (

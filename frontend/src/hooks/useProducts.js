@@ -1,5 +1,23 @@
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
+import { isValidImageUrl, defaultCutoutOf, defaultPhotoOf } from "@/lib/visual";
+
+export function sanitizeProduct(p) {
+  if (!p) return p;
+  const defaultCut = defaultCutoutOf(p.slug);
+  const defaultPhoto = defaultPhotoOf(p.slug);
+
+  const rawImages = Array.isArray(p.images) && p.images.length > 0 ? p.images : (p.image ? [p.image] : []);
+  const validImages = Array.from(new Set(rawImages.filter(isValidImageUrl)));
+  const finalImages = validImages.length > 0 ? validImages : [defaultCut, defaultPhoto].filter(Boolean);
+  const finalImage = isValidImageUrl(p.image) ? p.image : (finalImages[0] || defaultCut);
+
+  return {
+    ...p,
+    image: finalImage,
+    images: finalImages,
+  };
+}
 
 export const FALLBACK_PRODUCTS = [
   {
@@ -157,29 +175,30 @@ export const FALLBACK_PRODUCTS = [
   },
 ];
 
-const CACHE_KEY = "hotk_catalog_cache_v6";
+const CACHE_KEY = "hotk_catalog_cache_v7";
 
 export function getCachedCatalog() {
-  if (typeof window === "undefined") return FALLBACK_PRODUCTS;
+  if (typeof window === "undefined") return FALLBACK_PRODUCTS.map(sanitizeProduct);
   try {
     const raw = window.localStorage.getItem(CACHE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed;
+        return parsed.map(sanitizeProduct);
       }
     }
   } catch (e) {
     // Quota or parse issue
   }
-  return FALLBACK_PRODUCTS;
+  return FALLBACK_PRODUCTS.map(sanitizeProduct);
 }
 
 export function setCachedCatalog(products) {
   if (typeof window === "undefined") return;
   try {
     if (Array.isArray(products) && products.length > 0) {
-      window.localStorage.setItem(CACHE_KEY, JSON.stringify(products));
+      const sanitized = products.map(sanitizeProduct);
+      window.localStorage.setItem(CACHE_KEY, JSON.stringify(sanitized));
     }
   } catch (e) {
     // Storage full or private browsing
@@ -193,8 +212,9 @@ export function useProducts() {
       try {
         const res = await api.get("/products");
         if (Array.isArray(res.data) && res.data.length > 0) {
-          setCachedCatalog(res.data);
-          return res.data;
+          const sanitized = res.data.map(sanitizeProduct);
+          setCachedCatalog(sanitized);
+          return sanitized;
         }
         return getCachedCatalog();
       } catch (err) {
@@ -206,29 +226,30 @@ export function useProducts() {
     refetchOnWindowFocus: true,
   });
 
-  const products = Array.isArray(q.data) && q.data.length ? q.data : getCachedCatalog();
+  const products = Array.isArray(q.data) && q.data.length ? q.data.map(sanitizeProduct) : getCachedCatalog();
   return { ...q, products };
 }
 
 export function useProduct(slug) {
   const cachedCatalog = getCachedCatalog();
-  const fallback = cachedCatalog.find((p) => p.slug === slug) || FALLBACK_PRODUCTS.find((p) => p.slug === slug);
+  const fallback = cachedCatalog.find((p) => p.slug === slug) || sanitizeProduct(FALLBACK_PRODUCTS.find((p) => p.slug === slug));
   const q = useQuery({
     queryKey: ["product", slug],
     queryFn: async () => {
       try {
         const res = await api.get(`/products/${slug}`);
         if (res.data) {
+          const sanitized = sanitizeProduct(res.data);
           // If updated, sync into cached catalog
           const catalog = [...getCachedCatalog()];
           const idx = catalog.findIndex((p) => p.slug === slug);
           if (idx >= 0) {
-            catalog[idx] = { ...catalog[idx], ...res.data };
+            catalog[idx] = { ...catalog[idx], ...sanitized };
           } else {
-            catalog.push(res.data);
+            catalog.push(sanitized);
           }
           setCachedCatalog(catalog);
-          return res.data;
+          return sanitized;
         }
         return fallback;
       } catch (err) {
@@ -240,5 +261,5 @@ export function useProduct(slug) {
     refetchOnWindowFocus: true,
     retry: 1,
   });
-  return { ...q, data: q.data || fallback };
+  return { ...q, data: q.data ? sanitizeProduct(q.data) : fallback };
 }

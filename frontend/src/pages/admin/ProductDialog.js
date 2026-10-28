@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { api, formatErr } from "@/lib/api";
 import { BottleUpload } from "./BottleUpload";
 import { getCachedCatalog, setCachedCatalog } from "@/hooks/useProducts";
-import { getNoteImage, KNOWN_NOTES } from "@/lib/visual";
+import { getNoteImage, KNOWN_NOTES, isValidImageUrl, defaultCutoutOf } from "@/lib/visual";
 
 const TEXT = [
   ["name", "Name"],
@@ -15,7 +15,6 @@ const TEXT = [
   ["badge", "Badge"],
   ["concentration", "Concentration (e.g. EDP)"],
   ["volume", "Volume"],
-  ["image", "Image URL (or upload below)"],
   ["color", "Liquid colour (hex)"],
 ];
 
@@ -385,6 +384,13 @@ export function ProductDialog({ product, onClose, onSaved }) {
     setBusy(true);
 
     const parsedAccordsList = parseAccords(f.accords_str);
+    const savedSlug = isNew ? f.slug.trim().toLowerCase().replace(/\s+/g, "-") : product.slug;
+
+    const rawImgs = Array.isArray(f.images) && f.images.length > 0 ? f.images : (f.image ? [f.image] : []);
+    const cleanImages = rawImgs.filter(isValidImageUrl);
+    const defaultCut = defaultCutoutOf(savedSlug);
+    const finalImages = cleanImages.length > 0 ? cleanImages : [defaultCut];
+    const finalPrimary = isValidImageUrl(f.image) ? f.image : finalImages[0];
 
     const body = {
       name: f.name,
@@ -393,8 +399,8 @@ export function ProductDialog({ product, onClose, onSaved }) {
       badge: f.badge,
       concentration: f.concentration || "EDP",
       volume: f.volume || "50 ml",
-      image: f.image || (f.images && f.images[0]) || "",
-      images: Array.isArray(f.images) && f.images.length > 0 ? f.images : (f.image ? [f.image] : []),
+      image: finalPrimary,
+      images: finalImages,
       color: f.color,
       price: Number(f.price),
       sample_price: Number(f.sample_price || 99),
@@ -419,7 +425,6 @@ export function ProductDialog({ product, onClose, onSaved }) {
     };
 
     try {
-      const savedSlug = isNew ? f.slug.trim().toLowerCase().replace(/\s+/g, "-") : product.slug;
       if (isNew) await api.post("/admin/products", { ...body, slug: savedSlug });
       else await api.patch(`/admin/products/${product.slug}`, body);
 

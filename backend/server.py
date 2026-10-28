@@ -448,6 +448,21 @@ async def ensure_seeded():
                 if missing:
                     await db.products.update_one({"slug": p["slug"]}, {"$set": missing})
 
+        # Auto-clean any malformed/broken image paths (e.g. folder paths without extensions)
+        try:
+            async for prod in db.products.find():
+                orig_img = prod.get("image", "")
+                orig_imgs = prod.get("images", [])
+                sanitized = _sanitize_product_doc(dict(prod))
+                if sanitized.get("image") != orig_img or sanitized.get("images") != orig_imgs:
+                    await db.products.update_one(
+                        {"_id": prod["_id"]},
+                        {"$set": {"image": sanitized["image"], "images": sanitized["images"]}}
+                    )
+                    logger.info("Auto-cleaned product %s images in MongoDB", prod.get("slug"))
+        except Exception as e:
+            logger.debug("Image cleanup check skipped: %s", e)
+
         # One-time cleanup of initial development dummy/test orders and customers
         dummy_cleaned = await db.meta.find_one({"_id": "initial_dummy_cleaned_v1"})
         if not dummy_cleaned:
@@ -475,13 +490,57 @@ async def manual_seed():
 
 _products_cache: list = []
 
+VALID_IMG_EXTS = (".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg")
+
+
+def _is_valid_img_url(url: str) -> bool:
+    if not url or not isinstance(url, str):
+        return False
+    u = url.strip()
+    if u.startswith("data:image/") or u.startswith("http://") or u.startswith("https://") or u.startswith("/images/"):
+        return True
+    if u.startswith("/api/media/"):
+        return any(u.lower().endswith(ext) for ext in VALID_IMG_EXTS)
+    return any(u.lower().endswith(ext) for ext in VALID_IMG_EXTS)
+
+
+def _sanitize_product_doc(p: dict) -> dict:
+    if not p:
+        return p
+    slug = p.get("slug", "")
+    img = p.get("image", "")
+    imgs = p.get("images", [])
+
+    clean_imgs = [u for u in imgs if _is_valid_img_url(u)]
+    is_valid_primary = _is_valid_img_url(img)
+
+    default_cut = f"/images/cut-{slug.replace('-on-the-rocks', '')}.png" if slug else "/images/cut-blonde-amber.png"
+    default_photo = f"/images/{slug.replace('-on-the-rocks', '')}.jpg" if slug else "/images/blonde-amber.jpg"
+
+    clean_primary = img if is_valid_primary else (clean_imgs[0] if clean_imgs else default_cut)
+    if not clean_imgs:
+        clean_imgs = [clean_primary, default_photo]
+
+    p["image"] = clean_primary
+    p["images"] = list(dict.fromkeys(clean_imgs))
+    return p
+
 
 def _seed_fallback():
     """Return seed products from code when MongoDB is unavailable."""
     return [
-        {**p, "price": SEED_PRICES[p["slug"]], "sample_price": SEED_SAMPLE_PRICES[p["slug"]],
-         "volume": "50 ml", "image": f"/images/{p['slug'].replace('-on-the-rocks', '')}.jpg",
-         "low_stock_threshold": 10, "active": True, "featured": True, "updated_at": ""}
+        _sanitize_product_doc({
+            **p,
+            "price": SEED_PRICES[p["slug"]],
+            "sample_price": SEED_SAMPLE_PRICES[p["slug"]],
+            "volume": "50 ml",
+            "image": f"/images/{p['slug'].replace('-on-the-rocks', '')}.jpg",
+            "images": [f"/images/{p['slug'].replace('-on-the-rocks', '')}.jpg"],
+            "low_stock_threshold": 10,
+            "active": True,
+            "featured": True,
+            "updated_at": ""
+        })
         for p in SEED
     ]
 
@@ -498,7 +557,7 @@ async def list_products():
         for it in items:
             if it["slug"] not in seen:
                 seen.add(it["slug"])
-                deduped.append(it)
+                deduped.append(_sanitize_product_doc(it))
         _products_cache = deduped
         return deduped
     except Exception as e:
@@ -525,7 +584,7 @@ async def get_product(slug: str):
             p = fallback.get(slug)
         if not p:
             raise HTTPException(status_code=404, detail="Fragrance not found")
-        return p
+        return _sanitize_product_doc(p)
     except HTTPException:
         raise
     except Exception as e:
@@ -533,12 +592,12 @@ async def get_product(slug: str):
         if _products_cache:
             for item in _products_cache:
                 if item.get("slug") == slug:
-                    return item
+                    return _sanitize_product_doc(item)
         fallback = {f["slug"]: f for f in _seed_fallback()}
         p = fallback.get(slug)
         if not p:
             raise HTTPException(status_code=404, detail="Fragrance not found")
-        return p
+        return _sanitize_product_doc(p)
 
 
 # ---------- Orders ----------
@@ -706,7 +765,8 @@ async def admin_stats(_: dict = Depends(require_admin)):
 
 @api.get("/admin/products")
 async def admin_products(_: dict = Depends(require_admin)):
-    return await db.products.find({}, {"_id": 0}).sort("order", 1).to_list(1000)
+    items = await db.products.find({}, {"_id": 0}).sort("order", 1).to_list(1000)
+    return [_sanitize_product_doc(it) for it in items]
 
 
 @api.post("/admin/products")

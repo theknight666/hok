@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { Upload, Loader2, Star, Plus, Sparkles, X } from "lucide-react";
 import { api, formatErr } from "@/lib/api";
 import { getCachedCatalog, setCachedCatalog } from "@/hooks/useProducts";
+import { isValidImageUrl, defaultCutoutOf } from "@/lib/visual";
 
 /**
  * Fast client-side image compression.
@@ -72,21 +73,23 @@ export function BottleUpload({ slug, image, images = [], onChange, onDone }) {
   const [progressMsg, setProgressMsg] = useState("");
   const [isDragOver, setIsDragOver] = useState(false);
 
-  // Maintain local state so uploaded images display instantly
+  // Maintain local state so uploaded images display instantly and only valid image paths are kept
   const [gallery, setGallery] = useState(() => {
     const raw = Array.isArray(images) && images.length > 0 ? images : (image ? [image] : []);
-    return Array.from(new Set(raw.filter(Boolean)));
+    const valid = Array.from(new Set(raw.filter(isValidImageUrl)));
+    return valid.length > 0 ? valid : (slug ? [defaultCutoutOf(slug)] : []);
   });
-  const [primaryUrl, setPrimaryUrl] = useState(() => image || gallery[0] || "");
+  const [primaryUrl, setPrimaryUrl] = useState(() => (isValidImageUrl(image) ? image : (gallery[0] || "")));
 
   const imagesKey = Array.isArray(images) ? images.join(",") : "";
   // Synchronize when parent props change
   useEffect(() => {
     const raw = Array.isArray(images) && images.length > 0 ? images : (image ? [image] : []);
-    const unique = Array.from(new Set(raw.filter(Boolean)));
-    setGallery(unique);
-    setPrimaryUrl(image || unique[0] || "");
-  }, [image, images, imagesKey]);
+    const valid = Array.from(new Set(raw.filter(isValidImageUrl)));
+    const finalGallery = valid.length > 0 ? valid : (slug ? [defaultCutoutOf(slug)] : []);
+    setGallery(finalGallery);
+    setPrimaryUrl(isValidImageUrl(image) ? image : (finalGallery[0] || ""));
+  }, [image, images, imagesKey, slug]);
 
   const handleUploadFiles = async (filesList) => {
     if (!filesList || filesList.length === 0) return;
@@ -219,16 +222,18 @@ export function BottleUpload({ slug, image, images = [], onChange, onDone }) {
   };
 
   const handleDeleteImage = async (imgUrlToDelete) => {
-    const updated = gallery.filter((u) => u !== imgUrlToDelete);
-    const newPrimary = primaryUrl === imgUrlToDelete ? (updated[0] || "") : primaryUrl;
+    const updated = gallery.filter((u) => u !== imgUrlToDelete && isValidImageUrl(u));
+    const fallbackImage = slug ? defaultCutoutOf(slug) : "";
+    const finalUpdated = updated.length > 0 ? updated : (fallbackImage ? [fallbackImage] : []);
+    const newPrimary = primaryUrl === imgUrlToDelete ? (finalUpdated[0] || fallbackImage) : primaryUrl;
 
-    setGallery(updated);
+    setGallery(finalUpdated);
     setPrimaryUrl(newPrimary);
 
     if (onChange) {
       onChange({
         image: newPrimary,
-        images: updated,
+        images: finalUpdated,
       });
     }
 
@@ -356,6 +361,12 @@ export function BottleUpload({ slug, image, images = [], onChange, onDone }) {
                     alt={`Photo ${idx + 1}`}
                     className="h-full w-full object-contain rounded-xl select-none"
                     draggable={false}
+                    onError={(e) => {
+                      const fallback = defaultCutoutOf(slug);
+                      if (e.currentTarget.src !== fallback) {
+                        e.currentTarget.src = fallback;
+                      }
+                    }}
                   />
 
                   {/* Primary Badge */}
