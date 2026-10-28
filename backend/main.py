@@ -942,15 +942,20 @@ async def admin_customers(_: dict = Depends(require_admin)):
 @api.get("/media/{path:path}")
 async def media(path: str):
     clean_path = path.lstrip("/")
+
+    # 1. Fast instant local disk check (<1ms)
     try:
-        doc = await db.media.find_one({
-            "$or": [
-                {"path": clean_path},
-                {"path": "/" + clean_path},
-                {"path": "images/" + clean_path},
-                {"path": clean_path.replace("images/", "")},
-            ]
-        })
+        data, ct = storage.get_disk_object(clean_path)
+        return Response(content=data, media_type=ct,
+                        headers={"Cache-Control": "public, max-age=31536000, immutable"})
+    except FileNotFoundError:
+        pass
+
+    # 2. Fast direct equality lookup in MongoDB for user-uploaded photos
+    try:
+        doc = await db.media.find_one({"path": clean_path})
+        if not doc:
+            doc = await db.media.find_one({"path": f"hotk/{clean_path}"})
         if doc and "data" in doc:
             return Response(
                 content=doc["data"],
@@ -960,15 +965,7 @@ async def media(path: str):
     except Exception as e:
         logger.warning("Motor media lookup failed for %s: %s", clean_path, e)
 
-    try:
-        data, ct = storage.get_disk_object(clean_path)
-        return Response(content=data, media_type=ct,
-                        headers={"Cache-Control": "public, max-age=31536000, immutable"})
-    except FileNotFoundError:
-        raise HTTPException(status_code=404, detail="File not found")
-    except Exception as e:
-        logger.error("Media retrieval failed for %s: %s", path, e)
-        raise HTTPException(status_code=500, detail="Error fetching media")
+    raise HTTPException(status_code=404, detail="File not found")
 
 
 @api.post("/admin/media/upload")
