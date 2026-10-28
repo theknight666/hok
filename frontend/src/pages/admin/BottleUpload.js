@@ -84,7 +84,9 @@ export function BottleUpload({ slug, image, images = [], onChange, onDone }) {
   const [gallery, setGallery] = useState(() => {
     const raw = Array.isArray(images) && images.length > 0 ? images : (image ? [image] : []);
     const valid = Array.from(new Set(raw.filter(isValidImageUrl)));
-    return valid.length > 0 ? valid : (slug ? [defaultCutoutOf(slug)] : []);
+    const hasCustom = valid.some((u) => u.startsWith("/api/media/") || u.startsWith("data:") || u.startsWith("http"));
+    const clean = hasCustom ? valid.filter((u) => !u.includes("/images/cut-") && !u.includes("/images/blonde-amber.jpg") && !u.includes("/images/layton.jpg") && !u.includes("/images/angels-share.jpg") && !u.includes("/images/side-effect.jpg")) : valid;
+    return clean.length > 0 ? clean : (slug ? [defaultCutoutOf(slug)] : []);
   });
   const [primaryUrl, setPrimaryUrl] = useState(() => (isValidImageUrl(image) ? image : (gallery[0] || "")));
 
@@ -93,9 +95,11 @@ export function BottleUpload({ slug, image, images = [], onChange, onDone }) {
   useEffect(() => {
     const raw = Array.isArray(images) && images.length > 0 ? images : (image ? [image] : []);
     const valid = Array.from(new Set(raw.filter(isValidImageUrl)));
-    const finalGallery = valid.length > 0 ? valid : (slug ? [defaultCutoutOf(slug)] : []);
+    const hasCustom = valid.some((u) => u.startsWith("/api/media/") || u.startsWith("data:") || u.startsWith("http"));
+    const clean = hasCustom ? valid.filter((u) => !u.includes("/images/cut-") && !u.includes("/images/blonde-amber.jpg") && !u.includes("/images/layton.jpg") && !u.includes("/images/angels-share.jpg") && !u.includes("/images/side-effect.jpg")) : valid;
+    const finalGallery = clean.length > 0 ? clean : (slug ? [defaultCutoutOf(slug)] : []);
     setGallery(finalGallery);
-    setPrimaryUrl(isValidImageUrl(image) ? image : (finalGallery[0] || ""));
+    setPrimaryUrl(isValidImageUrl(image) && (!hasCustom || !image.includes("/images/cut-")) ? image : (finalGallery[0] || ""));
   }, [image, images, imagesKey, slug]);
 
   const handleUploadFiles = async (filesList) => {
@@ -139,13 +143,19 @@ export function BottleUpload({ slug, image, images = [], onChange, onDone }) {
           data.image;
 
         if (newUrl) {
-          currentGallery = [newUrl, ...currentGallery.filter((u) => u !== newUrl)];
+          const prevWithoutStock = currentGallery.filter(
+            (u) => !u.includes("/images/cut-") && !u.includes("/images/blonde-amber.jpg") && !u.includes("/images/layton.jpg") && !u.includes("/images/angels-share.jpg") && !u.includes("/images/side-effect.jpg")
+          );
+          currentGallery = [newUrl, ...prevWithoutStock.filter((u) => u !== newUrl)];
           activePrimary = newUrl;
         }
 
-        // If backend returned updated images array, merge it
+        // If backend returned updated images array, merge it (excluding default stock mockups)
         if (Array.isArray(data.images) && data.images.length > 0) {
-          const others = data.images.filter((u) => u !== activePrimary);
+          const cleanBackendImgs = data.images.filter(
+            (u) => !u.includes("/images/cut-") && !u.includes("/images/blonde-amber.jpg") && !u.includes("/images/layton.jpg") && !u.includes("/images/angels-share.jpg") && !u.includes("/images/side-effect.jpg")
+          );
+          const others = cleanBackendImgs.filter((u) => u !== activePrimary);
           currentGallery = Array.from(new Set([activePrimary, ...others, ...currentGallery]));
         }
 
@@ -250,7 +260,7 @@ export function BottleUpload({ slug, image, images = [], onChange, onDone }) {
     if (slug) {
       try {
         await api.patch(`/admin/products/${slug}`, {
-          images: updated,
+          images: finalUpdated,
           image: newPrimary,
         });
         qc.invalidateQueries({ queryKey: ["products"] });

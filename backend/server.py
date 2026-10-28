@@ -1050,11 +1050,22 @@ async def admin_upload_image(slug: str, file: UploadFile = File(...),
                                "size": len(opt_data), "product_slug": slug, "by": admin["email"],
                                "is_deleted": False, "created_at": now().isoformat()})
     
-    update_doc = {
-        "$addToSet": {"images": url},
-        "$set": {"updated_at": now().isoformat()}
-    }
+    # Clean out default stock catalog mockups when user uploads authentic photos
+    current_prod = await db.products.find_one({"slug": slug})
+    current_imgs = list(current_prod.get("images") or []) if current_prod else []
+    filtered_imgs = [img for img in current_imgs if not (img.startswith("/images/cut-") or img.startswith("/images/"))]
+    if url not in filtered_imgs:
+        filtered_imgs.append(url)
     if set_primary:
+        filtered_imgs = [url] + [u for u in filtered_imgs if u != url]
+
+    update_doc = {
+        "$set": {
+            "images": filtered_imgs,
+            "updated_at": now().isoformat(),
+        }
+    }
+    if set_primary or not (current_prod and current_prod.get("image")) or (current_prod and current_prod.get("image", "").startswith("/images/")):
         update_doc["$set"]["image"] = url
 
     p = await db.products.find_one_and_update(
@@ -1067,13 +1078,9 @@ async def admin_upload_image(slug: str, file: UploadFile = File(...),
     if p is not None:
         p["url"] = url
         p["uploaded_url"] = url
-        all_imgs = list(p.get("images") or [])
-        if url not in all_imgs:
-            all_imgs.append(url)
-        # If set_primary, place the new image at the front of images
-        if set_primary and url in all_imgs:
-            all_imgs = [url] + [u for u in all_imgs if u != url]
-        p["images"] = all_imgs
+        p["images"] = filtered_imgs
+        if set_primary:
+            p["image"] = url
         return p
     return {"url": url, "image": url, "images": [url]}
 

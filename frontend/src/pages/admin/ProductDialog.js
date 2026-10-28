@@ -571,9 +571,15 @@ export function ProductDialog({ product, onClose, onSaved }) {
 
     const rawImgs = Array.isArray(f.images) && f.images.length > 0 ? f.images : (f.image ? [f.image] : []);
     const cleanImages = rawImgs.filter(isValidImageUrl);
+    const hasCustom = cleanImages.some((u) => u.startsWith("/api/media/") || u.startsWith("data:") || u.startsWith("http"));
+    const pureImages = hasCustom
+      ? cleanImages.filter((u) => !u.includes("/images/cut-") && !u.includes("/images/blonde-amber.jpg") && !u.includes("/images/layton.jpg") && !u.includes("/images/angels-share.jpg") && !u.includes("/images/side-effect.jpg"))
+      : cleanImages;
     const defaultCut = defaultCutoutOf(savedSlug);
-    const finalImages = cleanImages.length > 0 ? cleanImages : [defaultCut];
-    const finalPrimary = isValidImageUrl(f.image) ? f.image : finalImages[0];
+    const finalImages = pureImages.length > 0 ? pureImages : [defaultCut];
+    const finalPrimary = isValidImageUrl(f.image) && (!hasCustom || !f.image.includes("/images/cut-"))
+      ? f.image
+      : (finalImages[0] || defaultCut);
 
     const body = {
       name: f.name,
