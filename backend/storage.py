@@ -115,11 +115,6 @@ def get_object(path: str) -> Tuple[bytes, str]:
             data = cand.read_bytes()
             suffix = cand.suffix.lower()
             ct = "image/png" if suffix == ".png" else "image/jpeg" if suffix in [".jpg", ".jpeg"] else "image/webp"
-            # Auto-populate MongoDB with this local file
-            try:
-                put_object(clean_path, data, ct)
-            except Exception as e:
-                logger.debug("Failed auto-caching local file to MongoDB: %s", e)
             return data, ct
 
     raise FileNotFoundError(clean_path)
