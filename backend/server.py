@@ -949,7 +949,7 @@ async def media(path: str):
     try:
         data, ct = storage.get_disk_object(clean_path)
         return Response(content=data, media_type=ct,
-                        headers={"Cache-Control": "public, max-age=31536000, immutable"})
+                        headers={"Cache-Control": "public, max-age=31536000, s-maxage=31536000, immutable"})
     except FileNotFoundError:
         pass
 
@@ -958,11 +958,18 @@ async def media(path: str):
         doc = await db.media.find_one({"path": clean_path})
         if not doc:
             doc = await db.media.find_one({"path": f"hotk/{clean_path}"})
+        if not doc and clean_path.startswith("hotk/"):
+            doc = await db.media.find_one({"path": clean_path.replace("hotk/", "")})
         if doc and "data" in doc:
+            raw_data = doc["data"]
+            content = bytes(raw_data) if not isinstance(raw_data, bytes) else raw_data
+            ct = doc.get("content_type")
+            if not ct:
+                ct = "image/png" if clean_path.lower().endswith(".png") else "image/jpeg"
             return Response(
-                content=doc["data"],
-                media_type=doc.get("content_type", "image/png"),
-                headers={"Cache-Control": "public, max-age=31536000, immutable"},
+                content=content,
+                media_type=ct,
+                headers={"Cache-Control": "public, max-age=31536000, s-maxage=31536000, immutable"},
             )
     except Exception as e:
         logger.warning("Motor media lookup failed for %s: %s", clean_path, e)
@@ -979,26 +986,27 @@ async def admin_upload_generic_image(file: UploadFile = File(...),
     if len(data) > storage.MAX_UPLOAD_BYTES:
         raise HTTPException(status_code=413, detail="Image must be under 10 MB")
     try:
-        png = await asyncio.to_thread(storage.to_png, data)
+        opt_data, opt_ct = await asyncio.to_thread(storage.optimize_image, data)
     except Exception as e:
         logger.error("Image processing failed: %s", e)
         raise HTTPException(status_code=422, detail="Could not process that image")
-    path = f"{storage.APP_NAME}/uploads/{uuid.uuid4().hex}.png"
+    ext = ".jpg" if opt_ct == "image/jpeg" else ".png"
+    path = f"{storage.APP_NAME}/uploads/{uuid.uuid4().hex}{ext}"
     now_utc = now()
     try:
         await db.media.update_one(
             {"path": path},
-            {"$set": {"path": path, "data": png, "content_type": "image/png", "size": len(png), "updated_at": now_utc},
+            {"$set": {"path": path, "data": opt_data, "content_type": opt_ct, "size": len(opt_data), "updated_at": now_utc},
              "$setOnInsert": {"created_at": now_utc}},
             upsert=True
         )
     except Exception as e:
         logger.warning("Motor media store warning: %s", e)
-    result = await asyncio.to_thread(storage.put_object, path, png, "image/png")
+    result = await asyncio.to_thread(storage.put_object, path, opt_data, opt_ct)
     url = f"/api/media/{path}"
     await db.files.insert_one({"id": f"file_{uuid.uuid4().hex[:12]}", "storage_path": path,
-                               "original_filename": file.filename, "content_type": "image/png",
-                               "size": len(png), "by": admin["email"],
+                               "original_filename": file.filename, "content_type": opt_ct,
+                               "size": len(opt_data), "by": admin["email"],
                                "is_deleted": False, "created_at": now().isoformat()})
     return {"url": url, "path": path}
 
@@ -1016,29 +1024,30 @@ async def admin_upload_image(slug: str, file: UploadFile = File(...),
     if len(data) > storage.MAX_UPLOAD_BYTES:
         raise HTTPException(status_code=413, detail="Image must be under 10 MB")
     try:
-        png = await asyncio.to_thread(storage.to_png, data)
+        opt_data, opt_ct = await asyncio.to_thread(storage.optimize_image, data)
     except Exception as e:
         logger.error("Image processing failed: %s", e)
         raise HTTPException(status_code=422, detail="Could not process that image")
-    path = f"{storage.APP_NAME}/products/{slug}/{uuid.uuid4().hex}.png"
+    ext = ".jpg" if opt_ct == "image/jpeg" else ".png"
+    path = f"{storage.APP_NAME}/products/{slug}/{uuid.uuid4().hex}{ext}"
     now_utc = now()
     try:
         await db.media.update_one(
             {"path": path},
-            {"$set": {"path": path, "data": png, "content_type": "image/png", "size": len(png), "updated_at": now_utc},
+            {"$set": {"path": path, "data": opt_data, "content_type": opt_ct, "size": len(opt_data), "updated_at": now_utc},
              "$setOnInsert": {"created_at": now_utc}},
             upsert=True
         )
     except Exception as e:
         logger.warning("Motor media store warning: %s", e)
     try:
-        result = await asyncio.to_thread(storage.put_object, path, png, "image/png")
+        result = await asyncio.to_thread(storage.put_object, path, opt_data, opt_ct)
     except Exception as e:
         logger.warning("Storage upload warning: %s", e)
     url = f"/api/media/{path}"
     await db.files.insert_one({"id": f"file_{uuid.uuid4().hex[:12]}", "storage_path": path,
-                               "original_filename": file.filename, "content_type": "image/png",
-                               "size": len(png), "product_slug": slug, "by": admin["email"],
+                               "original_filename": file.filename, "content_type": opt_ct,
+                               "size": len(opt_data), "product_slug": slug, "by": admin["email"],
                                "is_deleted": False, "created_at": now().isoformat()})
     
     update_doc = {
@@ -1061,6 +1070,9 @@ async def admin_upload_image(slug: str, file: UploadFile = File(...),
         all_imgs = list(p.get("images") or [])
         if url not in all_imgs:
             all_imgs.append(url)
+        # If set_primary, place the new image at the front of images
+        if set_primary and url in all_imgs:
+            all_imgs = [url] + [u for u in all_imgs if u != url]
         p["images"] = all_imgs
         return p
     return {"url": url, "image": url, "images": [url]}

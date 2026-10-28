@@ -168,13 +168,36 @@ def seed_existing_images() -> int:
 
 
 
-def to_png(data: bytes) -> bytes:
-    """Normalise an uploaded image to PNG (keeps existing transparency and scales cleanly)."""
-    im = Image.open(io.BytesIO(data)).convert("RGBA")
-    im.thumbnail((1600, 1600))
+def optimize_image(data: bytes) -> Tuple[bytes, str]:
+    """Normalise and compress uploaded image to high-performance web resolution (<150KB). Returns (data, content_type)."""
+    im = Image.open(io.BytesIO(data))
+    resample = Image.Resampling.LANCZOS if hasattr(Image, "Resampling") else Image.LANCZOS
+    im.thumbnail((900, 900), resample)
     buf = io.BytesIO()
-    im.save(buf, format="PNG", optimize=True)
-    return buf.getvalue()
+    has_alpha = im.mode in ("RGBA", "LA") or (im.mode == "P" and "transparency" in im.info)
+    if has_alpha:
+        im = im.convert("RGBA")
+        alpha = im.split()[-1]
+        extrema = alpha.getextrema()
+        if extrema == (255, 255):
+            # Opaque image, convert to RGB JPEG for minimal footprint (<80KB)
+            rgb = im.convert("RGB")
+            rgb.save(buf, format="JPEG", quality=85, optimize=True)
+            return buf.getvalue(), "image/jpeg"
+        else:
+            # Has transparent pixels, preserve transparency with optimized PNG
+            im.save(buf, format="PNG", optimize=True)
+            return buf.getvalue(), "image/png"
+    else:
+        rgb = im.convert("RGB")
+        rgb.save(buf, format="JPEG", quality=85, optimize=True)
+        return buf.getvalue(), "image/jpeg"
+
+
+def to_png(data: bytes) -> bytes:
+    """Normalise an uploaded image (keeps existing transparency and scales cleanly)."""
+    out_data, _ = optimize_image(data)
+    return out_data
 
 
 # Alias cut_out_bottle to standard clean image processing

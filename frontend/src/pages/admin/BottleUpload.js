@@ -10,7 +10,7 @@ import { isValidImageUrl, defaultCutoutOf } from "@/lib/visual";
  * Fast client-side image compression.
  * Scales max dimension to 1600px to ensure quick uploads and avoid Vercel 4.5MB payload limit.
  */
-export async function prepareImage(file, maxDim = 1600, quality = 0.90) {
+export async function prepareImage(file, maxDim = 900, quality = 0.82) {
   return new Promise((resolve) => {
     const reader = new FileReader();
     reader.onerror = () => resolve(file);
@@ -38,18 +38,25 @@ export async function prepareImage(file, maxDim = 1600, quality = 0.90) {
 
           ctx.drawImage(img, 0, 0, width, height);
 
-          const isPng = file.type === "image/png";
-          const mime = isPng ? "image/png" : "image/jpeg";
-          const ext = isPng ? ".png" : ".jpg";
-
+          // Try exporting as WebP (supports transparency + ultra lightweight <80KB)
           canvas.toBlob((blob) => {
-            if (blob) {
-              const compressedFile = new File([blob], file.name.replace(/\.[^.]+$/, ext), { type: mime });
+            if (blob && blob.size > 0) {
+              const compressedFile = new File([blob], file.name.replace(/\.[^.]+$/, ".webp"), { type: "image/webp" });
               resolve(compressedFile);
             } else {
-              resolve(file);
+              const isPng = file.type === "image/png";
+              const mime = isPng ? "image/png" : "image/jpeg";
+              const ext = isPng ? ".png" : ".jpg";
+              canvas.toBlob((fallbackBlob) => {
+                if (fallbackBlob) {
+                  const fallbackFile = new File([fallbackBlob], file.name.replace(/\.[^.]+$/, ext), { type: mime });
+                  resolve(fallbackFile);
+                } else {
+                  resolve(file);
+                }
+              }, mime, quality);
             }
-          }, mime, quality);
+          }, "image/webp", quality);
         } catch (e) {
           console.warn("Canvas compression failed, sending original:", e);
           resolve(file);
@@ -117,9 +124,9 @@ export function BottleUpload({ slug, image, images = [], onChange, onDone }) {
         const fd = new FormData();
         fd.append("file", optimizedFile);
 
-        const isFirst = currentGallery.length === 0 && i === 0;
+        // Set the uploaded image as primary cover so user uploads take effect immediately
         const endpoint = slug
-          ? `/admin/products/${slug}/image?set_primary=${isFirst}`
+          ? `/admin/products/${slug}/image?set_primary=true`
           : `/admin/media/upload`;
 
         const { data } = await api.post(endpoint, fd, { timeout: 120000 });
@@ -128,17 +135,18 @@ export function BottleUpload({ slug, image, images = [], onChange, onDone }) {
         const newUrl =
           data.url ||
           data.uploaded_url ||
-          (Array.isArray(data.images) && data.images[data.images.length - 1]) ||
+          (Array.isArray(data.images) && data.images[0]) ||
           data.image;
 
-        if (newUrl && !currentGallery.includes(newUrl)) {
-          currentGallery = [...currentGallery, newUrl];
-          if (!activePrimary) activePrimary = newUrl;
+        if (newUrl) {
+          currentGallery = [newUrl, ...currentGallery.filter((u) => u !== newUrl)];
+          activePrimary = newUrl;
         }
 
         // If backend returned updated images array, merge it
         if (Array.isArray(data.images) && data.images.length > 0) {
-          currentGallery = Array.from(new Set([...currentGallery, ...data.images]));
+          const others = data.images.filter((u) => u !== activePrimary);
+          currentGallery = Array.from(new Set([activePrimary, ...others, ...currentGallery]));
         }
 
         // Update local state right away
