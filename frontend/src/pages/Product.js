@@ -1,14 +1,14 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Link, useParams } from "react-router-dom";
-import { motion } from "framer-motion";
-import { Minus, Plus, ArrowLeft, ArrowUpRight } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Minus, Plus, ArrowLeft, ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { useProduct, useProducts } from "@/hooks/useProducts";
 import { useCart } from "@/context/CartContext";
 import { Bottle } from "@/components/site/Bottle";
 import { EASE, FadeUp } from "@/components/site/Reveal";
 import { NotesPyramid } from "./home/NotesAtlas";
 import { ReviewsBlock } from "@/components/site/ReviewsBlock";
-import { worldOf, worldVars, featuredFirst } from "@/lib/visual";
+import { worldOf, worldVars, featuredFirst, cutout } from "@/lib/visual";
 import { inr } from "@/lib/api";
 
 function StockLine({ p }) {
@@ -24,6 +24,8 @@ export default function Product() {
   const { add } = useCart();
   const [qty, setQty] = useState(1);
   const [size, setSize] = useState("50 ml");
+  const [selectedIdx, setSelectedIdx] = useState(0);
+  const galleryRef = useRef(null);
 
   if (isLoading) return <div className="min-h-screen" />;
   if (isError || !p)
@@ -42,29 +44,141 @@ export default function Product() {
   const currentPrice = size === "2 ml" ? samplePrice : p.price;
   const isSoldOut = size === "50 ml" && p.stock <= 0;
 
+  // Build luxury gallery including cutout, staged bottle photo, and any uploaded images
+  const cutoutUrl = cutout(p);
+  const extraImages = Array.isArray(p.images) ? p.images : [];
+  const candidateList = [
+    cutoutUrl || p.image,
+    p.image && p.image !== cutoutUrl ? p.image : null,
+    ...extraImages,
+  ].filter(Boolean);
+  const gallery = Array.from(new Set(candidateList));
+  const activeImage = gallery[selectedIdx] || gallery[0] || p.image;
+  const isCutoutActive = activeImage === cutoutUrl || (selectedIdx === 0 && Boolean(cutoutUrl));
+
   return (
     <main data-testid="product-page" className="w-full max-w-full overflow-x-hidden">
       <section style={worldVars(world)} className="grain relative overflow-hidden transform-gpu w-full max-w-full">
         <p aria-hidden="true" className="pointer-events-none absolute left-0 top-24 select-none whitespace-nowrap font-display text-[13vw] leading-none opacity-[0.1] will-change-transform max-w-full overflow-hidden truncate">{p.name}</p>
         <div className="relative mx-auto grid max-w-[1600px] gap-10 px-5 pb-16 pt-28 sm:px-10 lg:grid-cols-12 lg:pb-24 w-full min-w-0 max-w-full">
           <div className="min-w-0 w-full max-w-full lg:col-span-6">
-            <div className="lg:sticky lg:top-28">
+            <div className="lg:sticky lg:top-24">
               <Link to="/#collection" className="pill border border-current" data-testid="back-to-collection">
                 <ArrowLeft className="h-4 w-4" strokeWidth={2.6} /> Collection
               </Link>
-              <div className="relative mt-6 flex h-[56svh] items-center justify-center lg:h-[72svh]">
+
+              {/* Upper Main Stage (Shows active image in bigger state) */}
+              <div className="relative mt-4 sm:mt-6 flex h-[48svh] items-center justify-center lg:h-[62svh]">
                 <div className="world-glow pointer-events-none absolute left-1/2 top-1/2 h-[80%] w-[80%] -translate-x-1/2 -translate-y-1/2 will-change-transform" />
-                <motion.div
-                  key={p.slug}
-                  initial={{ opacity: 0, y: 120, rotate: -10 }}
-                  animate={{ opacity: 1, y: 0, rotate: 0 }}
-                  transition={{ duration: 0.9, ease: EASE }}
-                  className="animate-floaty relative will-change-transform transform-gpu"
-                  style={{ "--tilt": "-3deg" }}
-                >
-                  <Bottle p={p} className="bottle-shadow h-[52svh] w-auto lg:h-[66svh]" />
-                </motion.div>
+                <AnimatePresence mode="wait">
+                  {isCutoutActive ? (
+                    <motion.div
+                      key="main-bottle-cutout"
+                      initial={{ opacity: 0, scale: 0.94, y: 30 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.94 }}
+                      transition={{ duration: 0.45, ease: EASE }}
+                      className="animate-floaty relative will-change-transform transform-gpu flex items-center justify-center h-full w-full"
+                      style={{ "--tilt": "-3deg" }}
+                    >
+                      <Bottle p={p} className="bottle-shadow h-[46svh] w-auto lg:h-[58svh] max-w-full select-none" />
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key={activeImage}
+                      initial={{ opacity: 0, scale: 0.92, y: 15 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.92, y: -15 }}
+                      transition={{ duration: 0.35, ease: EASE }}
+                      className="relative flex items-center justify-center h-full w-full p-2"
+                    >
+                      <div className="relative max-h-[46svh] lg:max-h-[58svh] aspect-square w-auto max-w-[90%] overflow-hidden rounded-[2.5rem] border border-white/20 bg-black/30 backdrop-blur-xl shadow-2xl flex items-center justify-center p-3 sm:p-5 group">
+                        <img
+                          src={activeImage}
+                          alt={`${p.name} - View ${selectedIdx + 1}`}
+                          className="h-full w-full object-contain rounded-2xl select-none transition-transform duration-500 group-hover:scale-105"
+                          draggable={false}
+                          onError={(e) => {
+                            if (activeImage !== p.image) e.currentTarget.src = p.image;
+                          }}
+                        />
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
+
+              {/* Red-Marked Area: Premium Squircle Cubes Gallery Strip */}
+              {gallery.length > 1 && (
+                <div className="mt-4 flex flex-col items-center w-full" data-testid="product-squircle-gallery">
+                  <div className="relative flex w-full max-w-full items-center justify-center">
+                    {gallery.length > 4 && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (galleryRef.current) galleryRef.current.scrollBy({ left: -140, behavior: "smooth" });
+                        }}
+                        className="hidden sm:grid absolute -left-3 z-10 h-8 w-8 place-items-center rounded-full bg-black/60 text-white border border-white/20 backdrop-blur-md hover:bg-black/90 transition-colors cursor-pointer"
+                        aria-label="Previous image"
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                      </button>
+                    )}
+
+                    <div
+                      ref={galleryRef}
+                      className="flex items-center gap-3 overflow-x-auto py-2 px-2 no-scrollbar scroll-smooth max-w-full justify-start sm:justify-center"
+                    >
+                      {gallery.map((imgUrl, idx) => {
+                        const isActive = idx === selectedIdx;
+                        return (
+                          <button
+                            key={imgUrl + idx}
+                            type="button"
+                            onClick={() => setSelectedIdx(idx)}
+                            className={`group relative h-16 w-16 sm:h-20 sm:w-20 shrink-0 aspect-square rounded-2xl overflow-hidden transition-all duration-300 transform-gpu cursor-pointer p-1.5 flex items-center justify-center ${
+                              isActive
+                                ? "border-2 border-gold bg-gold/15 shadow-[0_0_22px_rgba(212,175,55,0.45)] scale-105 z-10 ring-1 ring-gold"
+                                : "border border-white/20 hover:border-white/50 bg-black/30 hover:bg-black/50 opacity-70 hover:opacity-100 hover:scale-105"
+                            }`}
+                            aria-label={`View photo ${idx + 1}`}
+                            data-testid={`squircle-thumb-${idx}`}
+                          >
+                            <img
+                              src={imgUrl}
+                              alt=""
+                              className="h-full w-full object-contain rounded-xl select-none transition-transform duration-300 group-hover:scale-110"
+                              draggable={false}
+                              onError={(e) => {
+                                if (imgUrl !== p.image) e.currentTarget.src = p.image;
+                              }}
+                            />
+                            {isActive && (
+                              <span className="absolute bottom-1 left-1/2 -translate-x-1/2 h-1 w-4 rounded-full bg-gold shadow-[0_0_6px_#D4AF37]" />
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {gallery.length > 4 && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (galleryRef.current) galleryRef.current.scrollBy({ left: 140, behavior: "smooth" });
+                        }}
+                        className="hidden sm:grid absolute -right-3 z-10 h-8 w-8 place-items-center rounded-full bg-black/60 text-white border border-white/20 backdrop-blur-md hover:bg-black/90 transition-colors cursor-pointer"
+                        aria-label="Next image"
+                      >
+                        <ChevronRight className="h-4 w-4" />
+                      </button>
+                    )}
+                  </div>
+                  <span className="text-[10px] uppercase tracking-[0.2em] text-white/70 mt-2 font-mono">
+                    {selectedIdx + 1} / {gallery.length} Views
+                  </span>
+                </div>
+              )}
             </div>
           </div>
 

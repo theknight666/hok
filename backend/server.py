@@ -198,6 +198,7 @@ class ProductIn(BaseModel):
     badge: str = ""
     color: str = "#C5A059"
     image: str = ""
+    images: List[str] = []
     notes: Notes = Notes()
     olfactory_family: Optional[str] = None
     accords: Optional[List[dict]] = None
@@ -220,6 +221,7 @@ class ProductPatch(BaseModel):
     badge: Optional[str] = None
     color: Optional[str] = None
     image: Optional[str] = None
+    images: Optional[List[str]] = None
     notes: Optional[Notes] = None
     olfactory_family: Optional[str] = None
     accords: Optional[List[dict]] = None
@@ -846,8 +848,11 @@ async def admin_upload_generic_image(file: UploadFile = File(...), remove_bg: bo
     try:
         png = await asyncio.to_thread(storage.cut_out_bottle if remove_bg else storage.to_png, data)
     except Exception as e:
-        logger.error("Image processing failed: %s", e)
-        raise HTTPException(status_code=422, detail="Could not process that image")
+        logger.warning("cut_out_bottle failed in generic upload, falling back to to_png: %s", e)
+        try:
+            png = await asyncio.to_thread(storage.to_png, data)
+        except Exception:
+            raise HTTPException(status_code=422, detail="Could not process that image")
     path = f"{storage.APP_NAME}/uploads/{uuid.uuid4().hex}.png"
     result = await asyncio.to_thread(storage.put_object, path, png, "image/png")
     url = f"/api/media/{result['path']}"
@@ -860,7 +865,9 @@ async def admin_upload_generic_image(file: UploadFile = File(...), remove_bg: bo
 
 @api.post("/admin/products/{slug}/image")
 async def admin_upload_image(slug: str, file: UploadFile = File(...), remove_bg: bool = Query(True),
+                             set_primary: bool = Query(True),
                              admin: dict = Depends(require_admin)):
+    global _products_cache
     if not await db.products.find_one({"slug": slug}):
         raise HTTPException(status_code=404, detail="Product not found")
     if file.content_type not in storage.ALLOWED_TYPES:
@@ -871,8 +878,11 @@ async def admin_upload_image(slug: str, file: UploadFile = File(...), remove_bg:
     try:
         png = await asyncio.to_thread(storage.cut_out_bottle if remove_bg else storage.to_png, data)
     except Exception as e:
-        logger.error("Image processing failed: %s", e)
-        raise HTTPException(status_code=422, detail="Could not process that image")
+        logger.warning("cut_out_bottle failed in product image upload, falling back to to_png: %s", e)
+        try:
+            png = await asyncio.to_thread(storage.to_png, data)
+        except Exception:
+            raise HTTPException(status_code=422, detail="Could not process that image")
     path = f"{storage.APP_NAME}/products/{slug}/{uuid.uuid4().hex}.png"
     try:
         result = await asyncio.to_thread(storage.put_object, path, png, "image/png")
@@ -884,8 +894,76 @@ async def admin_upload_image(slug: str, file: UploadFile = File(...), remove_bg:
                                "original_filename": file.filename, "content_type": "image/png",
                                "size": result.get("size", len(png)), "product_slug": slug, "by": admin["email"],
                                "is_deleted": False, "created_at": now().isoformat()})
-    p = await db.products.find_one_and_update({"slug": slug}, {"$set": {"image": url, "updated_at": now().isoformat()}},
-                                              projection={"_id": 0}, return_document=True)
+    
+    update_doc = {
+        "$addToSet": {"images": url},
+        "$set": {"updated_at": now().isoformat()}
+    }
+    if set_primary:
+        update_doc["$set"]["image"] = url
+
+    p = await db.products.find_one_and_update(
+        {"slug": slug},
+        update_doc,
+        projection={"_id": 0},
+        return_document=True
+    )
+    _products_cache = []
+    return p
+
+
+@api.post("/admin/products/{slug}/images")
+async def admin_upload_multiple_images(slug: str, files: List[UploadFile] = File(...), remove_bg: bool = Query(False),
+                                       admin: dict = Depends(require_admin)):
+    global _products_cache
+    prod = await db.products.find_one({"slug": slug})
+    if not prod:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    uploaded_urls = []
+    for f in files:
+        if f.content_type not in storage.ALLOWED_TYPES:
+            continue
+        raw = await f.read()
+        if len(raw) > storage.MAX_UPLOAD_BYTES:
+            continue
+        try:
+            png = await asyncio.to_thread(storage.cut_out_bottle if remove_bg else storage.to_png, raw)
+        except Exception:
+            try:
+                png = await asyncio.to_thread(storage.to_png, raw)
+            except Exception:
+                continue
+        path = f"{storage.APP_NAME}/products/{slug}/{uuid.uuid4().hex}.png"
+        try:
+            res = await asyncio.to_thread(storage.put_object, path, png, "image/png")
+            url = f"/api/media/{res['path']}"
+            uploaded_urls.append(url)
+            await db.files.insert_one({
+                "id": f"file_{uuid.uuid4().hex[:12]}",
+                "storage_path": res["path"],
+                "original_filename": f.filename,
+                "content_type": "image/png",
+                "size": len(png),
+                "product_slug": slug,
+                "by": admin["email"],
+                "is_deleted": False,
+                "created_at": now().isoformat()
+            })
+        except Exception as e:
+            logger.error("Failed saving multi image: %s", e)
+
+    if uploaded_urls:
+        update_ops = {
+            "$addToSet": {"images": {"$each": uploaded_urls}},
+            "$set": {"updated_at": now().isoformat()}
+        }
+        if not prod.get("image"):
+            update_ops["$set"]["image"] = uploaded_urls[0]
+        await db.products.update_one({"slug": slug}, update_ops)
+
+    p = await db.products.find_one({"slug": slug}, projection={"_id": 0})
+    _products_cache = []
     return p
 
 

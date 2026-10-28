@@ -302,6 +302,7 @@ export function ProductDialog({ product, onClose, onSaved }) {
       concentration: "EDP",
       volume: "50 ml",
       image: "",
+      images: Array.isArray(product.images) && product.images.length > 0 ? product.images : (product.image ? [product.image] : []),
       color: "#C5A059",
       price: 0,
       sample_price: 99,
@@ -391,7 +392,8 @@ export function ProductDialog({ product, onClose, onSaved }) {
       badge: f.badge,
       concentration: f.concentration || "EDP",
       volume: f.volume || "50 ml",
-      image: f.image,
+      image: f.image || (f.images && f.images[0]) || "",
+      images: Array.isArray(f.images) && f.images.length > 0 ? f.images : (f.image ? [f.image] : []),
       color: f.color,
       price: Number(f.price),
       sample_price: Number(f.sample_price || 99),
@@ -462,8 +464,17 @@ export function ProductDialog({ product, onClose, onSaved }) {
             <BottleUpload
               slug={isNew ? null : product.slug}
               image={f.image}
+              images={f.images}
+              onChange={({ image, images }) => {
+                setF((c) => ({
+                  ...c,
+                  image: image || (images && images[0]) || "",
+                  images: images || [],
+                }));
+              }}
               onDone={(p) => {
-                setF((c) => ({ ...c, image: p.image || p.url }));
+                if (p.image) setF((c) => ({ ...c, image: p.image }));
+                if (p.images) setF((c) => ({ ...c, images: p.images }));
                 if (!isNew) onSaved();
               }}
             />
