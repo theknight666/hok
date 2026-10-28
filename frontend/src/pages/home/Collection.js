@@ -1,12 +1,48 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowUpRight, Plus } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { Bottle } from "@/components/site/Bottle";
 import { SplitChars, EASE } from "@/components/site/Reveal";
-import { worldOf, worldVars, flatNotes } from "@/lib/visual";
+import { worldOf, worldVars, flatNotes, getNoteImage } from "@/lib/visual";
 import { inr } from "@/lib/api";
+
+function NotePill({ name, color }) {
+  const [imgError, setImgError] = useState(false);
+  const imgSrc = getNoteImage(name);
+
+  return (
+    <li className="list-none">
+      <span
+        className="group relative inline-flex items-center gap-2 rounded-full border border-current/30 bg-background/80 py-1 pl-1 pr-3 sm:gap-2.5 sm:py-1 sm:pl-1.5 sm:pr-3.5 text-xs sm:text-sm font-semibold backdrop-blur-md transition-all duration-300 hover:scale-[1.04] hover:bg-background/95 hover:shadow-md cursor-default select-none text-foreground shadow-sm"
+        style={{ borderColor: color ? `${color}88` : undefined }}
+      >
+        <span
+          className="relative flex h-6 w-6 sm:h-7 sm:w-7 flex-shrink-0 items-center justify-center overflow-hidden rounded-full border border-border/60 bg-muted/70 shadow-inner"
+          style={{ borderColor: color ? `${color}55` : undefined }}
+        >
+          {!imgError && imgSrc ? (
+            <img
+              src={imgSrc}
+              alt={name}
+              onError={() => setImgError(true)}
+              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-115"
+              loading="lazy"
+            />
+          ) : (
+            <span className="flex h-full w-full items-center justify-center text-[10px] font-black uppercase tracking-wider text-muted-foreground">
+              {name.slice(0, 2)}
+            </span>
+          )}
+        </span>
+        <span className="leading-none text-foreground/90 transition-colors group-hover:text-foreground whitespace-nowrap">
+          {name}
+        </span>
+      </span>
+    </li>
+  );
+}
 
 function Chapter({ p, idx, total }) {
   const { add } = useCart();
@@ -63,9 +99,9 @@ function Chapter({ p, idx, total }) {
             </div>
             <h3 className="mt-2 font-display text-3xl leading-[0.95] sm:mt-4 sm:text-4xl lg:mt-6 lg:display-lg break-words [overflow-wrap:anywhere]">{p.name}</h3>
             <p className="mt-2 max-w-sm text-xs font-medium leading-snug opacity-85 sm:mt-4 sm:text-base lg:mt-5 lg:text-lg line-clamp-2 lg:line-clamp-none break-words [overflow-wrap:anywhere]">{p.tagline}</p>
-            <ul className="mt-3 flex flex-wrap gap-1.5 sm:mt-5 sm:gap-2 lg:mt-6" data-testid={`chapter-notes-${p.slug}`}>
-              {notes.map((n, ni) => (
-                <li key={n} className={`rounded-full border border-current/40 px-2.5 py-0.5 text-[11px] font-semibold sm:px-3 sm:py-1 sm:text-xs ${ni >= 3 ? "hidden sm:inline-block" : ""}`}>{n}</li>
+            <ul className="mt-3 flex flex-wrap gap-2 sm:mt-5 sm:gap-2.5 lg:mt-6" data-testid={`chapter-notes-${p.slug}`}>
+              {notes.map((n) => (
+                <NotePill key={n} name={n} color={world.bg} />
               ))}
             </ul>
           </div>
