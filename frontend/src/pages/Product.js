@@ -8,7 +8,7 @@ import { Bottle } from "@/components/site/Bottle";
 import { EASE, FadeUp } from "@/components/site/Reveal";
 import { NotesPyramid } from "./home/NotesAtlas";
 import { ReviewsBlock } from "@/components/site/ReviewsBlock";
-import { worldOf, worldVars, featuredFirst, cutout } from "@/lib/visual";
+import { worldOf, worldVars, featuredFirst, cutout, photoshoot } from "@/lib/visual";
 import { inr } from "@/lib/api";
 
 function StockLine({ p }) {
@@ -46,15 +46,17 @@ export default function Product() {
 
   // Build luxury gallery including cutout, staged bottle photo, and any uploaded images
   const cutoutUrl = cutout(p);
+  const stagedUrl = photoshoot(p);
   const extraImages = Array.isArray(p.images) ? p.images : [];
   const candidateList = [
-    cutoutUrl || p.image,
-    p.image && p.image !== cutoutUrl ? p.image : null,
+    cutoutUrl,
+    stagedUrl && stagedUrl !== cutoutUrl ? stagedUrl : null,
+    p.image && p.image !== cutoutUrl && p.image !== stagedUrl ? p.image : null,
     ...extraImages,
   ].filter(Boolean);
   const gallery = Array.from(new Set(candidateList));
-  const activeImage = gallery[selectedIdx] || gallery[0] || p.image;
-  const isCutoutActive = activeImage === cutoutUrl || (selectedIdx === 0 && Boolean(cutoutUrl));
+  const activeImage = gallery[selectedIdx] || gallery[0] || cutoutUrl || p.image;
+  const isCutoutActive = activeImage === cutoutUrl;
 
   return (
     <main data-testid="product-page" className="w-full max-w-full overflow-x-hidden">

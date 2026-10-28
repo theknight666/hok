@@ -11,8 +11,35 @@ export const worldOf = (p) => WORLDS[p?.slug] || { ...DEFAULT_WORLD, bg: p?.colo
 
 export const worldVars = (w) => ({ "--w-bg": w.bg, "--w-ink": w.ink, "--w-soft": w.soft, background: w.bg, color: w.ink });
 
-export const cutout = (p) =>
-  p?.image ? p.image.replace("/images/", "/images/cut-").replace(/\.(jpg|jpeg|webp)$/i, ".png") : "";
+export const cutout = (p) => {
+  if (!p) return "";
+  const known = {
+    "blonde-amber": "/images/cut-blonde-amber.png",
+    layton: "/images/cut-layton.png",
+    "angels-share-on-the-rocks": "/images/cut-angels-share.png",
+    "side-effect": "/images/cut-side-effect.png",
+  };
+  if (p.slug && known[p.slug]) return known[p.slug];
+  if (p.image) {
+    if (p.image.includes("/images/") && !p.image.includes("/images/cut-")) {
+      return p.image.replace("/images/", "/images/cut-").replace(/\.(jpg|jpeg|webp)$/i, ".png");
+    }
+    return p.image;
+  }
+  return "";
+};
+
+export const photoshoot = (p) => {
+  if (!p) return "";
+  const known = {
+    "blonde-amber": "/images/blonde-amber.jpg",
+    layton: "/images/layton.jpg",
+    "angels-share-on-the-rocks": "/images/angels-share.jpg",
+    "side-effect": "/images/side-effect.jpg",
+  };
+  if (p.slug && known[p.slug]) return known[p.slug];
+  return p.image || "";
+};
 
 export const flatNotes = (notes, n = 5) =>
   [...(notes?.top || []), ...(notes?.heart || []), ...(notes?.base || [])].slice(0, n);
