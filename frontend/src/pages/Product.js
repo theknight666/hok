@@ -51,17 +51,16 @@ export default function Product() {
   const isSoldOut = size === "2 ml" ? (sampleStock <= 0) : ((p.stock ?? 0) <= 0);
 
   const defaultCut = defaultCutoutOf(p.slug);
-  const defaultPhoto = defaultPhotoOf(p.slug);
 
   // Filter gallery strictly to valid image URLs, with guaranteed fallback to authentic catalog cutouts
   const rawImages = Array.isArray(p.images) && p.images.length > 0 ? p.images : (p.image ? [p.image] : []);
   const validImages = Array.from(new Set(rawImages.filter(isValidImageUrl)));
-  const baseGallery = validImages.length > 0 ? validImages : [defaultCut, defaultPhoto].filter(Boolean);
+  const baseGallery = validImages.length > 0 ? validImages : (defaultCut ? [defaultCut] : []);
   // Ensure the user-selected primary cover photo is always the first cube and active view
   const gallery = p.image && baseGallery.includes(p.image)
     ? [p.image, ...baseGallery.filter((x) => x !== p.image)]
     : baseGallery;
-  const activeImage = gallery[selectedIdx] || p.image || gallery[0] || "";
+  const activeImage = gallery[selectedIdx] || p.image || gallery[0] || defaultCut || "";
 
   return (
     <main data-testid="product-page" className="w-full max-w-full overflow-x-hidden">

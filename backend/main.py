@@ -713,8 +713,6 @@ def _sanitize_product_doc(p: dict) -> dict:
     clean_primary = img if is_valid_primary else (clean_imgs[0] if clean_imgs else default_cut)
     if not clean_imgs and clean_primary:
         clean_imgs = [clean_primary]
-        if default_photo and default_photo != clean_primary:
-            clean_imgs.append(default_photo)
 
     p["image"] = clean_primary or ""
     p["images"] = [u for u in dict.fromkeys(clean_imgs) if u]

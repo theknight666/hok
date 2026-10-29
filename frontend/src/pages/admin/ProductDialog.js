@@ -545,6 +545,11 @@ export function ProductDialog({ product, onClose, onSaved }) {
     const initialMajorNotes = Array.isArray(product.major_notes) && product.major_notes.length > 0
       ? product.major_notes
       : (product.slug && DEFAULT_MAJOR_NOTES[product.slug] ? DEFAULT_MAJOR_NOTES[product.slug] : []);
+    const initialCut = defaultCutoutOf(product.slug);
+    const initialImages = Array.isArray(product.images) && product.images.length > 0
+      ? product.images
+      : (product.image ? [product.image] : (initialCut ? [initialCut] : []));
+    const initialImage = (isValidImageUrl(product.image) ? product.image : "") || initialImages[0] || initialCut || "";
 
     return {
       name: "",
@@ -554,8 +559,8 @@ export function ProductDialog({ product, onClose, onSaved }) {
       badge: "",
       concentration: "EDP",
       volume: "50 ml",
-      image: "",
-      images: Array.isArray(product.images) && product.images.length > 0 ? product.images : (product.image ? [product.image] : []),
+      image: initialImage,
+      images: initialImages,
       color: "#C5A059",
       price: 0,
       sample_price: 99,
@@ -579,8 +584,8 @@ export function ProductDialog({ product, onClose, onSaved }) {
       base_list: baseNotes,
       major_notes: initialMajorNotes,
       ...product,
-      major_notes: initialMajorNotes,
-      images: Array.isArray(product.images) && product.images.length > 0 ? product.images : (product.image ? [product.image] : []),
+      image: initialImage,
+      images: initialImages,
       top_list: topNotes,
       heart_list: heartNotes,
       base_list: baseNotes,

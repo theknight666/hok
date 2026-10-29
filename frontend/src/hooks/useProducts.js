@@ -5,12 +5,11 @@ import { isValidImageUrl, defaultCutoutOf, defaultPhotoOf, DEFAULT_MAJOR_NOTES }
 export function sanitizeProduct(p) {
   if (!p) return p;
   const defaultCut = defaultCutoutOf(p.slug);
-  const defaultPhoto = defaultPhotoOf(p.slug);
 
   const rawImages = Array.isArray(p.images) && p.images.length > 0 ? p.images : (p.image ? [p.image] : []);
   const validImages = Array.from(new Set(rawImages.filter(isValidImageUrl)));
-  const finalImages = validImages.length > 0 ? validImages : [defaultCut, defaultPhoto].filter(Boolean);
-  const finalImage = isValidImageUrl(p.image) ? p.image : (finalImages[0] || "");
+  const finalImages = validImages.length > 0 ? validImages : (defaultCut ? [defaultCut] : []);
+  const finalImage = isValidImageUrl(p.image) ? p.image : (finalImages[0] || defaultCut || "");
   const finalMajorNotes = Array.isArray(p.major_notes) && p.major_notes.length > 0
     ? p.major_notes
     : (DEFAULT_MAJOR_NOTES[p.slug] || []);
