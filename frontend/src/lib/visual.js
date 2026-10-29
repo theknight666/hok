@@ -11,18 +11,6 @@ export const worldOf = (p) => WORLDS[p?.slug] || { ...DEFAULT_WORLD, bg: p?.colo
 
 export const worldVars = (w) => ({ "--w-bg": w.bg, "--w-ink": w.ink, "--w-soft": w.soft, background: w.bg, color: w.ink });
 
-export function isValidImageUrl(url) {
-  if (!url || typeof url !== "string") return false;
-  const trimmed = url.trim();
-  if (!trimmed) return false;
-  if (trimmed.startsWith("data:image/")) return true;
-  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) return true;
-  if (trimmed.startsWith("/images/")) return true;
-  if (trimmed.startsWith("/api/media/")) return true;
-  if (trimmed.startsWith("blob:")) return true;
-  return /\.(png|jpe?g|webp|gif|svg)(\?.*)?$/i.test(trimmed);
-}
-
 export const KNOWN_CUTOUTS = {
   "blonde-amber": "/images/cut-blonde-amber.png",
   layton: "/images/cut-layton.png",
@@ -37,15 +25,31 @@ export const KNOWN_PHOTOS = {
   "side-effect": "/images/side-effect.jpg",
 };
 
+export function isValidImageUrl(url) {
+  if (!url || typeof url !== "string") return false;
+  const trimmed = url.trim();
+  if (!trimmed) return false;
+  if (trimmed.startsWith("data:image/")) return true;
+  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) return true;
+  if (trimmed.startsWith("/api/media/")) return true;
+  if (trimmed.startsWith("blob:")) return true;
+  if (trimmed.startsWith("/images/cut-")) {
+    return Object.values(KNOWN_CUTOUTS).includes(trimmed);
+  }
+  if (trimmed.startsWith("/images/")) {
+    if (trimmed.startsWith("/images/notes/") || trimmed.startsWith("/images/payments/")) return true;
+    return Object.values(KNOWN_PHOTOS).includes(trimmed) || Object.values(KNOWN_CUTOUTS).includes(trimmed);
+  }
+  return /\.(png|jpe?g|webp|gif|svg)(\?.*)?$/i.test(trimmed);
+}
+
 export const defaultCutoutOf = (slug) =>
   (slug && KNOWN_CUTOUTS[slug]) ||
-  (slug && `/images/cut-${slug.replace("-on-the-rocks", "")}.png`) ||
   "/images/cut-blonde-amber.png";
 
 export const defaultPhotoOf = (slug) =>
   (slug && KNOWN_PHOTOS[slug]) ||
-  (slug && `/images/${slug.replace("-on-the-rocks", "")}.jpg`) ||
-  defaultCutoutOf(slug);
+  "/images/blonde-amber.jpg";
 
 export const cutout = (p) => {
   if (!p) return "/images/cut-blonde-amber.png";

@@ -401,13 +401,8 @@ export function BottleUpload({ slug, image, images = [], onChange, onDone }) {
                     className="h-full w-full object-contain rounded-xl select-none"
                     draggable={false}
                     onError={(e) => {
-                      // Only fallback if this was a stock catalog image; never replace custom uploaded photos with the default bottle!
-                      if (imgUrl.includes("/images/cut-") || imgUrl.includes("/images/blonde-amber.jpg") || imgUrl.includes("/images/layton.jpg") || imgUrl.includes("/images/angels-share.jpg") || imgUrl.includes("/images/side-effect.jpg")) {
-                        const fallback = defaultCutoutOf(slug);
-                        if (e.currentTarget.src !== fallback) {
-                          e.currentTarget.src = fallback;
-                        }
-                      }
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = "/images/cut-blonde-amber.png";
                     }}
                   />
 

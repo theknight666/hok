@@ -653,15 +653,41 @@ _products_cache: list = []
 
 VALID_IMG_EXTS = (".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg")
 
+KNOWN_CUTOUTS = {
+    "blonde-amber": "/images/cut-blonde-amber.png",
+    "layton": "/images/cut-layton.png",
+    "angels-share-on-the-rocks": "/images/cut-angels-share.png",
+    "side-effect": "/images/cut-side-effect.png",
+}
+
+KNOWN_PHOTOS = {
+    "blonde-amber": "/images/blonde-amber.jpg",
+    "layton": "/images/layton.jpg",
+    "angels-share-on-the-rocks": "/images/angels-share.jpg",
+    "side-effect": "/images/side-effect.jpg",
+}
+
+def default_cutout_of(slug: str) -> str:
+    return KNOWN_CUTOUTS.get(slug, "/images/cut-blonde-amber.png")
+
+def default_photo_of(slug: str) -> str:
+    return KNOWN_PHOTOS.get(slug, "/images/blonde-amber.jpg")
+
 
 def _is_valid_img_url(url: str) -> bool:
     if not url or not isinstance(url, str):
         return False
     u = url.strip()
-    if u.startswith("data:image/") or u.startswith("http://") or u.startswith("https://") or u.startswith("/images/"):
+    if u.startswith("data:image/") or u.startswith("http://") or u.startswith("https://"):
         return True
     if u.startswith("/api/media/"):
         return any(u.lower().endswith(ext) for ext in VALID_IMG_EXTS)
+    if u.startswith("/images/cut-"):
+        return u in KNOWN_CUTOUTS.values()
+    if u.startswith("/images/"):
+        if u.startswith("/images/notes/") or u.startswith("/images/payments/"):
+            return True
+        return u in KNOWN_PHOTOS.values() or u in KNOWN_CUTOUTS.values()
     return any(u.lower().endswith(ext) for ext in VALID_IMG_EXTS)
 
 
@@ -675,8 +701,8 @@ def _sanitize_product_doc(p: dict) -> dict:
     clean_imgs = [u for u in imgs if _is_valid_img_url(u)]
     is_valid_primary = _is_valid_img_url(img)
 
-    default_cut = f"/images/cut-{slug.replace('-on-the-rocks', '')}.png" if slug else "/images/cut-blonde-amber.png"
-    default_photo = f"/images/{slug.replace('-on-the-rocks', '')}.jpg" if slug else "/images/blonde-amber.jpg"
+    default_cut = default_cutout_of(slug)
+    default_photo = default_photo_of(slug)
 
     clean_primary = img if is_valid_primary else (clean_imgs[0] if clean_imgs else default_cut)
     if not clean_imgs:

@@ -5,7 +5,7 @@ import { Minus, Plus, Pencil, Trash2, Search, X } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { api, formatErr, inr } from "@/lib/api";
 import { ProductDialog } from "./ProductDialog";
-import { defaultCutoutOf } from "@/lib/visual";
+import { defaultCutoutOf, isValidImageUrl } from "@/lib/visual";
 
 function Row({ p, onEdit, refresh }) {
   const [targetSize, setTargetSize] = useState("50 ml");
@@ -52,13 +52,11 @@ function Row({ p, onEdit, refresh }) {
       <td className="py-4 pl-4 pr-4">
         <div className="flex items-center gap-4 min-w-0">
           <img
-            src={p.image}
+            src={p.image && isValidImageUrl(p.image) ? p.image : defaultCutoutOf(p.slug)}
             alt=""
             onError={(e) => {
-              if (p.image && (p.image.includes("/images/cut-") || p.image.includes("/images/blonde-amber.jpg") || p.image.includes("/images/layton.jpg") || p.image.includes("/images/angels-share.jpg") || p.image.includes("/images/side-effect.jpg"))) {
-                const fallback = defaultCutoutOf(p.slug);
-                if (e.currentTarget.src !== fallback) e.currentTarget.src = fallback;
-              }
+              e.currentTarget.onerror = null;
+              e.currentTarget.src = "/images/cut-blonde-amber.png";
             }}
             className="h-14 w-11 rounded-lg bg-muted object-contain shrink-0"
             data-testid={`inventory-image-${p.slug}`}
