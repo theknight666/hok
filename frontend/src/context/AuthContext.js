@@ -63,6 +63,18 @@ export function AuthProvider({ children }) {
     } catch {}
     return data;
   };
+  const loginWithGoogle = async (credentialOrToken) => {
+    const payload =
+      typeof credentialOrToken === "string"
+        ? { credential: credentialOrToken }
+        : credentialOrToken;
+    const { data } = await api.post("/auth/google", payload);
+    setUser(data);
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    } catch {}
+    return data;
+  };
   const logout = async () => {
     await api.post("/auth/logout").catch(() => {});
     setUser(false);
@@ -71,7 +83,7 @@ export function AuthProvider({ children }) {
     } catch {}
   };
 
-  return <AuthCtx.Provider value={{ user, setUser, login, register, logout, checkAuth }}>{children}</AuthCtx.Provider>;
+  return <AuthCtx.Provider value={{ user, setUser, login, register, logout, checkAuth, loginWithGoogle }}>{children}</AuthCtx.Provider>;
 }
 
 export const useAuth = () => useContext(AuthCtx);

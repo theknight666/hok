@@ -21,7 +21,7 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-const NO_RETRY = ["/auth/refresh", "/auth/login", "/auth/register", "/auth/google/session"];
+const NO_RETRY = ["/auth/refresh", "/auth/login", "/auth/register", "/auth/google", "/auth/google/session", "/auth/google/config"];
 let refreshing = null;
 api.interceptors.response.use(
   (r) => r,

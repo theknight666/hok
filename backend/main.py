@@ -206,7 +206,17 @@ class LoginIn(BaseModel):
 
 
 class SessionIn(BaseModel):
-    session_id: str
+    session_id: Optional[str] = None
+    credential: Optional[str] = None
+    id_token: Optional[str] = None
+    access_token: Optional[str] = None
+
+
+class GoogleAuthIn(BaseModel):
+    credential: Optional[str] = None
+    id_token: Optional[str] = None
+    access_token: Optional[str] = None
+    session_id: Optional[str] = None
 
 
 class Notes(BaseModel):
@@ -437,9 +447,95 @@ async def refresh(request: Request, response: Response):
     return {"ok": True}
 
 
+@api.get("/auth/google/config")
+async def google_auth_config():
+    client_id = os.environ.get("GOOGLE_CLIENT_ID", "").strip()
+    return {
+        "enabled": bool(client_id),
+        "client_id": client_id,
+    }
+
+
+async def verify_google_token(token_str: str) -> dict:
+    async with httpx.AsyncClient(timeout=10) as client:
+        # Try verifying as an ID token with Google's tokeninfo endpoint
+        try:
+            r = await client.get(f"https://oauth2.googleapis.com/tokeninfo?id_token={token_str}")
+            if r.status_code == 200:
+                data = r.json()
+                if data.get("email"):
+                    return {
+                        "email": data["email"].strip().lower(),
+                        "name": data.get("name") or data["email"].split("@")[0],
+                        "picture": data.get("picture"),
+                        "sub": data.get("sub"),
+                        "email_verified": data.get("email_verified") in [True, "true", "True", 1],
+                    }
+        except Exception as e:
+            logger.warning("Google tokeninfo check error: %s", e)
+
+        # Try verifying as an access token with Google's UserInfo endpoint
+        try:
+            r_userinfo = await client.get(
+                "https://www.googleapis.com/oauth2/v3/userinfo",
+                headers={"Authorization": f"Bearer {token_str}"},
+            )
+            if r_userinfo.status_code == 200:
+                data = r_userinfo.json()
+                if data.get("email"):
+                    return {
+                        "email": data["email"].strip().lower(),
+                        "name": data.get("name") or data["email"].split("@")[0],
+                        "picture": data.get("picture"),
+                        "sub": data.get("sub"),
+                        "email_verified": data.get("email_verified") in [True, "true", "True", 1],
+                    }
+        except Exception as e:
+            logger.warning("Google userinfo check error: %s", e)
+
+    raise HTTPException(status_code=401, detail="Invalid Google token or unable to verify with Google")
+
+
+@api.post("/auth/google")
 @api.post("/auth/google/session")
-async def google_session():
-    raise HTTPException(status_code=400, detail="Google authentication is disabled. Please sign in with email and password.")
+async def google_session(body: GoogleAuthIn, response: Response):
+    raw_token = body.credential or body.id_token or body.access_token or body.session_id
+    if not raw_token:
+        raise HTTPException(status_code=400, detail="Missing Google credential or token")
+
+    info = await verify_google_token(raw_token)
+    email = info["email"]
+
+    admin_email = os.environ.get("ADMIN_EMAIL", "admin@houseoftheknight.com").strip().strip('"').strip("'").lower()
+    is_admin = (email == admin_email) or (email in google_admin_emails())
+    target_role = "admin" if is_admin else "customer"
+
+    user = await db.users.find_one({"email": email})
+    if user:
+        upd = {}
+        if info.get("picture") and not user.get("picture"):
+            upd["picture"] = info["picture"]
+        if info.get("name") and not user.get("name"):
+            upd["name"] = info["name"]
+        if is_admin and user.get("role") != "admin":
+            upd["role"] = "admin"
+        if upd:
+            await db.users.update_one({"email": email}, {"$set": upd})
+            user.update(upd)
+    else:
+        user = {
+            "user_id": f"user_{uuid.uuid4().hex[:12]}",
+            "email": email,
+            "name": info.get("name") or email.split("@")[0],
+            "picture": info.get("picture"),
+            "role": target_role,
+            "created_at": now().isoformat(),
+        }
+        await db.users.insert_one(dict(user))
+
+    set_auth_cookies(response, user["user_id"])
+    access_token = make_token(user["user_id"], "access")
+    return public_user(user, token=access_token)
 
 
 
