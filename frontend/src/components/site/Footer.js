@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ShieldCheck, Lock, Building2, CheckCircle2 } from "lucide-react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { KnightMark } from "./Logo";
 
@@ -8,6 +8,179 @@ const COLS = [
   { t: "Shop", links: [["/collection", "All fragrances"], ["/discovery", "Discovery Sets"], ["/#best-sellers", "Best sellers"], ["/track", "Track your order"], ["/checkout", "Checkout"]] },
   { t: "House", links: [["/#house", "Why the House"], ["/contact", "Contact concierge"], ["/account", "My account", "footer-account"], ["/login", "Sign in"]] },
 ];
+
+function InstagramIcon({ className = "h-4.5 w-4.5" }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="currentColor">
+      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+    </svg>
+  );
+}
+
+function RedditIcon({ className = "h-4.5 w-4.5" }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="currentColor">
+      <path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.702zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.197-2.512-.73a.326.326 0 0 0-.232-.095z"/>
+    </svg>
+  );
+}
+
+function WhatsAppIcon({ className = "h-4.5 w-4.5" }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="currentColor">
+      <path d="M12.031 0C5.395 0 .012 5.383.012 12.019c0 2.12.553 4.19 1.606 6.012L0 24l6.16-1.615a12.012 12.012 0 0 0 5.867 1.517h.005c6.636 0 12.02-5.383 12.02-12.02 0-3.21-1.249-6.226-3.522-8.5C18.257 1.11 15.242 0 12.031 0zm0 21.986h-.004a9.98 9.98 0 0 1-5.088-1.39l-.365-.216-3.778.99.101-3.682-.238-.378a9.99 9.99 0 0 1-1.536-5.29c0-5.518 4.49-10.008 10.012-10.008 2.673 0 5.186 1.042 7.078 2.934a9.96 9.96 0 0 1 2.93 7.077c0 5.519-4.49 10.01-10.01 10.01zm5.485-7.5c-.3-.15-1.777-.878-2.052-.978-.276-.1-.476-.15-.676.15-.2.3-.776.978-.952 1.178-.175.2-.35.225-.65.075-.3-.15-1.267-.467-2.414-1.49-.893-.796-1.495-1.78-1.67-2.08-.176-.3-.019-.462.13-.611.136-.134.301-.35.451-.525.15-.175.2-.3.3-.5.1-.2.05-.375-.025-.525-.075-.15-.676-1.63-.926-2.23-.243-.585-.49-.506-.676-.515-.175-.009-.375-.01-.575-.01-.2 0-.525.075-.8.375-.276.3-1.052 1.028-1.052 2.508 0 1.48 1.077 2.91 1.227 3.11.15.2 2.12 3.237 5.136 4.54.717.31 1.277.495 1.713.633.72.228 1.376.196 1.894.118.578-.087 1.777-.726 2.027-1.428.25-.702.25-1.303.175-1.428-.075-.125-.275-.2-.575-.35z"/>
+    </svg>
+  );
+}
+
+function XIcon({ className = "h-4 w-4" }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="currentColor">
+      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+    </svg>
+  );
+}
+
+function SocialLinks() {
+  return (
+    <div className="flex flex-col gap-2.5 pb-2" data-testid="footer-socials">
+      <p className="text-[0.66rem] font-medium uppercase tracking-[0.3em] text-gold">Join The Circle</p>
+      <div className="flex items-center gap-2.5">
+        <a
+          href="https://instagram.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Instagram"
+          title="Follow House of the Knight on Instagram"
+          className="grid h-10 w-10 place-items-center rounded-full border border-background/25 bg-background/5 text-background/80 transition-all duration-300 hover:scale-110 hover:border-gold hover:bg-gold/15 hover:text-gold cursor-pointer"
+        >
+          <InstagramIcon />
+        </a>
+        <a
+          href="https://reddit.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Reddit"
+          title="Join the House of the Knight Community on Reddit"
+          className="grid h-10 w-10 place-items-center rounded-full border border-background/25 bg-background/5 text-background/80 transition-all duration-300 hover:scale-110 hover:border-gold hover:bg-gold/15 hover:text-gold cursor-pointer"
+        >
+          <RedditIcon />
+        </a>
+        <a
+          href="https://wa.me/"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="WhatsApp"
+          title="Chat with House Concierge on WhatsApp"
+          className="grid h-10 w-10 place-items-center rounded-full border border-background/25 bg-background/5 text-background/80 transition-all duration-300 hover:scale-110 hover:border-gold hover:bg-gold/15 hover:text-gold cursor-pointer"
+        >
+          <WhatsAppIcon />
+        </a>
+        <a
+          href="https://x.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="X (Twitter)"
+          title="Follow House of the Knight on X"
+          className="grid h-10 w-10 place-items-center rounded-full border border-background/25 bg-background/5 text-background/80 transition-all duration-300 hover:scale-110 hover:border-gold hover:bg-gold/15 hover:text-gold cursor-pointer"
+        >
+          <XIcon />
+        </a>
+      </div>
+    </div>
+  );
+}
+
+function PaymentBadges() {
+  return (
+    <div className="mt-8 lg:mt-6 pt-6 border-t border-background/15" data-testid="payment-trust-badges">
+      <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+        <p className="text-[0.66rem] font-medium uppercase tracking-[0.25em] text-gold flex items-center gap-1.5">
+          <ShieldCheck className="h-3.5 w-3.5 text-gold" />
+          <span>Guaranteed Safe & Secure Checkout</span>
+        </p>
+        <span className="text-[10px] uppercase font-mono tracking-wider opacity-60 flex items-center gap-1">
+          <Lock className="h-3 w-3" />
+          <span>256-Bit SSL Encrypted</span>
+        </span>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
+        {/* UPI Badge */}
+        <div
+          className="group flex h-9 items-center justify-center rounded-lg border border-background/20 bg-background/5 px-3 py-1 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-gold/60 hover:bg-gold/10"
+          title="UPI Payments (Google Pay, PhonePe, Paytm, BHIM)"
+        >
+          <svg viewBox="0 0 78 24" className="h-4.5 w-auto">
+            <path fill="#097939" d="M8 20L13.5 4h4.2l-5.5 16z"/>
+            <path fill="#ED752E" d="M15 20L20.5 4h4.2l-5.5 16z"/>
+            <text x="29" y="17" fill="currentColor" fontFamily="sans-serif" fontSize="14" fontWeight="900" letterSpacing="0.8">UPI</text>
+          </svg>
+        </div>
+
+        {/* Visa Badge */}
+        <div
+          className="group flex h-9 items-center justify-center rounded-lg border border-background/20 bg-background/5 px-3 py-1 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-gold/60 hover:bg-gold/10"
+          title="Visa Debit & Credit Cards"
+        >
+          <svg viewBox="0 0 54 18" className="h-4 w-auto">
+            <text x="2" y="15" fill="currentColor" fontFamily="sans-serif" fontStyle="italic" fontSize="17" fontWeight="900" letterSpacing="1">VISA</text>
+          </svg>
+        </div>
+
+        {/* Mastercard Badge */}
+        <div
+          className="group flex h-9 items-center justify-center gap-1.5 rounded-lg border border-background/20 bg-background/5 px-2.5 py-1 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-gold/60 hover:bg-gold/10"
+          title="Mastercard Debit & Credit Cards"
+        >
+          <svg viewBox="0 0 34 22" className="h-4.5 w-auto">
+            <circle cx="11" cy="11" r="9" fill="#EB001B"/>
+            <circle cx="23" cy="11" r="9" fill="#F79E1B" fillOpacity="0.88"/>
+          </svg>
+          <span className="text-[11px] font-bold tracking-tight">Mastercard</span>
+        </div>
+
+        {/* RuPay Badge */}
+        <div
+          className="group flex h-9 items-center justify-center gap-1 rounded-lg border border-background/20 bg-background/5 px-2.5 py-1 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-gold/60 hover:bg-gold/10"
+          title="RuPay Debit & Credit Cards"
+        >
+          <svg viewBox="0 0 20 20" className="h-3.5 w-3.5">
+            <path d="M3 16l5-12h3.5l-5 12z" fill="#097939"/>
+            <path d="M10 16l5-12h3.5l-5 12z" fill="#ED752E"/>
+          </svg>
+          <span className="text-[11px] font-bold tracking-tight">RuPay</span>
+        </div>
+
+        {/* Amex Badge */}
+        <div
+          className="group flex h-9 items-center justify-center rounded-lg border border-background/20 bg-background/5 px-2.5 py-1 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-gold/60 hover:bg-gold/10"
+          title="American Express"
+        >
+          <span className="rounded bg-[#006FCF] px-1.5 py-0.5 text-[10px] font-black tracking-wider text-white">AMEX</span>
+        </div>
+
+        {/* NetBanking Badge */}
+        <div
+          className="group flex h-9 items-center justify-center gap-1.5 rounded-lg border border-background/20 bg-background/5 px-2.5 py-1 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-gold/60 hover:bg-gold/10"
+          title="All Major Indian Banks NetBanking"
+        >
+          <Building2 className="h-3.5 w-3.5 text-gold" />
+          <span className="text-[11px] font-semibold">NetBanking</span>
+        </div>
+
+        {/* Cash on Delivery Badge */}
+        <div
+          className="group flex h-9 items-center justify-center gap-1.5 rounded-lg border border-background/20 bg-background/5 px-2.5 py-1 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-gold/60 hover:bg-gold/10"
+          title="Cash on Delivery Available Across India"
+        >
+          <CheckCircle2 className="h-3.5 w-3.5 text-gold" />
+          <span className="text-[11px] font-semibold">Pay on Delivery</span>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function IndianFlag({ className = "inline-block h-3 w-[18px] rounded-[1.5px] shadow-sm overflow-hidden shrink-0 -translate-y-[1px]" }) {
   return (
@@ -93,14 +266,29 @@ export function Footer() {
   return (
     <footer ref={footerRef} className="relative overflow-hidden bg-foreground text-background" data-testid="site-footer">
       <div className="mx-auto max-w-[1600px] px-5 pt-6 sm:pt-8 sm:px-10">
-        <div className="grid gap-14 lg:grid-cols-12">
-          <div className="lg:col-span-6">
-            <KnightMark variant="dark" className="h-36 w-36 sm:h-48 sm:w-48 hidden dark:inline-flex" />
-            <KnightMark variant="gold" className="h-36 w-36 sm:h-48 sm:w-48 inline-flex dark:hidden" />
-            <p className="mt-2 sm:mt-3 max-w-md font-display text-4xl leading-[0.95] sm:text-5xl">Stay in the know. New drops, rare finds, no noise.</p>
-            <form onSubmit={subscribe} className="mt-10 max-w-md" data-testid="newsletter-form">
+        <div className="grid gap-12 lg:grid-cols-12">
+          {/* Left Column (lg:col-span-6): Brand Crest, Socials (Pink Marked Area) & Newsletter */}
+          <div className="lg:col-span-6 flex flex-col justify-between gap-8">
+            <div>
+              <div className="flex flex-wrap items-center justify-between gap-6 sm:gap-8">
+                <div className="flex items-center gap-3">
+                  <KnightMark variant="dark" className="h-32 w-32 sm:h-44 sm:w-44 hidden dark:inline-flex" />
+                  <KnightMark variant="gold" className="h-32 w-32 sm:h-44 sm:w-44 inline-flex dark:hidden" />
+                </div>
+                {/* Socials: Instagram, Reddit, WhatsApp, X (Pink Marked Area) */}
+                <SocialLinks />
+              </div>
+
+              <p className="mt-4 sm:mt-5 max-w-md font-display text-4xl leading-[0.95] sm:text-5xl">
+                Stay in the know. New drops, rare finds, no noise.
+              </p>
+            </div>
+
+            <form onSubmit={subscribe} className="mt-4 max-w-md" data-testid="newsletter-form">
               {sent ? (
-                <p className="rounded-full border border-background/30 px-6 py-4 text-sm font-semibold" data-testid="newsletter-success">You're in. Watch your inbox.</p>
+                <p className="rounded-full border border-background/30 px-6 py-4 text-sm font-semibold" data-testid="newsletter-success">
+                  You're in. Watch your inbox.
+                </p>
               ) : (
                 <div className="flex items-center rounded-full border-2 border-background/30 p-1.5 pl-6 focus-within:border-gold">
                   <input
@@ -119,17 +307,30 @@ export function Footer() {
               )}
             </form>
           </div>
-          {COLS.map((c) => (
-            <div key={c.t} className="lg:col-span-3">
-              <p className="text-[0.66rem] font-medium uppercase tracking-[0.3em] text-gold">{c.t}</p>
-              <ul className="mt-5 space-y-3 text-base font-semibold">
-                {c.links.map(([to, label, tid]) => (
-                  <li key={to + label}><Link to={to} onClick={(e) => handleNavClick(e, to)} data-testid={tid} className="link-line opacity-80 transition-opacity hover:opacity-100">{label}</Link></li>
-                ))}
-              </ul>
-              {c.t === "House" && <p className="mt-6 text-sm opacity-50">concierge@houseoftheknight.com</p>}
+
+          {/* Right Column (lg:col-span-6): Navigation Links & Premium Payment Trust Badges (Red Marked Area) */}
+          <div className="lg:col-span-6 flex flex-col justify-between gap-8">
+            <div className="grid grid-cols-2 gap-8">
+              {COLS.map((c) => (
+                <div key={c.t}>
+                  <p className="text-[0.66rem] font-medium uppercase tracking-[0.3em] text-gold">{c.t}</p>
+                  <ul className="mt-5 space-y-3 text-base font-semibold">
+                    {c.links.map(([to, label, tid]) => (
+                      <li key={to + label}>
+                        <Link to={to} onClick={(e) => handleNavClick(e, to)} data-testid={tid} className="link-line opacity-80 transition-opacity hover:opacity-100">
+                          {label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                  {c.t === "House" && <p className="mt-6 text-sm opacity-50">concierge@houseoftheknight.com</p>}
+                </div>
+              ))}
             </div>
-          ))}
+
+            {/* Red Marked Area: Premium Payment Trust Badges */}
+            <PaymentBadges />
+          </div>
         </div>
       </div>
 
