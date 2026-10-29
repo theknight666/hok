@@ -49,6 +49,9 @@ export const defaultPhotoOf = (slug) =>
 
 export const cutout = (p) => {
   if (!p) return "/images/cut-blonde-amber.png";
+  if (p.image && (p.image.endsWith("/blonde-amber.jpg") || p.image.endsWith("/layton.jpg") || p.image.endsWith("/angels-share.jpg") || p.image.endsWith("/side-effect.jpg"))) {
+    return defaultCutoutOf(p.slug);
+  }
   // Always prioritize the user's primary image
   if (isValidImageUrl(p.image)) {
     return p.image;

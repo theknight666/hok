@@ -58,7 +58,8 @@ export const FALLBACK_PRODUCTS = [
       base: ["Amber", "Vanilla", "Tonka Bean", "Cedarwood", "Labdanum", "Myrrh", "Patchouli", "Musk"],
     },
     major_notes: ["Rum", "Blonde Tobacco", "Amber", "Dried Fruits", "Olibanum", "Bitter Orange"],
-    image: "/images/blonde-amber.jpg",
+    image: "/images/cut-blonde-amber.png",
+    images: ["/images/cut-blonde-amber.png", "/images/blonde-amber.jpg"],
     low_stock_threshold: 10,
     active: true,
     featured: true,
@@ -97,7 +98,8 @@ export const FALLBACK_PRODUCTS = [
       base: ["Vanilla", "Sandalwood", "Guaiac Wood", "Amber", "Patchouli"],
     },
     major_notes: ["French Lavender", "Crisp Apple", "Bergamot", "Cardamom", "Sandalwood", "Guaiac Wood"],
-    image: "/images/layton.jpg",
+    image: "/images/cut-layton.png",
+    images: ["/images/cut-layton.png", "/images/layton.jpg"],
     low_stock_threshold: 10,
     active: true,
     featured: true,
@@ -136,7 +138,8 @@ export const FALLBACK_PRODUCTS = [
       base: ["Vanilla", "Sandalwood", "Amber", "Cedarwood"],
     },
     major_notes: ["Oak-Aged Cognac", "Cinnamon", "Roasted Praline", "Tonka Bean", "French Oak", "Nutmeg"],
-    image: "/images/angels-share.jpg",
+    image: "/images/cut-angels-share.png",
+    images: ["/images/cut-angels-share.png", "/images/angels-share.jpg"],
     low_stock_threshold: 10,
     active: true,
     featured: true,
@@ -175,7 +178,8 @@ export const FALLBACK_PRODUCTS = [
       base: ["Leather", "Vanilla", "Woody Amber", "Sandalwood", "Patchouli"],
     },
     major_notes: ["Vintage Rum", "Rich Tobacco", "Dark Leather", "Crimson Saffron", "Cinnamon", "Woody Amber"],
-    image: "/images/side-effect.jpg",
+    image: "/images/cut-side-effect.png",
+    images: ["/images/cut-side-effect.png", "/images/side-effect.jpg"],
     low_stock_threshold: 10,
     active: true,
     featured: true,
@@ -183,7 +187,7 @@ export const FALLBACK_PRODUCTS = [
   },
 ];
 
-const CACHE_KEY = "hotk_catalog_cache_v8";
+const CACHE_KEY = "hotk_catalog_cache_v9";
 
 export function getCachedCatalog() {
   if (typeof window === "undefined") return FALLBACK_PRODUCTS.map(sanitizeProduct);
