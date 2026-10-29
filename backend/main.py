@@ -609,20 +609,7 @@ async def ensure_seeded():
                 if missing:
                     await db.products.update_one({"slug": p["slug"]}, {"$set": missing})
 
-        # Auto-clean any malformed/broken image paths (e.g. folder paths without extensions)
-        try:
-            async for prod in db.products.find():
-                orig_img = prod.get("image", "")
-                orig_imgs = prod.get("images", [])
-                sanitized = _sanitize_product_doc(dict(prod))
-                if sanitized.get("image") != orig_img or sanitized.get("images") != orig_imgs:
-                    await db.products.update_one(
-                        {"_id": prod["_id"]},
-                        {"$set": {"image": sanitized["image"], "images": sanitized["images"]}}
-                    )
-                    logger.info("Auto-cleaned product %s images in MongoDB", prod.get("slug"))
-        except Exception as e:
-            logger.debug("Image cleanup check skipped: %s", e)
+
 
         # One-time cleanup of initial development dummy/test orders and customers
         dummy_cleaned = await db.meta.find_one({"_id": "initial_dummy_cleaned_v1"})
@@ -688,12 +675,8 @@ def _is_valid_img_url(url: str) -> bool:
         return True
     if u.startswith("/api/media/"):
         return any(u.lower().endswith(ext) for ext in VALID_IMG_EXTS)
-    if u.startswith("/images/cut-"):
-        return u in KNOWN_CUTOUTS.values()
     if u.startswith("/images/"):
-        if u.startswith("/images/notes/") or u.startswith("/images/payments/"):
-            return True
-        return u in KNOWN_PHOTOS.values() or u in KNOWN_CUTOUTS.values()
+        return any(u.lower().endswith(ext) for ext in VALID_IMG_EXTS)
     return any(u.lower().endswith(ext) for ext in VALID_IMG_EXTS)
 
 

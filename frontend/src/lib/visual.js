@@ -42,12 +42,8 @@ export function isValidImageUrl(url) {
   if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) return true;
   if (trimmed.startsWith("/api/media/")) return true;
   if (trimmed.startsWith("blob:")) return true;
-  if (trimmed.startsWith("/images/cut-")) {
-    return Object.values(KNOWN_CUTOUTS).includes(trimmed);
-  }
   if (trimmed.startsWith("/images/")) {
-    if (trimmed.startsWith("/images/notes/") || trimmed.startsWith("/images/payments/")) return true;
-    return Object.values(KNOWN_PHOTOS).includes(trimmed) || Object.values(KNOWN_CUTOUTS).includes(trimmed);
+    return /\.(png|jpe?g|webp|gif|svg)(\?.*)?$/i.test(trimmed);
   }
   return /\.(png|jpe?g|webp|gif|svg)(\?.*)?$/i.test(trimmed);
 }
