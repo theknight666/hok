@@ -27,7 +27,7 @@ const NUM = [
   ["sample_low_stock_threshold", "2 ml Low-stock alert at"],
 ];
 
-const cls = "w-full border-b border-input bg-transparent py-2 text-sm outline-none focus:border-gold transition-colors";
+const cls = "w-full border-b border-border/80 bg-transparent py-2 text-sm font-medium text-foreground outline-none focus:border-gold transition-colors placeholder:text-muted-foreground/40 placeholder:font-normal";
 
 const toList = (s) => (s || "").split(",").map((x) => x.trim()).filter(Boolean);
 
@@ -754,36 +754,36 @@ export function ProductDialog({ product, onClose, onSaved }) {
           </div>
 
           <div className="sm:col-span-2 border-b pb-2">
-            <h4 className="font-display text-lg">General Information</h4>
+            <h4 className="font-display text-lg font-bold text-foreground">General Information</h4>
           </div>
 
           {TEXT.map(([k, l]) => (
-            <label key={k} className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
-              {l}
+            <label key={k} className="flex flex-col gap-1.5 text-xs font-bold uppercase tracking-[0.16em] text-foreground">
+              <span className="font-bold text-foreground/90">{l}</span>
               <input value={f[k]} onChange={set(k)} disabled={k === "slug" && !isNew} required={["name", "slug"].includes(k)} className={cls} data-testid={`pd-${k}`} />
             </label>
           ))}
 
           {NUM.map(([k, l]) => (
-            <label key={k} className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
-              {l}
+            <label key={k} className="flex flex-col gap-1.5 text-xs font-bold uppercase tracking-[0.16em] text-foreground">
+              <span className="font-bold text-foreground/90">{l}</span>
               <input type="number" min={0} value={f[k]} onChange={set(k)} className={cls} data-testid={`pd-${k}`} />
             </label>
           ))}
 
           <div className="sm:col-span-2 border-b pt-4 pb-2">
-            <h4 className="font-display text-lg">Fragrance Story</h4>
+            <h4 className="font-display text-lg font-bold text-foreground">Fragrance Story</h4>
             <p className="text-xs text-muted-foreground">The narrative displayed on the product showcase.</p>
           </div>
 
-          <label className="text-xs uppercase tracking-[0.18em] text-muted-foreground sm:col-span-2">
-            Story Narrative
+          <label className="flex flex-col gap-1.5 text-xs font-bold uppercase tracking-[0.16em] text-foreground sm:col-span-2">
+            <span className="font-bold text-foreground/90">Story Narrative</span>
             <textarea rows={4} value={f.story} onChange={set("story")} className={`${cls} resize-none leading-relaxed break-words [overflow-wrap:anywhere]`} data-testid="pd-story" placeholder="Write the fragrance story..." />
           </label>
 
 
           <div className="sm:col-span-2 border-b pt-4 pb-2">
-            <h4 className="font-display text-lg flex items-center gap-2">
+            <h4 className="font-display text-lg font-bold text-foreground flex items-center gap-2">
               <span>Full Note Structure & Pyramid</span>
               <Sparkles className="h-4 w-4 text-gold" />
             </h4>
@@ -792,8 +792,8 @@ export function ProductDialog({ product, onClose, onSaved }) {
             </p>
           </div>
 
-          <label className="text-xs uppercase tracking-[0.18em] text-muted-foreground sm:col-span-2">
-            Olfactory Family
+          <label className="flex flex-col gap-1.5 text-xs font-bold uppercase tracking-[0.16em] text-foreground sm:col-span-2">
+            <span className="font-bold text-foreground/90">Olfactory Family</span>
             <input value={f.olfactory_family} onChange={set("olfactory_family")} className={cls} placeholder="e.g. Warm Amber Spicy · Oriental Gourmand" data-testid="pd-olfactory-family" />
           </label>
 
@@ -823,12 +823,15 @@ export function ProductDialog({ product, onClose, onSaved }) {
           ))}
 
           <div className="sm:col-span-2 border-b pt-4 pb-2">
-            <h4 className="font-display text-lg">Scent Architecture & Dominant Accords</h4>
+            <h4 className="font-display text-lg font-bold text-foreground">Scent Architecture & Dominant Accords</h4>
             <p className="text-xs text-muted-foreground">Configure the harmonic balance and performance pillars.</p>
           </div>
 
-          <label className="text-xs uppercase tracking-[0.18em] text-muted-foreground sm:col-span-2">
-            Dominant Accords (Format: Accord Name: Percentage, ...)
+          <label className="flex flex-col gap-1.5 text-xs font-bold uppercase tracking-[0.16em] text-foreground sm:col-span-2">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <span className="font-bold text-foreground">Dominant Accords</span>
+              <span className="text-[10px] font-mono font-normal text-gold uppercase tracking-wider">Format: Accord Name: Percentage, ...</span>
+            </div>
             <input
               value={f.accords_str}
               onChange={set("accords_str")}
@@ -836,28 +839,28 @@ export function ProductDialog({ product, onClose, onSaved }) {
               placeholder="e.g. Amber Resin: 95, Warm Spice: 90, Sweet Tobacco: 86, Bourbon Vanilla: 82"
               data-testid="pd-accords"
             />
-            <span className="mt-1 block text-[11px] text-muted-foreground normal-case">
+            <span className="mt-0.5 block text-[11px] font-normal text-muted-foreground normal-case">
               Names will be displayed in full without truncation. Percentages determine the progress bar widths.
             </span>
           </label>
 
-          <label className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
-            Longevity Pillar
+          <label className="flex flex-col gap-1.5 text-xs font-bold uppercase tracking-[0.16em] text-foreground">
+            <span className="font-bold text-foreground">Longevity Pillar</span>
             <input value={f.arch_longevity} onChange={set("arch_longevity")} className={cls} placeholder="e.g. 12+ Hours · Enduring Aura" data-testid="pd-arch-longevity" />
           </label>
 
-          <label className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
-            Sillage Pillar
+          <label className="flex flex-col gap-1.5 text-xs font-bold uppercase tracking-[0.16em] text-foreground">
+            <span className="font-bold text-foreground">Sillage Pillar</span>
             <input value={f.arch_sillage} onChange={set("arch_sillage")} className={cls} placeholder="e.g. Intense · Regal Radiance" data-testid="pd-arch-sillage" />
           </label>
 
-          <label className="text-xs uppercase tracking-[0.18em] text-muted-foreground sm:col-span-2">
-            Season / Recommended Occasion
+          <label className="flex flex-col gap-1.5 text-xs font-bold uppercase tracking-[0.16em] text-foreground sm:col-span-2">
+            <span className="font-bold text-foreground">Season / Recommended Occasion</span>
             <input value={f.arch_season} onChange={set("arch_season")} className={cls} placeholder="e.g. Autumn / Winter / Sovereign Evenings" data-testid="pd-arch-season" />
           </label>
 
-          <label className="text-xs uppercase tracking-[0.18em] text-muted-foreground sm:col-span-2">
-            Olfactory Journey (Detailed Narrative)
+          <label className="flex flex-col gap-1.5 text-xs font-bold uppercase tracking-[0.16em] text-foreground sm:col-span-2">
+            <span className="font-bold text-foreground">Olfactory Journey (Detailed Narrative)</span>
             <textarea rows={3} value={f.arch_profile} onChange={set("arch_profile")} className={`${cls} resize-none leading-relaxed`} placeholder="Describe the progression from top notes through the drydown..." data-testid="pd-arch-profile" />
           </label>
 
