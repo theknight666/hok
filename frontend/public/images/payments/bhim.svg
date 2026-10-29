@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 54 34" width="54" height="34">
+  <title>BHIM UPI</title>
+  <rect width="54" height="34" rx="4" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1"/>
+  <g transform="translate(7, 10)">
+    <polygon points="0,14 5,0 9.5,0 4.5,14" fill="#009A44"/>
+    <polygon points="6.5,14 11.5,0 16,0 11,14" fill="#F15A24"/>
+    <text x="17" y="12" font-family="'Arial Black', Impact, sans-serif" font-weight="900" font-size="12" fill="#0B2B5C" letter-spacing="0.5">BHIM</text>
+  </g>
+</svg>

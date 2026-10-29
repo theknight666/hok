@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { ArrowRight, ShieldCheck, Lock, Building2, CheckCircle2 } from "lucide-react";
+import { ArrowRight, ShieldCheck, Lock } from "lucide-react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { KnightMark } from "./Logo";
 
@@ -91,92 +91,53 @@ function SocialLinks() {
   );
 }
 
+const PAYMENT_BADGES = [
+  { name: "Visa", file: "visa.svg" },
+  { name: "Mastercard", file: "mastercard.svg" },
+  { name: "RuPay", file: "rupay.svg" },
+  { name: "American Express", file: "amex.svg" },
+  { name: "UPI", file: "upi.svg" },
+  { name: "Google Pay", file: "gpay.svg" },
+  { name: "PhonePe", file: "phonepe.svg" },
+  { name: "Paytm", file: "paytm.svg" },
+  { name: "Apple Pay", file: "apple-pay.svg" },
+  { name: "BHIM UPI", file: "bhim.svg" },
+  { name: "PayPal", file: "paypal.svg" },
+  { name: "Net Banking", file: "netbanking.svg" },
+  { name: "Cash on Delivery", file: "cod.svg" },
+  { name: "Razorpay Verified", file: "razorpay.svg" },
+  { name: "Maestro", file: "maestro.svg" },
+  { name: "Diners Club", file: "diners.svg" },
+  { name: "Discover", file: "discover.svg" },
+  { name: "JCB", file: "jcb.svg" },
+  { name: "100% Secure Checkout", file: "secure-ssl.svg" },
+];
+
 function PaymentBadges() {
   return (
     <div className="mt-8 lg:mt-6 pt-6 border-t border-background/15" data-testid="payment-trust-badges">
-      <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+      <div className="flex flex-wrap items-center justify-between gap-2 mb-3.5">
         <p className="text-[0.66rem] font-medium uppercase tracking-[0.25em] text-gold flex items-center gap-1.5">
-          <ShieldCheck className="h-3.5 w-3.5 text-gold" />
-          <span>Guaranteed Safe & Secure Checkout</span>
+          <ShieldCheck className="h-3.5 w-3.5 text-gold shrink-0" />
+          <span>Guaranteed Safe &amp; Secure Checkout</span>
         </p>
         <span className="text-[10px] uppercase font-mono tracking-wider opacity-60 flex items-center gap-1">
-          <Lock className="h-3 w-3" />
+          <Lock className="h-3 w-3 shrink-0" />
           <span>256-Bit SSL Encrypted</span>
         </span>
       </div>
 
       <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
-        {/* UPI Badge */}
-        <div
-          className="group flex h-9 items-center justify-center rounded-lg border border-background/20 bg-background/5 px-3 py-1 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-gold/60 hover:bg-gold/10"
-          title="UPI Payments (Google Pay, PhonePe, Paytm, BHIM)"
-        >
-          <svg viewBox="0 0 78 24" className="h-4.5 w-auto">
-            <path fill="#097939" d="M8 20L13.5 4h4.2l-5.5 16z"/>
-            <path fill="#ED752E" d="M15 20L20.5 4h4.2l-5.5 16z"/>
-            <text x="29" y="17" fill="currentColor" fontFamily="sans-serif" fontSize="14" fontWeight="900" letterSpacing="0.8">UPI</text>
-          </svg>
-        </div>
-
-        {/* Visa Badge */}
-        <div
-          className="group flex h-9 items-center justify-center rounded-lg border border-background/20 bg-background/5 px-3 py-1 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-gold/60 hover:bg-gold/10"
-          title="Visa Debit & Credit Cards"
-        >
-          <svg viewBox="0 0 54 18" className="h-4 w-auto">
-            <text x="2" y="15" fill="currentColor" fontFamily="sans-serif" fontStyle="italic" fontSize="17" fontWeight="900" letterSpacing="1">VISA</text>
-          </svg>
-        </div>
-
-        {/* Mastercard Badge */}
-        <div
-          className="group flex h-9 items-center justify-center gap-1.5 rounded-lg border border-background/20 bg-background/5 px-2.5 py-1 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-gold/60 hover:bg-gold/10"
-          title="Mastercard Debit & Credit Cards"
-        >
-          <svg viewBox="0 0 34 22" className="h-4.5 w-auto">
-            <circle cx="11" cy="11" r="9" fill="#EB001B"/>
-            <circle cx="23" cy="11" r="9" fill="#F79E1B" fillOpacity="0.88"/>
-          </svg>
-          <span className="text-[11px] font-bold tracking-tight">Mastercard</span>
-        </div>
-
-        {/* RuPay Badge */}
-        <div
-          className="group flex h-9 items-center justify-center gap-1 rounded-lg border border-background/20 bg-background/5 px-2.5 py-1 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-gold/60 hover:bg-gold/10"
-          title="RuPay Debit & Credit Cards"
-        >
-          <svg viewBox="0 0 20 20" className="h-3.5 w-3.5">
-            <path d="M3 16l5-12h3.5l-5 12z" fill="#097939"/>
-            <path d="M10 16l5-12h3.5l-5 12z" fill="#ED752E"/>
-          </svg>
-          <span className="text-[11px] font-bold tracking-tight">RuPay</span>
-        </div>
-
-        {/* Amex Badge */}
-        <div
-          className="group flex h-9 items-center justify-center rounded-lg border border-background/20 bg-background/5 px-2.5 py-1 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-gold/60 hover:bg-gold/10"
-          title="American Express"
-        >
-          <span className="rounded bg-[#006FCF] px-1.5 py-0.5 text-[10px] font-black tracking-wider text-white">AMEX</span>
-        </div>
-
-        {/* NetBanking Badge */}
-        <div
-          className="group flex h-9 items-center justify-center gap-1.5 rounded-lg border border-background/20 bg-background/5 px-2.5 py-1 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-gold/60 hover:bg-gold/10"
-          title="All Major Indian Banks NetBanking"
-        >
-          <Building2 className="h-3.5 w-3.5 text-gold" />
-          <span className="text-[11px] font-semibold">NetBanking</span>
-        </div>
-
-        {/* Cash on Delivery Badge */}
-        <div
-          className="group flex h-9 items-center justify-center gap-1.5 rounded-lg border border-background/20 bg-background/5 px-2.5 py-1 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-gold/60 hover:bg-gold/10"
-          title="Cash on Delivery Available Across India"
-        >
-          <CheckCircle2 className="h-3.5 w-3.5 text-gold" />
-          <span className="text-[11px] font-semibold">Pay on Delivery</span>
-        </div>
+        {PAYMENT_BADGES.map((b) => (
+          <img
+            key={b.file}
+            src={`/images/payments/${b.file}`}
+            alt={b.name}
+            title={b.name}
+            className="h-7 w-auto object-contain rounded transition-transform duration-200 hover:scale-110 shadow-sm cursor-default"
+            loading="lazy"
+          />
+        ))}
       </div>
     </div>
   );
@@ -270,8 +231,8 @@ export function Footer() {
           {/* Left Column (lg:col-span-6): Brand Crest, Socials (Pink Marked Area) & Newsletter */}
           <div className="lg:col-span-6 flex flex-col justify-between gap-8">
             <div>
-              <div className="flex flex-wrap items-center justify-between gap-6 sm:gap-8">
-                <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-6 sm:gap-8">
+                <div className="flex items-center gap-3 shrink-0">
                   <KnightMark variant="dark" className="h-32 w-32 sm:h-44 sm:w-44 hidden dark:inline-flex" />
                   <KnightMark variant="gold" className="h-32 w-32 sm:h-44 sm:w-44 inline-flex dark:hidden" />
                 </div>

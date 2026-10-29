@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 54 34" width="54" height="34">
+  <title>Net Banking</title>
+  <rect width="54" height="34" rx="4" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1"/>
+  <g transform="translate(6, 6)">
+    <path d="M11 2L2 7.5h18L11 2zm-7 7.5v6.5h2.5v-6.5H4zm5 0v6.5h2.5v-6.5H9zm5 0v6.5h2.5v-6.5H14zm-12 8.5v2.5h18V18H2z" fill="#006699"/>
+    <text x="23" y="10.5" font-family="-apple-system, BlinkMacSystemFont, Arial, sans-serif" font-weight="800" font-size="7.5" fill="#0A2540" letter-spacing="0.3">NET</text>
+    <text x="23" y="18.5" font-family="-apple-system, BlinkMacSystemFont, Arial, sans-serif" font-weight="800" font-size="7.5" fill="#0A2540" letter-spacing="0.3">BANK</text>
+  </g>
+</svg>
