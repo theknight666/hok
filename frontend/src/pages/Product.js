@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { Link, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Minus, Plus, ArrowLeft, ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { Minus, Plus, ArrowLeft, ArrowUpRight, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 import { useProduct, useProducts } from "@/hooks/useProducts";
 import { useCart } from "@/context/CartContext";
 import { Bottle } from "@/components/site/Bottle";
@@ -152,7 +152,11 @@ export default function Product() {
                               draggable={false}
                               onError={(e) => {
                                 e.currentTarget.onerror = null;
-                                e.currentTarget.src = defaultCut;
+                                if (defaultCut) {
+                                  e.currentTarget.src = defaultCut;
+                                } else {
+                                  e.currentTarget.style.display = "none";
+                                }
                               }}
                             />
                             {isActive && (

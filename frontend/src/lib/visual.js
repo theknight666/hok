@@ -3,6 +3,9 @@ export const WORLDS = {
   layton: { bg: "#2338DB", ink: "#F3F5FF", soft: "#93A4FF" },
   "angels-share-on-the-rocks": { bg: "#C9471B", ink: "#FFF1E4", soft: "#FFA06A" },
   "side-effect": { bg: "#4B0F2C", ink: "#FFE4EE", soft: "#D13C78" },
+  "arabians-tonka": { bg: "#8A1828", ink: "#FFF1F3", soft: "#FFA3B1" },
+  imagination: { bg: "#0D6E66", ink: "#E6FFF9", soft: "#5CE1D6" },
+  "aventus-absolu": { bg: "#1E1E22", ink: "#F4F4F6", soft: "#A1A1AA" },
 };
 
 const DEFAULT_WORLD = { bg: "#110E13", ink: "#F6EFE4", soft: "#8c8c8c" };
@@ -16,6 +19,9 @@ export const KNOWN_CUTOUTS = {
   layton: "/images/cut-layton.png",
   "angels-share-on-the-rocks": "/images/cut-angels-share.png",
   "side-effect": "/images/cut-side-effect.png",
+  imagination: "/images/cut-imagination.png",
+  "aventus-absolu": "/images/cut-aventus-absolu.png",
+  "arabians-tonka": "/images/cut-arabians-tonka.png",
 };
 
 export const KNOWN_PHOTOS = {
@@ -23,6 +29,9 @@ export const KNOWN_PHOTOS = {
   layton: "/images/layton.jpg",
   "angels-share-on-the-rocks": "/images/angels-share.jpg",
   "side-effect": "/images/side-effect.jpg",
+  imagination: "/images/imagination.jpg",
+  "aventus-absolu": "/images/aventus-absolu.jpg",
+  "arabians-tonka": "/images/arabians-tonka.jpg",
 };
 
 export function isValidImageUrl(url) {
@@ -102,6 +111,8 @@ const NOTE_IMAGE_MAP = {
   "grapefruit": "/images/notes/bitter-orange.png",
   "pink-grapefruit": "/images/notes/bitter-orange.png",
   "pomelo": "/images/notes/bitter-orange.png",
+  "sicilian-orange": "/images/notes/mandarin-orange.png",
+  "tunisian-neroli": "/images/notes/bitter-orange.png",
   "bergamot": "/images/notes/bergamot.jpg",
   "calabrian-bergamot": "/images/notes/bergamot.jpg",
   "frozen-bergamot": "/images/notes/frozen-bergamot.jpg",
@@ -153,6 +164,7 @@ const NOTE_IMAGE_MAP = {
   "black-cardamom": "/images/notes/cardamom.jpg",
   "ginger": "/images/notes/ginger.jpg",
   "fresh-ginger": "/images/notes/ginger.jpg",
+  "nigerian-ginger": "/images/notes/ginger.jpg",
   "nutmeg": "/images/notes/nutmeg.png",
   "mace": "/images/notes/nutmeg.png",
   "clove": "/images/notes/nutmeg.png",
@@ -194,6 +206,13 @@ const NOTE_IMAGE_MAP = {
   "cashmere-wood": "/images/notes/cedarwood.jpg",
   "ebony": "/images/notes/oak.png",
   "driftwood": "/images/notes/oak.png",
+  "birch": "/images/notes/cedarwood.jpg",
+  "smoky-birch": "/images/notes/cedarwood.jpg",
+  "vetiver": "/images/notes/patchouli.jpg",
+  "haitian-vetiver": "/images/notes/patchouli.jpg",
+  "chinese-black-tea": "/images/notes/blonde-tobacco.png",
+  "black-tea": "/images/notes/blonde-tobacco.png",
+  "tea": "/images/notes/blonde-tobacco.png",
 
   // Spirits & Gourmands
   "cognac": "/images/notes/cognac.png",

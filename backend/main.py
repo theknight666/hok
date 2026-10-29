@@ -658,6 +658,9 @@ KNOWN_CUTOUTS = {
     "layton": "/images/cut-layton.png",
     "angels-share-on-the-rocks": "/images/cut-angels-share.png",
     "side-effect": "/images/cut-side-effect.png",
+    "imagination": "/images/cut-imagination.png",
+    "aventus-absolu": "/images/cut-aventus-absolu.png",
+    "arabians-tonka": "/images/cut-arabians-tonka.png",
 }
 
 KNOWN_PHOTOS = {
@@ -665,6 +668,9 @@ KNOWN_PHOTOS = {
     "layton": "/images/layton.jpg",
     "angels-share-on-the-rocks": "/images/angels-share.jpg",
     "side-effect": "/images/side-effect.jpg",
+    "imagination": "/images/imagination.jpg",
+    "aventus-absolu": "/images/aventus-absolu.jpg",
+    "arabians-tonka": "/images/arabians-tonka.jpg",
 }
 
 def default_cutout_of(slug: str) -> str:
