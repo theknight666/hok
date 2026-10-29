@@ -54,7 +54,7 @@ export function CartProvider({ children }) {
 
         const size = item.size || "50 ml";
         const currentPrice = size === "2 ml" ? (prod.sample_price || 99) : prod.price;
-        const maxStock = size === "2 ml" ? 20 : (prod.stock ?? 20);
+        const maxStock = size === "2 ml" ? (prod.sample_stock !== undefined ? prod.sample_stock : 50) : (prod.stock ?? 20);
 
         // Detect price change
         if (item.price !== currentPrice) {
@@ -138,7 +138,7 @@ export function CartProvider({ children }) {
     const key = `${p.slug}-${size}`;
     setItems((cur) => {
       const ex = cur.find((i) => (i.key || `${i.slug}-${i.size || "50 ml"}`) === key);
-      const max = size === "2 ml" ? 20 : (p.stock ?? 20);
+      const max = size === "2 ml" ? (p.sample_stock !== undefined ? p.sample_stock : 50) : (p.stock ?? 20);
       if (ex) {
         return cur.map((i) =>
           (i.key || `${i.slug}-${i.size || "50 ml"}`) === key

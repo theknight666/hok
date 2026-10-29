@@ -61,6 +61,8 @@ export const FALLBACK_PRODUCTS = [
     image: "/images/cut-blonde-amber.png",
     images: ["/images/cut-blonde-amber.png", "/images/blonde-amber.jpg"],
     low_stock_threshold: 10,
+    sample_stock: 50,
+    sample_low_stock_threshold: 10,
     active: true,
     featured: true,
     sample_price: 99,
@@ -101,6 +103,8 @@ export const FALLBACK_PRODUCTS = [
     image: "/images/cut-layton.png",
     images: ["/images/cut-layton.png", "/images/layton.jpg"],
     low_stock_threshold: 10,
+    sample_stock: 50,
+    sample_low_stock_threshold: 10,
     active: true,
     featured: true,
     sample_price: 99,
@@ -141,6 +145,8 @@ export const FALLBACK_PRODUCTS = [
     image: "/images/cut-angels-share.png",
     images: ["/images/cut-angels-share.png", "/images/angels-share.jpg"],
     low_stock_threshold: 10,
+    sample_stock: 50,
+    sample_low_stock_threshold: 10,
     active: true,
     featured: true,
     sample_price: 99,
@@ -181,13 +187,15 @@ export const FALLBACK_PRODUCTS = [
     image: "/images/cut-side-effect.png",
     images: ["/images/cut-side-effect.png", "/images/side-effect.jpg"],
     low_stock_threshold: 10,
+    sample_stock: 50,
+    sample_low_stock_threshold: 10,
     active: true,
     featured: true,
     sample_price: 99,
   },
 ];
 
-const CACHE_KEY = "hotk_catalog_cache_v9";
+const CACHE_KEY = "hotk_catalog_cache_v10";
 
 export function getCachedCatalog() {
   if (typeof window === "undefined") return FALLBACK_PRODUCTS.map(sanitizeProduct);

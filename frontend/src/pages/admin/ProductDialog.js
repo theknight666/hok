@@ -21,8 +21,10 @@ const TEXT = [
 const NUM = [
   ["price", "50 ml Price (₹)"],
   ["sample_price", "2 ml Sample Price (₹)"],
-  ["stock", "Stock (bottles)"],
-  ["low_stock_threshold", "Low-stock alert at"],
+  ["stock", "50 ml Stock (bottles)"],
+  ["low_stock_threshold", "50 ml Low-stock alert at"],
+  ["sample_stock", "2 ml Stock (vials)"],
+  ["sample_low_stock_threshold", "2 ml Low-stock alert at"],
 ];
 
 const cls = "w-full border-b border-input bg-transparent py-2 text-sm outline-none focus:border-gold transition-colors";
@@ -559,6 +561,8 @@ export function ProductDialog({ product, onClose, onSaved }) {
       sample_price: 99,
       stock: 0,
       low_stock_threshold: 10,
+      sample_stock: product.sample_stock !== undefined ? product.sample_stock : 50,
+      sample_low_stock_threshold: product.sample_low_stock_threshold !== undefined ? product.sample_low_stock_threshold : 10,
       active: true,
       featured: false,
       olfactory_family: product.olfactory_family || "",
@@ -666,6 +670,8 @@ export function ProductDialog({ product, onClose, onSaved }) {
       sample_price: Number(f.sample_price || 99),
       stock: Number(f.stock),
       low_stock_threshold: Number(f.low_stock_threshold),
+      sample_stock: Number(f.sample_stock !== undefined ? f.sample_stock : 50),
+      sample_low_stock_threshold: Number(f.sample_low_stock_threshold !== undefined ? f.sample_low_stock_threshold : 10),
       active: f.active,
       featured: f.featured,
       notes: {

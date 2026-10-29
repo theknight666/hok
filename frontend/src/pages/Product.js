@@ -11,9 +11,14 @@ import { ReviewsBlock } from "@/components/site/ReviewsBlock";
 import { worldOf, worldVars, featuredFirst, isValidImageUrl, defaultCutoutOf, defaultPhotoOf } from "@/lib/visual";
 import { inr } from "@/lib/api";
 
-function StockLine({ p }) {
-  if (p.stock <= 0) return <p className="text-sm font-semibold text-destructive" data-testid="stock-status">Currently sold out</p>;
-  if (p.stock <= (p.low_stock_threshold ?? 10)) return <p className="text-sm font-semibold text-gold" data-testid="stock-status">Only {p.stock} left</p>;
+function StockLine({ p, size = "50 ml" }) {
+  const isSample = size === "2 ml";
+  const stock = isSample ? (p.sample_stock !== undefined ? p.sample_stock : 50) : (p.stock ?? 0);
+  const threshold = isSample ? (p.sample_low_stock_threshold ?? 10) : (p.low_stock_threshold ?? 10);
+  const unit = isSample ? "vials" : "bottles";
+
+  if (stock <= 0) return <p className="text-sm font-semibold text-destructive" data-testid="stock-status">Currently sold out</p>;
+  if (stock <= threshold) return <p className="text-sm font-semibold text-gold" data-testid="stock-status">Only {stock} {unit} left</p>;
   return <p className="text-sm font-semibold text-muted-foreground" data-testid="stock-status">In stock · ships in 24h</p>;
 }
 
@@ -41,8 +46,9 @@ export default function Product() {
   const world = worldOf(p);
   const others = featuredFirst(products.filter((x) => x.slug !== p.slug)).slice(0, 3);
   const samplePrice = p.sample_price || 99;
+  const sampleStock = p.sample_stock !== undefined ? p.sample_stock : 50;
   const currentPrice = size === "2 ml" ? samplePrice : p.price;
-  const isSoldOut = size === "50 ml" && p.stock <= 0;
+  const isSoldOut = size === "2 ml" ? (sampleStock <= 0) : ((p.stock ?? 0) <= 0);
 
   const defaultCut = defaultCutoutOf(p.slug);
   const defaultPhoto = defaultPhotoOf(p.slug);
@@ -227,7 +233,7 @@ export default function Product() {
 
             <div className="mt-6 flex flex-wrap items-end justify-between gap-4 border-t pt-6">
               <span className="font-display text-4xl sm:text-6xl tabular-nums shrink-0" data-testid="product-price">{inr(currentPrice)}</span>
-              {size === "50 ml" ? <StockLine p={p} /> : <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">In stock · Ready to dispatch</span>}
+              <StockLine p={p} size={size} />
             </div>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
               <div className="flex items-center justify-between rounded-full border-2 px-2 py-1.5 sm:w-44">

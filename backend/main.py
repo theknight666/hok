@@ -234,6 +234,8 @@ class ProductIn(BaseModel):
     sample_price: int = Field(default=99, ge=0)
     stock: int = Field(ge=0)
     low_stock_threshold: int = Field(default=10, ge=0)
+    sample_stock: int = Field(default=50, ge=0)
+    sample_low_stock_threshold: int = Field(default=10, ge=0)
     volume: str = "50 ml"
     concentration: str = "Eau de Parfum"
     badge: str = ""
@@ -258,6 +260,8 @@ class ProductPatch(BaseModel):
     sample_price: Optional[int] = Field(default=None, ge=0)
     stock: Optional[int] = Field(default=None, ge=0)
     low_stock_threshold: Optional[int] = Field(default=None, ge=0)
+    sample_stock: Optional[int] = Field(default=None, ge=0)
+    sample_low_stock_threshold: Optional[int] = Field(default=None, ge=0)
     volume: Optional[str] = None
     concentration: Optional[str] = None
     badge: Optional[str] = None
@@ -275,6 +279,7 @@ class ProductPatch(BaseModel):
 
 class StockAdjust(BaseModel):
     delta: int
+    size: Optional[str] = "50 ml"
 
 
 class CartItem(BaseModel):
@@ -582,7 +587,9 @@ async def ensure_seeded():
                 img_url = f"/images/{p['slug'].replace('-on-the-rocks', '')}.jpg"
                 doc = {**p, "price": SEED_PRICES.get(p["slug"], 1499), "sample_price": SEED_SAMPLE_PRICES.get(p["slug"], 99),
                        "volume": "50 ml", "image": img_url, "images": [img_url],
-                       "low_stock_threshold": 10, "active": True, "featured": True, "updated_at": now().isoformat()}
+                       "stock": p.get("stock", 50), "low_stock_threshold": 10,
+                       "sample_stock": p.get("sample_stock", 50), "sample_low_stock_threshold": 10,
+                       "active": True, "featured": True, "updated_at": now().isoformat()}
                 await db.products.insert_one(doc)
                 logger.info("Seeded missing fragrance: %s", p["slug"])
             else:
@@ -591,6 +598,10 @@ async def ensure_seeded():
                 missing = {}
                 if "sample_price" not in existing or existing.get("sample_price") is None:
                     missing["sample_price"] = SEED_SAMPLE_PRICES.get(p["slug"], 99)
+                if "sample_stock" not in existing or existing.get("sample_stock") is None:
+                    missing["sample_stock"] = 50
+                if "sample_low_stock_threshold" not in existing or existing.get("sample_low_stock_threshold") is None:
+                    missing["sample_low_stock_threshold"] = 10
                 if "volume" not in existing:
                     missing["volume"] = "50 ml"
                 if "images" not in existing or not existing.get("images"):
@@ -686,7 +697,10 @@ def _seed_fallback():
             "volume": "50 ml",
             "image": f"/images/cut-{p['slug'].replace('-on-the-rocks', '')}.png",
             "images": [f"/images/cut-{p['slug'].replace('-on-the-rocks', '')}.png", f"/images/{p['slug'].replace('-on-the-rocks', '')}.jpg"],
+            "stock": p.get("stock", 50),
             "low_stock_threshold": 10,
+            "sample_stock": p.get("sample_stock", 50),
+            "sample_low_stock_threshold": 10,
             "active": True,
             "featured": True,
             "updated_at": ""
@@ -764,6 +778,12 @@ async def create_order(body: OrderIn, user: Optional[dict] = Depends(optional_us
             # Apply price and stock management per size
             if size == "2 ml":
                 unit_price = p.get("sample_price", 99)
+                p_upd = await db.products.find_one_and_update(
+                    {"slug": it.slug, "active": True, "sample_stock": {"$gte": it.qty}},
+                    {"$inc": {"sample_stock": -it.qty}}, projection={"_id": 0})
+                if not p_upd:
+                    raise HTTPException(status_code=400, detail=f"Not enough sample stock for {p['name']}")
+                reserved.append((it, "2 ml"))
             else:
                 unit_price = p.get("price", 0)
                 p_upd = await db.products.find_one_and_update(
@@ -771,13 +791,14 @@ async def create_order(body: OrderIn, user: Optional[dict] = Depends(optional_us
                     {"$inc": {"stock": -it.qty}}, projection={"_id": 0})
                 if not p_upd:
                     raise HTTPException(status_code=400, detail=f"Not enough stock for {p['name']}")
-                reserved.append(it)
+                reserved.append((it, "50 ml"))
 
             lines.append({"slug": p["slug"], "name": p["name"], "size": size, "price": unit_price, "qty": it.qty,
                           "image": p.get("image", ""), "line_total": unit_price * it.qty})
     except HTTPException:
-        for r in reserved:
-            await db.products.update_one({"slug": r.slug}, {"$inc": {"stock": r.qty}})
+        for r, r_size in reserved:
+            field = "sample_stock" if r_size == "2 ml" else "stock"
+            await db.products.update_one({"slug": r.slug}, {"$inc": {field: r.qty}})
         raise
 
     subtotal = sum(line["line_total"] for line in lines)
@@ -905,9 +926,14 @@ async def admin_stats(_: dict = Depends(require_admin)):
         "orders": len(orders),
         "pending": sum(1 for o in orders if o["status"] == "pending"),
         "customers": await db.users.count_documents({"role": "customer"}),
-        "units_in_stock": sum(p["stock"] for p in products),
-        "low_stock": [{"slug": p["slug"], "name": p["name"], "stock": p["stock"]} for p in products
-                      if p["stock"] <= p.get("low_stock_threshold", 10)],
+        "units_in_stock": sum(p.get("stock", 0) + p.get("sample_stock", 0) for p in products),
+        "low_stock": [
+            {"slug": p["slug"], "name": f"{p['name']} (50 ml)", "stock": p.get("stock", 0)}
+            for p in products if p.get("stock", 0) <= p.get("low_stock_threshold", 10)
+        ] + [
+            {"slug": p["slug"], "name": f"{p['name']} (2 ml)", "stock": p.get("sample_stock", 0)}
+            for p in products if p.get("sample_stock", 0) <= p.get("sample_low_stock_threshold", 10)
+        ],
         "best_sellers": sorted([{"slug": p["slug"], "name": p["name"], "units": units.get(p["slug"], 0)}
                                 for p in products], key=lambda x: -x["units"]),
     }
@@ -966,11 +992,15 @@ async def admin_adjust_stock(slug: str, body: StockAdjust, admin: dict = Depends
     p = await db.products.find_one({"slug": slug}, {"_id": 0})
     if not p:
         raise HTTPException(status_code=404, detail="Product not found")
-    new_stock = max(0, p["stock"] + body.delta)
-    await db.products.update_one({"slug": slug}, {"$set": {"stock": new_stock, "updated_at": now().isoformat()}})
-    await db.inventory_log.insert_one({"slug": slug, "delta": body.delta, "stock_after": new_stock,
+    is_sample = (body.size == "2 ml")
+    field = "sample_stock" if is_sample else "stock"
+    current_val = p.get(field, 50 if is_sample else 0)
+    new_stock = max(0, current_val + body.delta)
+    await db.products.update_one({"slug": slug}, {"$set": {field: new_stock, "updated_at": now().isoformat()}})
+    display_slug = f"{slug} · 2 ml" if is_sample else f"{slug} · 50 ml"
+    await db.inventory_log.insert_one({"slug": display_slug, "size": body.size or "50 ml", "delta": body.delta, "stock_after": new_stock,
                                        "by": admin["email"], "at": now().isoformat()})
-    p["stock"] = new_stock
+    p[field] = new_stock
     return p
 
 
@@ -991,10 +1021,11 @@ async def admin_reset_demo_data(_: dict = Depends(require_admin)):
     o_res = await db.orders.delete_many({})
     u_res = await db.users.delete_many({"role": {"$ne": "admin"}})
     l_res = await db.inventory_log.delete_many({})
-    await db.products.update_many({}, {"$set": {"stock": 50}})
+    await db.products.update_many({}, {"$set": {"stock": 50, "sample_stock": 50}})
     global _products_cache
     for p in _products_cache:
         p["stock"] = 50
+        p["sample_stock"] = 50
     return {
         "ok": True,
         "deleted_orders": o_res.deleted_count,
@@ -1015,7 +1046,8 @@ async def admin_order_status(order_id: str, body: OrderStatusIn, _: dict = Depen
         raise HTTPException(status_code=404, detail="Order not found")
     if body.status == "cancelled" and o["status"] != "cancelled":
         for i in o["items"]:
-            await db.products.update_one({"slug": i["slug"]}, {"$inc": {"stock": i["qty"]}})
+            field = "sample_stock" if i.get("size") == "2 ml" else "stock"
+            await db.products.update_one({"slug": i["slug"]}, {"$inc": {field: i["qty"]}})
     upd = {"status": body.status}
     if body.courier is not None:
         upd["courier"] = body.courier.strip()
@@ -1369,7 +1401,7 @@ SEED = [
         "slug": "blonde-amber", "name": "Blonde Amber", "order": 1, "color": "#D4A24C", "badge": "The Signature",
         "tagline": "Liquid gold, warm resins and a whisper of smoke.",
         "story": "A radiant amber that glows like candlelight on gilded walls — warm, golden and unmistakably regal. Conceived as a celebration of sovereign decadence, it weaves precious golden resins, smoky blonde tobacco and vintage rum into a captivating trail of timeless grandeur.",
-        "concentration": "Eau de Parfum", "volume": "50 ml", "price": 1599, "sample_price": 99, "stock": 50,
+        "concentration": "Eau de Parfum", "volume": "50 ml", "price": 1599, "sample_price": 99, "stock": 50, "low_stock_threshold": 10, "sample_stock": 50, "sample_low_stock_threshold": 10,
         "olfactory_family": "Warm Amber Spicy · Oriental Gourmand",
         "accords": [
             {"name": "Amber Resin", "pct": 95},
@@ -1397,7 +1429,7 @@ SEED = [
         "slug": "layton", "name": "Layton", "order": 2, "color": "#1E2F5C", "badge": "The Noble",
         "tagline": "Crisp bergamot, lavender and warm woods.",
         "story": "Composed with the poise of a knight in royal court — fresh and invigorating at first, then deep, warm and commanding. An aristocratic harmony of wild French lavender, tart green apple and precious woods designed for those who lead with quiet authority.",
-        "concentration": "Eau de Parfum", "volume": "50 ml", "price": 1499, "sample_price": 99, "stock": 50,
+        "concentration": "Eau de Parfum", "volume": "50 ml", "price": 1499, "sample_price": 99, "stock": 50, "low_stock_threshold": 10, "sample_stock": 50, "sample_low_stock_threshold": 10,
         "olfactory_family": "Amber Floral · Aristocratic Fresh Woody",
         "accords": [
             {"name": "Warm Spicy", "pct": 94},
@@ -1423,7 +1455,7 @@ SEED = [
         "slug": "angels-share-on-the-rocks", "name": "Angels Share On The Rocks", "order": 3, "color": "#8A4B1F",
         "badge": "The Reserve", "tagline": "Cognac, cinnamon and oak — served over ice.",
         "story": "An ode to the sacred spirit lost to the heavens as cognac ages in French oak, poured cold over crystal ice. Rich with spicy cinnamon, roasted praline and aged eau-de-vie, it captures the hedonistic warmth of late-night indulgence in an opulent salon.",
-        "concentration": "Eau de Parfum", "volume": "50 ml", "price": 1549, "sample_price": 99, "stock": 50,
+        "concentration": "Eau de Parfum", "volume": "50 ml", "price": 1549, "sample_price": 99, "stock": 50, "low_stock_threshold": 10, "sample_stock": 50, "sample_low_stock_threshold": 10,
         "olfactory_family": "Warm Gourmand · Boozy Amber Wood",
         "accords": [
             {"name": "Cinnamon Spice", "pct": 96},
@@ -1450,7 +1482,7 @@ SEED = [
         "slug": "side-effect", "name": "Side Effect", "order": 4, "color": "#5A1420", "badge": "The Enigma",
         "tagline": "Tobacco, rum and dark leather after midnight.",
         "story": "A dark, intoxicating trail of cured tobacco and vintage Jamaican rum that lingers long after you have left the room. Ignited by crimson saffron and wrapped in dark saddle leather, it is an enigmatic elixir of unrestrained passion and midnight temptation.",
-        "concentration": "Eau de Parfum", "volume": "50 ml", "price": 1499, "sample_price": 99, "stock": 50,
+        "concentration": "Eau de Parfum", "volume": "50 ml", "price": 1499, "sample_price": 99, "stock": 50, "low_stock_threshold": 10, "sample_stock": 50, "sample_low_stock_threshold": 10,
         "olfactory_family": "Amber Tobacco · Dark Narcotic Leather",
         "accords": [
             {"name": "Rich Tobacco", "pct": 96},

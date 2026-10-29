@@ -8,14 +8,23 @@ import { ProductDialog } from "./ProductDialog";
 import { defaultCutoutOf } from "@/lib/visual";
 
 function Row({ p, onEdit, refresh }) {
+  const [targetSize, setTargetSize] = useState("50 ml");
   const [amount, setAmount] = useState(10);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
+  const stock50 = p.stock ?? 0;
+  const threshold50 = p.low_stock_threshold ?? 10;
+  const low50 = stock50 <= threshold50;
+
+  const stock2 = p.sample_stock !== undefined ? p.sample_stock : 50;
+  const threshold2 = p.sample_low_stock_threshold !== undefined ? p.sample_low_stock_threshold : 10;
+  const low2 = stock2 <= threshold2;
+
   const adjust = async (delta) => {
     try {
-      await api.post(`/admin/products/${p.slug}/stock`, { delta });
-      toast.success(`${p.name}: stock ${delta > 0 ? "+" : ""}${delta}`);
+      await api.post(`/admin/products/${p.slug}/stock`, { delta, size: targetSize });
+      toast.success(`${p.name} (${targetSize}): stock ${delta > 0 ? "+" : ""}${delta}`);
       refresh();
     } catch (e) {
       toast.error(formatErr(e));
@@ -38,7 +47,6 @@ function Row({ p, onEdit, refresh }) {
     }
   };
 
-  const low = p.stock <= p.low_stock_threshold;
   return (
     <tr className="border-b border-border/40 hover:bg-muted/15 transition-colors align-middle" data-testid={`inventory-row-${p.slug}`}>
       <td className="py-4 pl-4 pr-4">
@@ -55,22 +63,106 @@ function Row({ p, onEdit, refresh }) {
             className="h-14 w-11 rounded-lg bg-muted object-contain shrink-0"
             data-testid={`inventory-image-${p.slug}`}
           />
-          <div className="min-w-0 max-w-[260px]">
+          <div className="min-w-0 max-w-[240px]">
             <p className="font-display text-xl leading-tight truncate" title={p.name}>{p.name}</p>
             <p className="text-xs text-muted-foreground truncate">{p.concentration} · {p.volume}</p>
           </div>
         </div>
       </td>
-      <td className="pr-4">{inr(p.price)}</td>
-      <td className="pr-4">
-        <span className={low ? "text-gold" : ""} data-testid={`inventory-stock-${p.slug}`}>{p.stock}</span>
-        <span className="ml-2 text-xs text-muted-foreground">/ alert ≤ {p.low_stock_threshold}</span>
+      <td className="pr-4 whitespace-nowrap">
+        <div className="flex flex-col gap-1 text-xs">
+          <div className="flex items-center gap-1.5">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground w-8">50 ml</span>
+            <span className="font-semibold text-foreground">{inr(p.price)}</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground w-8">2 ml</span>
+            <span className="text-muted-foreground">{inr(p.sample_price || 99)}</span>
+          </div>
+        </div>
       </td>
-      <td className="pr-4">
-        <div className="flex items-center gap-2">
-          <button onClick={() => adjust(-amount)} className="grid h-8 w-8 place-items-center border hover:border-gold" data-testid={`stock-remove-${p.slug}`} aria-label="Remove stock"><Minus className="h-3.5 w-3.5" /></button>
-          <input type="number" min={1} value={amount} onChange={(e) => setAmount(Math.max(1, Number(e.target.value) || 1))} className="h-8 w-16 border bg-transparent text-center text-sm" data-testid={`stock-amount-${p.slug}`} />
-          <button onClick={() => adjust(amount)} className="grid h-8 w-8 place-items-center border hover:border-gold" data-testid={`stock-add-${p.slug}`} aria-label="Add stock"><Plus className="h-3.5 w-3.5" /></button>
+      <td className="pr-4 whitespace-nowrap">
+        <div className="flex flex-col gap-1 text-xs">
+          <div className="flex items-center gap-1.5">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground w-8">50 ml</span>
+            <span className={low50 ? "font-bold text-gold" : "font-semibold text-foreground"} data-testid={`inventory-stock-${p.slug}`}>
+              {stock50}
+            </span>
+            <span className="text-[10px] text-muted-foreground/75">/ alert ≤ {threshold50}</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground w-8">2 ml</span>
+            <span className={low2 ? "font-bold text-gold" : "font-semibold text-foreground"} data-testid={`inventory-sample-stock-${p.slug}`}>
+              {stock2}
+            </span>
+            <span className="text-[10px] text-muted-foreground/75">/ alert ≤ {threshold2}</span>
+          </div>
+        </div>
+      </td>
+      <td className="pr-4 whitespace-nowrap">
+        <div className="flex flex-col gap-1.5 min-w-[145px]">
+          {/* Target Size Selector Toggle */}
+          <div className="inline-flex rounded-lg border border-border/80 p-0.5 bg-muted/40 self-start">
+            <button
+              type="button"
+              onClick={() => setTargetSize("50 ml")}
+              className={`px-2 py-0.5 text-[10px] uppercase tracking-wider rounded-md font-bold transition-all cursor-pointer ${
+                targetSize === "50 ml"
+                  ? "bg-gold text-black shadow-xs"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+              data-testid={`adjust-size-50ml-${p.slug}`}
+              title="Target 50 ml bottle stock"
+            >
+              50 ml ({stock50})
+            </button>
+            <button
+              type="button"
+              onClick={() => setTargetSize("2 ml")}
+              className={`px-2 py-0.5 text-[10px] uppercase tracking-wider rounded-md font-bold transition-all cursor-pointer ${
+                targetSize === "2 ml"
+                  ? "bg-gold text-black shadow-xs"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+              data-testid={`adjust-size-2ml-${p.slug}`}
+              title="Target 2 ml sample vial stock"
+            >
+              2 ml ({stock2})
+            </button>
+          </div>
+
+          {/* Stepper with current active size badge */}
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => adjust(-amount)}
+              className="grid h-7 w-7 place-items-center rounded border border-border/80 bg-card/60 hover:border-gold hover:text-gold transition-colors cursor-pointer"
+              data-testid={`stock-remove-${p.slug}`}
+              aria-label={`Remove ${amount} from ${targetSize} stock`}
+              title={`Remove ${amount} from ${targetSize} stock`}
+            >
+              <Minus className="h-3 w-3" />
+            </button>
+            <input
+              type="number"
+              min={1}
+              value={amount}
+              onChange={(e) => setAmount(Math.max(1, Number(e.target.value) || 1))}
+              className="h-7 w-12 rounded border border-border/80 bg-transparent text-center text-xs font-semibold focus:border-gold focus:outline-none"
+              data-testid={`stock-amount-${p.slug}`}
+            />
+            <button
+              type="button"
+              onClick={() => adjust(amount)}
+              className="grid h-7 w-7 place-items-center rounded border border-border/80 bg-card/60 hover:border-gold hover:text-gold transition-colors cursor-pointer"
+              data-testid={`stock-add-${p.slug}`}
+              aria-label={`Add ${amount} to ${targetSize} stock`}
+              title={`Add ${amount} to ${targetSize} stock`}
+            >
+              <Plus className="h-3 w-3" />
+            </button>
+            <span className="text-[10px] font-mono text-muted-foreground uppercase">{targetSize}</span>
+          </div>
         </div>
       </td>
       <td className="pr-4"><Switch checked={p.active} onCheckedChange={toggle} data-testid={`active-toggle-${p.slug}`} /></td>
@@ -221,7 +313,7 @@ export function Inventory() {
           tabIndex={0}
           aria-label="Fragrances catalogue"
         >
-          <table className="w-full min-w-[860px] text-sm border-collapse">
+          <table className="w-full min-w-[960px] text-sm border-collapse">
             <thead className="sticky top-0 z-10 bg-card/95 backdrop-blur-md shadow-[0_1px_0_0_hsl(var(--border)/0.8)]">
               <tr className="text-left text-[0.62rem] uppercase tracking-[0.25em] text-muted-foreground">
                 <th className="py-3.5 pl-4 pr-4">Fragrance</th>
@@ -299,13 +391,22 @@ export function Inventory() {
 
       <ul className="mt-2 divide-y border-y text-sm" data-testid="inventory-log">
         {(Array.isArray(log) ? log : []).slice(0, 50).map((l, i) => (
-          <li key={i} className="flex flex-wrap justify-between gap-2 py-3">
-            <span className="font-medium text-foreground">{l.slug}</span>
-            <span className={l.delta > 0 ? "text-emerald-700 dark:text-emerald-400 font-semibold" : "text-red-700 dark:text-red-400 font-semibold"}>
-              {l.delta > 0 ? "+" : ""}{l.delta}
-            </span>
-            <span className="text-muted-foreground">→ {l.stock_after}</span>
-            <span className="text-muted-foreground">{new Date(l.at).toLocaleString("en-IN")}</span>
+          <li key={i} className="flex flex-wrap items-center justify-between gap-3 py-3">
+            <div className="flex items-center gap-2.5">
+              <span className="font-medium text-foreground">{l.slug}</span>
+              {l.size && (
+                <span className="text-[10px] uppercase tracking-wider font-semibold px-2 py-0.5 rounded bg-muted text-muted-foreground border border-border/50">
+                  {l.size}
+                </span>
+              )}
+            </div>
+            <div className="flex items-center gap-6">
+              <span className={l.delta > 0 ? "text-emerald-700 dark:text-emerald-400 font-semibold" : "text-red-700 dark:text-red-400 font-semibold"}>
+                {l.delta > 0 ? "+" : ""}{l.delta}
+              </span>
+              <span className="text-muted-foreground text-xs sm:text-sm">→ {l.stock_after}</span>
+              <span className="text-xs text-muted-foreground">{new Date(l.at).toLocaleString("en-IN")}</span>
+            </div>
           </li>
         ))}
         {!(Array.isArray(log) && log.length) && <li className="py-4 text-muted-foreground italic">No movements recorded.</li>}
