@@ -668,10 +668,10 @@ KNOWN_PHOTOS = {
 }
 
 def default_cutout_of(slug: str) -> str:
-    return KNOWN_CUTOUTS.get(slug, "/images/cut-blonde-amber.png")
+    return KNOWN_CUTOUTS.get(slug, "")
 
 def default_photo_of(slug: str) -> str:
-    return KNOWN_PHOTOS.get(slug, "/images/blonde-amber.jpg")
+    return KNOWN_PHOTOS.get(slug, "")
 
 
 def _is_valid_img_url(url: str) -> bool:
@@ -705,11 +705,13 @@ def _sanitize_product_doc(p: dict) -> dict:
     default_photo = default_photo_of(slug)
 
     clean_primary = img if is_valid_primary else (clean_imgs[0] if clean_imgs else default_cut)
-    if not clean_imgs:
-        clean_imgs = [clean_primary, default_photo]
+    if not clean_imgs and clean_primary:
+        clean_imgs = [clean_primary]
+        if default_photo and default_photo != clean_primary:
+            clean_imgs.append(default_photo)
 
-    p["image"] = clean_primary
-    p["images"] = list(dict.fromkeys(clean_imgs))
+    p["image"] = clean_primary or ""
+    p["images"] = [u for u in dict.fromkeys(clean_imgs) if u]
     return p
 
 

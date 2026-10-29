@@ -51,16 +51,26 @@ function Row({ p, onEdit, refresh }) {
     <tr className="border-b border-border/40 hover:bg-muted/15 transition-colors align-middle" data-testid={`inventory-row-${p.slug}`}>
       <td className="py-4 pl-4 pr-4">
         <div className="flex items-center gap-4 min-w-0">
-          <img
-            src={p.image && isValidImageUrl(p.image) ? p.image : defaultCutoutOf(p.slug)}
-            alt=""
-            onError={(e) => {
-              e.currentTarget.onerror = null;
-              e.currentTarget.src = "/images/cut-blonde-amber.png";
-            }}
-            className="h-14 w-11 rounded-lg bg-muted object-contain shrink-0"
-            data-testid={`inventory-image-${p.slug}`}
-          />
+          {p.image && isValidImageUrl(p.image) ? (
+            <img
+              src={p.image}
+              alt={p.name}
+              onError={(e) => {
+                e.currentTarget.onerror = null;
+                e.currentTarget.style.display = "none";
+              }}
+              className="h-14 w-11 rounded-lg bg-muted object-contain shrink-0"
+              data-testid={`inventory-image-${p.slug}`}
+            />
+          ) : (
+            <div
+              className="h-14 w-11 rounded-lg bg-muted/30 border border-border/40 grid place-items-center shrink-0 text-muted-foreground/40 select-none"
+              title="No image uploaded"
+              data-testid={`inventory-no-image-${p.slug}`}
+            >
+              <span className="text-[9px] font-mono uppercase tracking-wider text-muted-foreground/60 font-semibold">No img</span>
+            </div>
+          )}
           <div className="min-w-0 max-w-[240px]">
             <p className="font-display text-xl leading-tight truncate" title={p.name}>{p.name}</p>
             <p className="text-xs text-muted-foreground truncate">{p.concentration} · {p.volume}</p>

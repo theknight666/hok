@@ -61,7 +61,7 @@ export default function Product() {
   const gallery = p.image && baseGallery.includes(p.image)
     ? [p.image, ...baseGallery.filter((x) => x !== p.image)]
     : baseGallery;
-  const activeImage = gallery[selectedIdx] || p.image || gallery[0] || defaultCut;
+  const activeImage = gallery[selectedIdx] || p.image || gallery[0] || "";
 
   return (
     <main data-testid="product-page" className="w-full max-w-full overflow-x-hidden">
@@ -87,16 +87,24 @@ export default function Product() {
                     className="animate-floaty relative will-change-transform transform-gpu flex items-center justify-center h-full w-full"
                     style={{ "--tilt": "-3deg" }}
                   >
-                    <img
-                      src={activeImage}
-                      alt={`${p.name} - View ${selectedIdx + 1}`}
-                      className="bottle-shadow h-[46svh] w-auto lg:h-[58svh] max-w-full select-none object-contain"
-                      draggable={false}
-                      onError={(e) => {
-                        e.currentTarget.onerror = null;
-                        e.currentTarget.src = defaultCut;
-                      }}
-                    />
+                    {activeImage ? (
+                      <img
+                        src={activeImage}
+                        alt={`${p.name} - View ${selectedIdx + 1}`}
+                        className="bottle-shadow h-[46svh] w-auto lg:h-[58svh] max-w-full select-none object-contain"
+                        draggable={false}
+                        onError={(e) => {
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.style.display = "none";
+                        }}
+                      />
+                    ) : (
+                      <div className="flex flex-col items-center justify-center h-[34svh] sm:h-[42svh] w-48 sm:w-60 rounded-3xl border border-dashed border-border/70 bg-black/10 backdrop-blur-xs p-6 text-center select-none">
+                        <Sparkles className="h-7 w-7 text-gold/70 mb-3" />
+                        <p className="font-display text-xl text-foreground/90">{p.name}</p>
+                        <p className="text-xs text-muted-foreground/75 mt-1">Image coming soon</p>
+                      </div>
+                    )}
                   </motion.div>
                 </AnimatePresence>
               </div>

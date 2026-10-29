@@ -44,15 +44,13 @@ export function isValidImageUrl(url) {
 }
 
 export const defaultCutoutOf = (slug) =>
-  (slug && KNOWN_CUTOUTS[slug]) ||
-  "/images/cut-blonde-amber.png";
+  (slug && KNOWN_CUTOUTS[slug]) || "";
 
 export const defaultPhotoOf = (slug) =>
-  (slug && KNOWN_PHOTOS[slug]) ||
-  "/images/blonde-amber.jpg";
+  (slug && KNOWN_PHOTOS[slug]) || "";
 
 export const cutout = (p) => {
-  if (!p) return "/images/cut-blonde-amber.png";
+  if (!p) return "";
   if (p.image && (p.image.endsWith("/blonde-amber.jpg") || p.image.endsWith("/layton.jpg") || p.image.endsWith("/angels-share.jpg") || p.image.endsWith("/side-effect.jpg"))) {
     return defaultCutoutOf(p.slug);
   }
@@ -61,16 +59,16 @@ export const cutout = (p) => {
     return p.image;
   }
   if (p.slug && KNOWN_CUTOUTS[p.slug]) return KNOWN_CUTOUTS[p.slug];
-  return defaultCutoutOf(p?.slug);
+  return "";
 };
 
 export const photoshoot = (p) => {
-  if (!p) return "/images/blonde-amber.jpg";
+  if (!p) return "";
   if (isValidImageUrl(p.image)) {
     return p.image;
   }
   if (p.slug && KNOWN_PHOTOS[p.slug]) return KNOWN_PHOTOS[p.slug];
-  return defaultPhotoOf(p?.slug);
+  return "";
 };
 
 export const flatNotes = (notes, n = 5) =>

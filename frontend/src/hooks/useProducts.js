@@ -10,7 +10,7 @@ export function sanitizeProduct(p) {
   const rawImages = Array.isArray(p.images) && p.images.length > 0 ? p.images : (p.image ? [p.image] : []);
   const validImages = Array.from(new Set(rawImages.filter(isValidImageUrl)));
   const finalImages = validImages.length > 0 ? validImages : [defaultCut, defaultPhoto].filter(Boolean);
-  const finalImage = isValidImageUrl(p.image) ? p.image : (finalImages[0] || defaultCut);
+  const finalImage = isValidImageUrl(p.image) ? p.image : (finalImages[0] || "");
   const finalMajorNotes = Array.isArray(p.major_notes) && p.major_notes.length > 0
     ? p.major_notes
     : (DEFAULT_MAJOR_NOTES[p.slug] || []);
@@ -195,7 +195,7 @@ export const FALLBACK_PRODUCTS = [
   },
 ];
 
-const CACHE_KEY = "hotk_catalog_cache_v11";
+const CACHE_KEY = "hotk_catalog_cache_v12";
 
 export function getCachedCatalog() {
   if (typeof window === "undefined") return FALLBACK_PRODUCTS.map(sanitizeProduct);

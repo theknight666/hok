@@ -86,7 +86,7 @@ export function BottleUpload({ slug, image, images = [], onChange, onDone }) {
     const valid = Array.from(new Set(raw.filter(isValidImageUrl)));
     const hasCustom = valid.some((u) => u.startsWith("/api/media/") || u.startsWith("data:") || u.startsWith("http"));
     const clean = hasCustom ? valid.filter((u) => !u.includes("/images/cut-") && !u.includes("/images/blonde-amber.jpg") && !u.includes("/images/layton.jpg") && !u.includes("/images/angels-share.jpg") && !u.includes("/images/side-effect.jpg")) : valid;
-    return clean.length > 0 ? clean : (slug ? [defaultCutoutOf(slug)] : []);
+    return clean.length > 0 ? clean : (slug && defaultCutoutOf(slug) ? [defaultCutoutOf(slug)] : []);
   });
   const [primaryUrl, setPrimaryUrl] = useState(() => (isValidImageUrl(image) ? image : (gallery[0] || "")));
 
@@ -97,7 +97,7 @@ export function BottleUpload({ slug, image, images = [], onChange, onDone }) {
     const valid = Array.from(new Set(raw.filter(isValidImageUrl)));
     const hasCustom = valid.some((u) => u.startsWith("/api/media/") || u.startsWith("data:") || u.startsWith("http"));
     const clean = hasCustom ? valid.filter((u) => !u.includes("/images/cut-") && !u.includes("/images/blonde-amber.jpg") && !u.includes("/images/layton.jpg") && !u.includes("/images/angels-share.jpg") && !u.includes("/images/side-effect.jpg")) : valid;
-    const finalGallery = clean.length > 0 ? clean : (slug ? [defaultCutoutOf(slug)] : []);
+    const finalGallery = clean.length > 0 ? clean : (slug && defaultCutoutOf(slug) ? [defaultCutoutOf(slug)] : []);
     setGallery(finalGallery);
     setPrimaryUrl(isValidImageUrl(image) && (!hasCustom || !image.includes("/images/cut-")) ? image : (finalGallery[0] || ""));
   }, [image, images, imagesKey, slug]);
@@ -243,9 +243,9 @@ export function BottleUpload({ slug, image, images = [], onChange, onDone }) {
 
   const handleDeleteImage = async (imgUrlToDelete) => {
     const updated = gallery.filter((u) => u !== imgUrlToDelete && isValidImageUrl(u));
-    const fallbackImage = slug ? defaultCutoutOf(slug) : "";
+    const fallbackImage = (slug && defaultCutoutOf(slug)) || "";
     const finalUpdated = updated.length > 0 ? updated : (fallbackImage ? [fallbackImage] : []);
-    const newPrimary = primaryUrl === imgUrlToDelete ? (finalUpdated[0] || fallbackImage) : primaryUrl;
+    const newPrimary = primaryUrl === imgUrlToDelete ? (finalUpdated[0] || "") : primaryUrl;
 
     setGallery(finalUpdated);
     setPrimaryUrl(newPrimary);

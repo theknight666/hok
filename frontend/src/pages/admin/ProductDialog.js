@@ -651,10 +651,10 @@ export function ProductDialog({ product, onClose, onSaved }) {
       ? cleanImages.filter((u) => !u.includes("/images/cut-") && !u.includes("/images/blonde-amber.jpg") && !u.includes("/images/layton.jpg") && !u.includes("/images/angels-share.jpg") && !u.includes("/images/side-effect.jpg"))
       : cleanImages;
     const defaultCut = defaultCutoutOf(savedSlug);
-    const finalImages = pureImages.length > 0 ? pureImages : [defaultCut];
-    const finalPrimary = isValidImageUrl(f.image) && (!hasCustom || !f.image.includes("/images/cut-"))
+    const finalImages = pureImages.length > 0 ? pureImages : (defaultCut ? [defaultCut] : []);
+    const finalPrimary = (isValidImageUrl(f.image) && (!hasCustom || !f.image.includes("/images/cut-")))
       ? f.image
-      : (finalImages[0] || defaultCut);
+      : (finalImages[0] || "");
 
     const body = {
       name: f.name,
