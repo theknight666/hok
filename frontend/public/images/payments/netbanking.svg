@@ -1,9 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 54 34" width="54" height="34">
-  <title>Net Banking</title>
-  <rect width="54" height="34" rx="4" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1"/>
-  <g transform="translate(6, 6)">
-    <path d="M11 2L2 7.5h18L11 2zm-7 7.5v6.5h2.5v-6.5H4zm5 0v6.5h2.5v-6.5H9zm5 0v6.5h2.5v-6.5H14zm-12 8.5v2.5h18V18H2z" fill="#006699"/>
-    <text x="23" y="10.5" font-family="-apple-system, BlinkMacSystemFont, Arial, sans-serif" font-weight="800" font-size="7.5" fill="#0A2540" letter-spacing="0.3">NET</text>
-    <text x="23" y="18.5" font-family="-apple-system, BlinkMacSystemFont, Arial, sans-serif" font-weight="800" font-size="7.5" fill="#0A2540" letter-spacing="0.3">BANK</text>
-  </g>
-</svg>
+<svg viewBox="0 0 38 24" xmlns="http://www.w3.org/2000/svg" data-name="Layer 1" width="38" height="24" role="img" aria-labelledby="pi-netbanking"><title id="pi-netbanking">NetBanking</title><rect x=".5" y=".5" width="37" height="23" rx="3" ry="3" fill="#fff" stroke="#000" stroke-opacity=".07"/><path d="M19 4.5l-7.5 5.63h15L19 4.5zm6.56 13.13H12.44a.94.94 0 0 0-.94.94v.93h15v-.94a.94.94 0 0 0-.94-.93zm-5.62-6.57h1.88v5.63h-1.88zm3.75 0h1.88v5.63h-1.88zm-7.5 0h1.88v5.63h-1.88zm-3.75 0h1.88v5.63h-1.88z"/></svg>
