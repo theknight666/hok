@@ -979,6 +979,13 @@ async def admin_inventory_log(_: dict = Depends(require_admin)):
     return await db.inventory_log.find({}, {"_id": 0}).sort("at", -1).to_list(50)
 
 
+@api.delete("/admin/inventory-log")
+@api.post("/admin/inventory-log/clear")
+async def admin_clear_inventory_log(_: dict = Depends(require_admin)):
+    res = await db.inventory_log.delete_many({})
+    return {"ok": True, "deleted": res.deleted_count}
+
+
 @api.post("/admin/reset-demo-data")
 async def admin_reset_demo_data(_: dict = Depends(require_admin)):
     o_res = await db.orders.delete_many({})
