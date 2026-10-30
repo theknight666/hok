@@ -82,7 +82,7 @@ export function Header() {
   return (
     <header data-testid="site-header" className="fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-5 sm:pt-4">
       <div
-        className={`mx-auto flex h-16 max-w-[1600px] items-center justify-between rounded-full border px-3 pl-5 text-foreground backdrop-blur-md transition-[background-color,border-color,box-shadow] duration-300 ${
+        className={`relative mx-auto flex h-16 max-w-[1600px] items-center justify-between rounded-full border px-3 pl-5 text-foreground backdrop-blur-md transition-[background-color,border-color,box-shadow] duration-300 ${
           compact ? "border-border/60 bg-background/85 shadow-lg" : "border-background/40 bg-background/60"
         }`}
       >
@@ -90,14 +90,14 @@ export function Header() {
           <KnightMark className="h-9 w-9 sm:h-10 sm:w-10" />
         </Link>
 
-        <nav className="hidden items-center gap-0.5 lg:gap-1 md:flex">
+        <nav className="pointer-events-none absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-0.5 md:flex lg:gap-1">
           {LINKS.map((l) => (
             <Link
               key={l.to}
               to={l.to}
               onClick={(e) => handleNavClick(e, l.to)}
               data-testid={`nav-${l.label.toLowerCase().replace(/\s+/g, "-")}`}
-              className="rounded-full px-2.5 py-1.5 lg:px-3.5 lg:py-2 text-[0.62rem] lg:text-[0.66rem] font-medium uppercase tracking-[0.18em] lg:tracking-[0.26em] transition-colors duration-300 hover:bg-foreground hover:text-background whitespace-nowrap"
+              className="pointer-events-auto rounded-full px-2.5 py-1.5 text-[0.62rem] font-medium uppercase tracking-[0.18em] transition-colors duration-300 hover:bg-foreground hover:text-background whitespace-nowrap lg:px-3.5 lg:py-2 lg:text-[0.66rem] lg:tracking-[0.26em]"
             >
               {l.label}
             </Link>
