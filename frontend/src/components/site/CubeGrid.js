@@ -45,13 +45,13 @@ function Cube({ p, i }) {
           className="grain relative aspect-square overflow-hidden rounded-[1.75rem] shadow-[0_30px_60px_-30px_rgba(0,0,0,0.5)] transform-gpu"
         >
           <span aria-hidden="true" className="pointer-events-none absolute -left-2 top-2 select-none font-display text-[9rem] leading-none opacity-[0.1]">{p.name[0]}</span>
-          <span className="absolute left-3 top-3 sm:left-5 sm:top-5 pill border border-current text-[10px] px-2 py-0.5 sm:text-xs sm:px-3 sm:py-1">{p.badge || "Signature"}</span>
+          <span className="absolute left-3 top-3 sm:left-5 sm:top-5 pill border border-current text-[8px] tracking-[0.16em] px-1.5 py-0.5 sm:text-xs sm:px-3 sm:py-1 sm:tracking-[0.28em]">{p.badge || "Signature"}</span>
           <ArrowUpRight className="absolute right-3 top-3 sm:right-5 sm:top-5 h-4 w-4 sm:h-5 sm:w-5 opacity-70 transition-all duration-300 group-hover:-translate-y-1 group-hover:translate-x-1 group-hover:opacity-100" strokeWidth={1.6} />
           <div className="world-glow pointer-events-none absolute left-1/2 top-[60%] h-[70%] w-[70%] -translate-x-1/2 -translate-y-1/2 will-change-transform" />
           <div className="absolute inset-x-0 bottom-0 flex h-[82%] items-end justify-center pb-4" style={{ transform: "translateZ(40px)" }}>
             <Bottle p={p} className="bottle-shadow h-full w-auto transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-3 group-hover:scale-105 will-change-transform" />
           </div>
-          {p.stock <= 0 && <span className="absolute bottom-3 left-3 sm:bottom-5 sm:left-5 pill bg-[var(--w-ink)] text-[var(--w-bg)] text-[10px] px-2 py-0.5 sm:text-xs">Sold out</span>}
+          {p.stock <= 0 && <span className="absolute bottom-3 left-3 sm:bottom-5 sm:left-5 pill bg-[var(--w-ink)] text-[var(--w-bg)] text-[8px] tracking-[0.16em] px-1.5 py-0.5 sm:text-xs sm:px-3 sm:py-1 sm:tracking-[0.28em]">Sold out</span>}
         </motion.div>
         <div className="mt-3 sm:mt-4 flex items-baseline justify-between gap-2 sm:gap-4 px-1">
           <span className="font-display text-sm leading-tight sm:text-lg truncate">{p.name}</span>

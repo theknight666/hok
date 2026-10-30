@@ -91,7 +91,7 @@ function Chapter({ p, idx, total }) {
           {/* Column 1: Header / Details */}
           <div className="z-10 flex flex-col justify-end lg:col-span-4 min-w-0 max-w-full">
             <div className="flex items-center gap-3">
-              <span className="pill border border-current text-[0.62rem] py-0.5 px-2.5 sm:text-xs sm:py-1 sm:px-3">{p.badge || "Signature"}</span>
+              <span className="pill border border-current text-[8px] tracking-[0.16em] py-0.5 px-2 sm:text-xs sm:py-1 sm:px-3 sm:tracking-[0.28em]">{p.badge || "Signature"}</span>
               <span className="text-[0.62rem] font-medium uppercase tracking-[0.25em] opacity-70 sm:text-[0.66rem] sm:tracking-[0.3em]">0{idx + 1} / 0{total}</span>
             </div>
             <h3 className="mt-2 font-display text-3xl leading-[0.95] sm:mt-4 sm:text-4xl lg:mt-6 lg:display-lg break-words [overflow-wrap:anywhere]">{p.name}</h3>

@@ -274,8 +274,8 @@ export default function Product() {
               return (
                 <Link key={o.slug} to={`/fragrance/${o.slug}`} className="group block" data-testid={`related-${o.slug}`}>
                   <div style={worldVars(w)} className="relative flex aspect-[4/5] items-end justify-center overflow-hidden rounded-[2rem] p-6">
-                    <span className="absolute left-5 top-5 pill border border-current">{o.badge}</span>
-                    <ArrowUpRight className="absolute right-5 top-5 h-6 w-6 transition-transform duration-500 group-hover:-translate-y-1 group-hover:translate-x-1" strokeWidth={2.4} />
+                    <span className="absolute left-3 top-3 sm:left-5 sm:top-5 pill border border-current text-[8px] tracking-[0.16em] px-1.5 py-0.5 sm:text-xs sm:px-3 sm:py-1 sm:tracking-[0.28em]">{o.badge}</span>
+                    <ArrowUpRight className="absolute right-3 top-3 sm:right-5 sm:top-5 h-4 w-4 sm:h-6 sm:w-6 transition-transform duration-500 group-hover:-translate-y-1 group-hover:translate-x-1" strokeWidth={2} />
                     <Bottle p={o} className="bottle-shadow h-[78%] w-auto transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-3 group-hover:rotate-[-4deg] group-hover:scale-105" />
                   </div>
                   <div className="mt-4 flex items-baseline justify-between gap-4 px-2">
