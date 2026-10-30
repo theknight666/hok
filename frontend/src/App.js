@@ -1,4 +1,5 @@
 import "@/App.css";
+import { useEffect } from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/context/ThemeContext";
@@ -48,6 +49,10 @@ function AppRouter() {
 }
 
 export default function App() {
+  useEffect(() => {
+    document.title = "House Of The Knight - Exotic Scents";
+  }, []);
+
   return (
     <div className="App">
       <ThemeProvider>
