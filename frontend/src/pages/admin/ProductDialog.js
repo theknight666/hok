@@ -570,6 +570,7 @@ export function ProductDialog({ product, onClose, onSaved }) {
       sample_low_stock_threshold: product.sample_low_stock_threshold !== undefined ? product.sample_low_stock_threshold : 10,
       active: true,
       in_stock: isNew ? true : (product.stock > 0 || (product.sample_stock !== undefined && product.sample_stock > 0)),
+      show_in_signature: product.show_in_signature !== undefined ? product.show_in_signature : (product.slug ? ["blonde-amber", "layton", "angels-share-on-the-rocks", "side-effect"].includes(product.slug) : false),
       featured: false,
       is_best_seller: product.is_best_seller !== undefined ? product.is_best_seller : (product.slug ? ["blonde-amber", "layton", "angels-share-on-the-rocks", "side-effect"].includes(product.slug) : false),
       olfactory_family: product.olfactory_family || "",
@@ -682,6 +683,7 @@ export function ProductDialog({ product, onClose, onSaved }) {
       active: f.active,
       featured: f.featured,
       is_best_seller: !!f.is_best_seller,
+      show_in_signature: !!f.show_in_signature,
       notes: {
         top: f.top_list && f.top_list.length ? f.top_list : toList(f.top),
         heart: f.heart_list && f.heart_list.length ? f.heart_list : toList(f.heart),
@@ -876,8 +878,9 @@ export function ProductDialog({ product, onClose, onSaved }) {
             {[
               ["active", "Visible in store"],
               ["in_stock", "In Stock (uncheck to immediately mark as sold out)"],
+              ["show_in_signature", "Choose Your Signature (Show in Homepage signature grid, max 4)"],
               ["is_best_seller", "Best Seller (Show in Best Sellers section)"],
-              ["featured", "Featured on home page (hero + spotlight)"],
+              ["featured", "Featured on home page hero carousel"],
             ].map(([k, l]) => (
               <label key={k} className="flex items-center gap-2 text-sm font-medium cursor-pointer">
                 <input type="checkbox" checked={!!f[k]} onChange={(e) => setF({ ...f, [k]: e.target.checked })} className="h-4 w-4 accent-[hsl(var(--gold))]" data-testid={`pd-${k}`} />

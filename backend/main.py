@@ -250,6 +250,7 @@ class ProductIn(BaseModel):
     active: bool = True
     featured: bool = False
     is_best_seller: bool = False
+    show_in_signature: bool = False
     prev_stock: Optional[int] = None
     prev_sample_stock: Optional[int] = None
     order: int = 0
@@ -279,6 +280,7 @@ class ProductPatch(BaseModel):
     active: Optional[bool] = None
     featured: Optional[bool] = None
     is_best_seller: Optional[bool] = None
+    show_in_signature: Optional[bool] = None
     prev_stock: Optional[int] = None
     prev_sample_stock: Optional[int] = None
 

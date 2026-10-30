@@ -118,7 +118,19 @@ function Row({ p, onEdit, refresh }) {
           })()}
           <div className="min-w-0 max-w-[240px]">
             <p className="font-display text-xl leading-tight truncate" title={p.name}>{p.name}</p>
-            <p className="text-xs text-muted-foreground truncate">{p.concentration} · {p.volume}</p>
+            <div className="flex items-center gap-1.5 flex-wrap mt-0.5">
+              <span className="text-xs text-muted-foreground truncate">{p.concentration} · {p.volume}</span>
+              {p.show_in_signature && (
+                <span className="text-[9px] uppercase tracking-wider bg-gold/15 text-gold border border-gold/30 px-1.5 py-0.5 rounded font-semibold" title="Shown in Homepage 'Choose your signature' section">
+                  Signature
+                </span>
+              )}
+              {p.is_best_seller && (
+                <span className="text-[9px] uppercase tracking-wider bg-foreground/10 text-foreground border border-border px-1.5 py-0.5 rounded font-semibold" title="Shown in Best Sellers section">
+                  Best Seller
+                </span>
+              )}
+            </div>
           </div>
         </div>
       </td>
