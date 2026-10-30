@@ -17,11 +17,28 @@ const ringOffset = (i, active, n) => ((i - active + n + Math.floor(n / 2)) % n) 
 function Formation({ list, active, onPick }) {
   const n = list.length;
   return (
-    <div className="relative h-[46svh] w-full sm:h-[52svh] lg:h-[60svh]" data-testid="hero-bottle-stage">
+    <div className="relative h-[46svh] w-full sm:h-[52svh] lg:h-[60svh] flex items-end justify-center select-none" data-testid="hero-bottle-stage">
+      {/* Luxury grounded studio shadow */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute bottom-1 sm:bottom-2 left-1/2 -translate-x-1/2 h-8 sm:h-12 w-[85%] rounded-full bg-black/25 blur-xl will-change-transform"
+      />
+
       {list.map((p, i) => {
         const off = ringOffset(i, active, n);
         const a = Math.abs(off);
         const isActive = off === 0;
+        const sign = Math.sign(off);
+
+        // Harmonious, symmetrical crescent fan spacing (% of stage width)
+        const xOffset = sign * (a === 1 ? 19 : a === 2 ? 35 : a * 18);
+
+        // Natural grounded perspective: balanced scale and unified floor anchoring
+        const scale = isActive ? 1.03 : a === 1 ? 0.84 : a === 2 ? 0.72 : 0.56;
+        const yOffset = `${a * 1}%`;
+        const opacity = isActive ? 1 : a === 1 ? 0.88 : a === 2 ? 0.65 : 0;
+        const zIndex = 30 - a * 6;
+
         return (
           <motion.button
             key={p.slug}
@@ -30,18 +47,30 @@ function Formation({ list, active, onPick }) {
             data-testid={`hero-bottle-${p.slug}`}
             aria-label={`Show ${p.name}`}
             aria-pressed={isActive}
-            className="absolute bottom-0 left-1/2 origin-bottom focus:outline-none will-change-transform transform-gpu"
+            className={`absolute bottom-0 left-1/2 origin-bottom focus:outline-none will-change-transform transform-gpu cursor-pointer transition-shadow ${
+              a > 2 ? "pointer-events-none" : ""
+            }`}
             initial={false}
             animate={{
-              x: `calc(-50% + ${off * 8}vw)`,
-              y: `${-a * 6}%`,
-              scale: isActive ? 1 : a === 1 ? 0.74 : 0.58,
-              zIndex: 10 - a,
-              opacity: isActive ? 1 : Math.max(0.48, 0.68 - a * 0.1),
+              x: `calc(-50% + ${xOffset}%)`,
+              y: yOffset,
+              scale,
+              zIndex,
+              opacity,
+              filter: isActive
+                ? "drop-shadow(0 20px 30px rgba(0,0,0,0.35)) drop-shadow(0 35px 55px rgba(0,0,0,0.2))"
+                : a === 1
+                ? "drop-shadow(0 14px 22px rgba(0,0,0,0.22))"
+                : "drop-shadow(0 8px 14px rgba(0,0,0,0.18))",
             }}
             transition={{ duration: 0.85, ease: EASE }}
           >
-            <Bottle p={p} className="bottle-shadow h-[40svh] w-auto sm:h-[46svh] lg:h-[54svh]" />
+            <Bottle
+              p={p}
+              className={`bottle-shadow h-[40svh] w-auto sm:h-[46svh] lg:h-[54svh] object-contain select-none transition-transform duration-500 ${
+                !isActive ? "hover:scale-[1.03]" : ""
+              }`}
+            />
           </motion.button>
         );
       })}
@@ -96,7 +125,7 @@ export function Hero({ products }) {
         </h1>
       </div>
 
-      <div className="relative z-10 mx-auto mt-4 w-full max-w-[1600px] px-5 sm:px-10 lg:absolute lg:bottom-[17svh] lg:left-[68%] lg:mt-0 lg:w-[56%] lg:-translate-x-1/2 lg:px-0">
+      <div className="relative z-10 mx-auto mt-4 w-full max-w-[1600px] px-5 sm:px-10 lg:absolute lg:bottom-[18.5svh] lg:left-[67%] lg:mt-0 lg:w-[56%] lg:-translate-x-1/2 lg:px-0">
         <div className="relative">
           <Formation list={list} active={active % list.length} onPick={setActive} />
         </div>
