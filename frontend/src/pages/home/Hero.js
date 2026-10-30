@@ -17,14 +17,15 @@ const ringOffset = (i, active, n) => ((i - active + n + Math.floor(n / 2)) % n) 
 /**
  * Calculates horizontal offset in vw with proportional step-down
  * so edge-to-edge bottle spacing remains uniform and eliminates awkward gaps.
+ * Scaled proportionally by 25% to match the 25% bottle size increase.
  */
 const getOffsetVW = (off) => {
   const a = Math.abs(off);
   const sign = Math.sign(off);
   if (a === 0) return 0;
-  if (a === 1) return sign * 8;
-  if (a === 2) return sign * 13.6;
-  return sign * (13.6 + (a - 2) * 4.4);
+  if (a === 1) return sign * 10;
+  if (a === 2) return sign * 17;
+  return sign * (17 + (a - 2) * 5.5);
 };
 
 /**
@@ -40,7 +41,7 @@ const getYOffset = (a) => {
 function Formation({ list, active, onPick }) {
   const n = list.length;
   return (
-    <div className="relative h-[46svh] w-full sm:h-[52svh] lg:h-[60svh]" data-testid="hero-bottle-stage">
+    <div className="relative h-[56svh] w-full sm:h-[64svh] lg:h-[72svh]" data-testid="hero-bottle-stage">
       {list.map((p, i) => {
         const off = ringOffset(i, active, n);
         const a = Math.abs(off);
@@ -58,7 +59,7 @@ function Formation({ list, active, onPick }) {
             animate={{
               x: `calc(-50% + ${getOffsetVW(off)}vw)`,
               y: getYOffset(a),
-              scale: isActive ? 1 : a === 1 ? 0.74 : 0.58,
+              scale: isActive ? 1.25 : a === 1 ? 0.925 : 0.725,
               zIndex: 10 - a,
               opacity: isActive ? 1 : Math.max(0.48, 0.68 - a * 0.1),
             }}
