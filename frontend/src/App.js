@@ -39,6 +39,7 @@ function AppRouter() {
         <Route path="/track-order" element={<TrackOrder />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/concierge" element={<Contact />} />
+        <Route path="/support" element={<Contact />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="*" element={<Home />} />
       </Routes>

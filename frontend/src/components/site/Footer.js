@@ -6,7 +6,7 @@ import { KnightMark } from "./Logo";
 
 const COLS = [
   { t: "Shop", links: [["/collection", "All fragrances"], ["/discovery", "Discovery Sets"], ["/#best-sellers", "Best sellers"], ["/track", "Track your order"], ["/checkout", "Checkout"]] },
-  { t: "House", links: [["/#house", "Why the House"], ["/contact", "Contact concierge"], ["/account", "My account", "footer-account"], ["/login", "Sign in"]] },
+  { t: "House", links: [["/#house", "Why the House"], ["/contact", "Support"], ["/account", "My account", "footer-account"], ["/login", "Sign in"]] },
 ];
 
 function InstagramIcon({ className = "h-4.5 w-4.5" }) {
@@ -71,7 +71,7 @@ function SocialLinks() {
           target="_blank"
           rel="noopener noreferrer"
           aria-label="WhatsApp"
-          title="Chat with House Concierge on WhatsApp"
+          title="Chat with House Support on WhatsApp"
           className="grid h-10 w-10 place-items-center rounded-full border border-background/25 bg-background/5 text-background/80 transition-all duration-300 hover:scale-110 hover:border-gold hover:bg-gold/15 hover:text-gold cursor-pointer"
         >
           <WhatsAppIcon />
@@ -284,7 +284,7 @@ export function Footer() {
                       </li>
                     ))}
                   </ul>
-                  {c.t === "House" && <p className="mt-6 text-sm opacity-50">concierge@houseoftheknight.com</p>}
+                  {c.t === "House" && <p className="mt-6 text-sm opacity-50">support@houseoftheknight.com</p>}
                 </div>
               ))}
             </div>
