@@ -250,6 +250,8 @@ class ProductIn(BaseModel):
     active: bool = True
     featured: bool = False
     is_best_seller: bool = False
+    prev_stock: Optional[int] = None
+    prev_sample_stock: Optional[int] = None
     order: int = 0
 
 
@@ -277,6 +279,8 @@ class ProductPatch(BaseModel):
     active: Optional[bool] = None
     featured: Optional[bool] = None
     is_best_seller: Optional[bool] = None
+    prev_stock: Optional[int] = None
+    prev_sample_stock: Optional[int] = None
 
 
 class StockAdjust(BaseModel):
@@ -1019,6 +1023,67 @@ async def admin_adjust_stock(slug: str, body: StockAdjust, admin: dict = Depends
                                        "by": admin["email"], "at": now().isoformat()})
     p[field] = new_stock
     return p
+
+
+@api.post("/admin/products/{slug}/toggle-stock")
+async def admin_toggle_stock(slug: str, body: dict, admin: dict = Depends(require_admin)):
+    global _products_cache
+    p = await db.products.find_one({"slug": slug}, {"_id": 0})
+    if not p:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    in_stock = bool(body.get("in_stock", True))
+
+    if not in_stock:
+        # Immediately out of stock: save previous stock levels and set to 0
+        curr_stock = p.get("stock", 0)
+        curr_sample = p.get("sample_stock", 0)
+        prev_stock = curr_stock if curr_stock > 0 else (p.get("prev_stock") or 50)
+        prev_sample = curr_sample if curr_sample > 0 else (p.get("prev_sample_stock") or 50)
+
+        await db.products.update_one(
+            {"slug": slug},
+            {"$set": {
+                "stock": 0,
+                "sample_stock": 0,
+                "prev_stock": prev_stock,
+                "prev_sample_stock": prev_sample,
+                "updated_at": now().isoformat()
+            }}
+        )
+        await db.inventory_log.insert_one({
+            "slug": f"{slug} · Out of Stock",
+            "size": "All sizes",
+            "delta": -curr_stock,
+            "stock_after": 0,
+            "by": admin["email"],
+            "at": now().isoformat()
+        })
+    else:
+        # Restore stock from previous level or default 50
+        restore_stock = p.get("prev_stock") or 50
+        restore_sample = p.get("prev_sample_stock") or 50
+
+        await db.products.update_one(
+            {"slug": slug},
+            {"$set": {
+                "stock": restore_stock,
+                "sample_stock": restore_sample,
+                "updated_at": now().isoformat()
+            }}
+        )
+        await db.inventory_log.insert_one({
+            "slug": f"{slug} · Restored Stock",
+            "size": "All sizes",
+            "delta": restore_stock,
+            "stock_after": restore_stock,
+            "by": admin["email"],
+            "at": now().isoformat()
+        })
+
+    _products_cache = []
+    updated = await db.products.find_one({"slug": slug}, {"_id": 0})
+    return _sanitize_product_doc(updated)
 
 
 @api.get("/admin/inventory-log")

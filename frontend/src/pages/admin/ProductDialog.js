@@ -569,6 +569,7 @@ export function ProductDialog({ product, onClose, onSaved }) {
       sample_stock: product.sample_stock !== undefined ? product.sample_stock : 50,
       sample_low_stock_threshold: product.sample_low_stock_threshold !== undefined ? product.sample_low_stock_threshold : 10,
       active: true,
+      in_stock: isNew ? true : (product.stock > 0 || (product.sample_stock !== undefined && product.sample_stock > 0)),
       featured: false,
       is_best_seller: product.is_best_seller !== undefined ? product.is_best_seller : (product.slug ? ["blonde-amber", "layton", "angels-share-on-the-rocks", "side-effect"].includes(product.slug) : false),
       olfactory_family: product.olfactory_family || "",
@@ -674,9 +675,9 @@ export function ProductDialog({ product, onClose, onSaved }) {
       color: f.color,
       price: Number(f.price),
       sample_price: Number(f.sample_price || 99),
-      stock: Number(f.stock),
+      stock: f.in_stock === false ? 0 : (Number(f.stock) > 0 ? Number(f.stock) : 50),
       low_stock_threshold: Number(f.low_stock_threshold),
-      sample_stock: Number(f.sample_stock !== undefined ? f.sample_stock : 50),
+      sample_stock: f.in_stock === false ? 0 : Number(f.sample_stock !== undefined ? f.sample_stock : 50),
       sample_low_stock_threshold: Number(f.sample_low_stock_threshold !== undefined ? f.sample_low_stock_threshold : 10),
       active: f.active,
       featured: f.featured,
@@ -874,6 +875,7 @@ export function ProductDialog({ product, onClose, onSaved }) {
           <div className="flex flex-wrap gap-6 sm:col-span-2 pt-2">
             {[
               ["active", "Visible in store"],
+              ["in_stock", "In Stock (uncheck to immediately mark as sold out)"],
               ["is_best_seller", "Best Seller (Show in Best Sellers section)"],
               ["featured", "Featured on home page (hero + spotlight)"],
             ].map(([k, l]) => (

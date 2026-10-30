@@ -21,6 +21,46 @@ function Row({ p, onEdit, refresh }) {
   const threshold2 = p.sample_low_stock_threshold !== undefined ? p.sample_low_stock_threshold : 10;
   const low2 = stock2 <= threshold2;
 
+  const [togglingStock, setTogglingStock] = useState(false);
+  const isInStock = (p.stock > 0 || (p.sample_stock !== undefined && p.sample_stock > 0));
+
+  const handleToggleStock = async (newInStock) => {
+    setTogglingStock(true);
+    try {
+      await api.post(`/admin/products/${p.slug}/toggle-stock`, { in_stock: newInStock });
+      toast.success(newInStock ? `${p.name} restored In Stock` : `${p.name} immediately marked Out of Stock`);
+      refresh();
+    } catch (e) {
+      // Fallback via PATCH if toggle-stock endpoint is pending
+      try {
+        if (!newInStock) {
+          const prev50 = p.stock > 0 ? p.stock : (p.prev_stock || 50);
+          const prev2 = p.sample_stock > 0 ? p.sample_stock : (p.prev_sample_stock || 50);
+          await api.patch(`/admin/products/${p.slug}`, {
+            stock: 0,
+            sample_stock: 0,
+            prev_stock: prev50,
+            prev_sample_stock: prev2
+          });
+          toast.success(`${p.name} immediately marked Out of Stock`);
+        } else {
+          const rest50 = p.prev_stock || 50;
+          const rest2 = p.prev_sample_stock || 50;
+          await api.patch(`/admin/products/${p.slug}`, {
+            stock: rest50,
+            sample_stock: rest2
+          });
+          toast.success(`${p.name} restored In Stock`);
+        }
+        refresh();
+      } catch (err2) {
+        toast.error(formatErr(e));
+      }
+    } finally {
+      setTogglingStock(false);
+    }
+  };
+
   const adjust = async (delta) => {
     try {
       await api.post(`/admin/products/${p.slug}/stock`, { delta, size: targetSize });
@@ -178,6 +218,23 @@ function Row({ p, onEdit, refresh }) {
           </div>
         </div>
       </td>
+      <td className="pr-4 whitespace-nowrap">
+        <div className="flex items-center gap-2">
+          <Switch
+            checked={isInStock}
+            onCheckedChange={handleToggleStock}
+            disabled={togglingStock}
+            data-testid={`stock-toggle-${p.slug}`}
+          />
+          <span
+            className={`text-[10px] font-bold uppercase tracking-wider ${
+              isInStock ? "text-emerald-400" : "text-destructive"
+            }`}
+          >
+            {isInStock ? "In Stock" : "Sold Out"}
+          </span>
+        </div>
+      </td>
       <td className="pr-4"><Switch checked={p.active} onCheckedChange={toggle} data-testid={`active-toggle-${p.slug}`} /></td>
       <td className="pr-4 text-right">
         {confirmDelete ? (
@@ -333,6 +390,7 @@ export function Inventory() {
                 <th className="py-3.5 pr-4">Price</th>
                 <th className="py-3.5 pr-4">Stock</th>
                 <th className="py-3.5 pr-4">Adjust stock</th>
+                <th className="py-3.5 pr-4">In stock</th>
                 <th className="py-3.5 pr-4">Live</th>
                 <th className="py-3.5 pr-4 text-right">Actions</th>
               </tr>
@@ -341,7 +399,7 @@ export function Inventory() {
               {filteredProducts.map((p) => <Row key={p.slug} p={p} onEdit={setEditing} refresh={refresh} />)}
               {filteredProducts.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="py-12 text-center text-muted-foreground">
+                  <td colSpan={7} className="py-12 text-center text-muted-foreground">
                     <p className="text-sm">No fragrances found matching "{searchQuery}"</p>
                     <button
                       type="button"
