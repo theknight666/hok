@@ -14,6 +14,29 @@ const FALLBACK = FALLBACK_PRODUCTS;
 /** Signed distance from the active index around the ring, e.g. -2,-1,0,1 for n=4. */
 const ringOffset = (i, active, n) => ((i - active + n + Math.floor(n / 2)) % n) - Math.floor(n / 2);
 
+/**
+ * Calculates horizontal offset in vw with proportional step-down
+ * so edge-to-edge bottle spacing remains uniform and eliminates awkward gaps.
+ */
+const getOffsetVW = (off) => {
+  const a = Math.abs(off);
+  const sign = Math.sign(off);
+  if (a === 0) return 0;
+  if (a === 1) return sign * 8;
+  if (a === 2) return sign * 13.6;
+  return sign * (13.6 + (a - 2) * 4.4);
+};
+
+/**
+ * Calculates vertical elevation to ensure a crisp, straight V-formation line.
+ */
+const getYOffset = (a) => {
+  if (a === 0) return "0%";
+  if (a === 1) return "-6%";
+  if (a === 2) return "-10.5%";
+  return `${-(10.5 + (a - 2) * 3.5)}%`;
+};
+
 function Formation({ list, active, onPick }) {
   const n = list.length;
   return (
@@ -33,8 +56,8 @@ function Formation({ list, active, onPick }) {
             className="absolute bottom-0 left-1/2 origin-bottom focus:outline-none will-change-transform transform-gpu"
             initial={false}
             animate={{
-              x: `calc(-50% + ${off * 8}vw)`,
-              y: `${-a * 6}%`,
+              x: `calc(-50% + ${getOffsetVW(off)}vw)`,
+              y: getYOffset(a),
               scale: isActive ? 1 : a === 1 ? 0.74 : 0.58,
               zIndex: 10 - a,
               opacity: isActive ? 1 : Math.max(0.48, 0.68 - a * 0.1),
