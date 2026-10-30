@@ -9,13 +9,18 @@ import { worldOf, featuredFirst } from "@/lib/visual";
 import { inr, FREE_SHIPPING } from "@/lib/api";
 
 const SLOTS = 4;
+const DEFAULT_BEST_SELLERS = ["blonde-amber", "layton", "angels-share-on-the-rocks", "side-effect"];
 
 export function Armoury({ products: all }) {
-  const products = featuredFirst(all).slice(0, 8);
+  // Filter strictly to best sellers only
+  const products = (all || []).filter((p) => {
+    if (typeof p.is_best_seller === "boolean") return p.is_best_seller;
+    return DEFAULT_BEST_SELLERS.includes(p.slug);
+  });
   const { add } = useCart();
   const [picked, setPicked] = useState([]);
   const toggle = (slug) => setPicked((c) => (c.includes(slug) ? c.filter((s) => s !== slug) : c.length < SLOTS ? [...c, slug] : c));
-  const chosen = picked.map((s) => products.find((p) => p.slug === s)).filter(Boolean);
+  const chosen = picked.map((s) => (all || []).find((p) => p.slug === s)).filter(Boolean);
   const total = chosen.reduce((s, p) => s + p.price, 0);
   const left = Math.max(0, FREE_SHIPPING - total);
 

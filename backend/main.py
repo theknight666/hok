@@ -249,6 +249,7 @@ class ProductIn(BaseModel):
     architecture: Optional[dict] = None
     active: bool = True
     featured: bool = False
+    is_best_seller: bool = False
     order: int = 0
 
 
@@ -275,6 +276,7 @@ class ProductPatch(BaseModel):
     architecture: Optional[dict] = None
     active: Optional[bool] = None
     featured: Optional[bool] = None
+    is_best_seller: Optional[bool] = None
 
 
 class StockAdjust(BaseModel):

@@ -570,6 +570,7 @@ export function ProductDialog({ product, onClose, onSaved }) {
       sample_low_stock_threshold: product.sample_low_stock_threshold !== undefined ? product.sample_low_stock_threshold : 10,
       active: true,
       featured: false,
+      is_best_seller: product.is_best_seller !== undefined ? product.is_best_seller : (product.slug ? ["blonde-amber", "layton", "angels-share-on-the-rocks", "side-effect"].includes(product.slug) : false),
       olfactory_family: product.olfactory_family || "",
       accords_str: (product.accords || []).map((a) => `${a.name}: ${a.pct}`).join(", "),
       arch_longevity: product.architecture?.longevity || "12+ Hours · Enduring Aura",
@@ -679,6 +680,7 @@ export function ProductDialog({ product, onClose, onSaved }) {
       sample_low_stock_threshold: Number(f.sample_low_stock_threshold !== undefined ? f.sample_low_stock_threshold : 10),
       active: f.active,
       featured: f.featured,
+      is_best_seller: !!f.is_best_seller,
       notes: {
         top: f.top_list && f.top_list.length ? f.top_list : toList(f.top),
         heart: f.heart_list && f.heart_list.length ? f.heart_list : toList(f.heart),
@@ -870,7 +872,11 @@ export function ProductDialog({ product, onClose, onSaved }) {
           </label>
 
           <div className="flex flex-wrap gap-6 sm:col-span-2 pt-2">
-            {[["active", "Visible in store"], ["featured", "Featured on home page (hero + spotlight)"]].map(([k, l]) => (
+            {[
+              ["active", "Visible in store"],
+              ["is_best_seller", "Best Seller (Show in Best Sellers section)"],
+              ["featured", "Featured on home page (hero + spotlight)"],
+            ].map(([k, l]) => (
               <label key={k} className="flex items-center gap-2 text-sm font-medium cursor-pointer">
                 <input type="checkbox" checked={!!f[k]} onChange={(e) => setF({ ...f, [k]: e.target.checked })} className="h-4 w-4 accent-[hsl(var(--gold))]" data-testid={`pd-${k}`} />
                 {l}
